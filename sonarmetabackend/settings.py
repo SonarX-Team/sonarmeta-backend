@@ -74,8 +74,8 @@ INTERNAL_IPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://imaginary-wave.com",
-    "https://www.imaginary-wave.com",
+    "https://sonarmeta.com",
+    "https://www.sonarmeta.com",
     "http://localhost:8080",
     "http://127.0.0.1:8080",
 ]

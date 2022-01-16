@@ -245,6 +245,12 @@ class SimpleResourceSerializer(serializers.ModelSerializer):
                   'favorites', 'downloads', 'shares', 'branch_id', 'time']
 
 
+class MicroResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Resource
+        fields = ['id', 'title', 'cover', 'entry', 'time']
+
+
 class UserResourceHistorySerializer(serializers.ModelSerializer):
     resource = SimpleResourceSerializer(read_only=True)
     profile = MicroProfileSerializer(read_only=True)
@@ -260,7 +266,7 @@ class UserResourceHistorySerializer(serializers.ModelSerializer):
         fields = ['id', 'resource', 'profile', 'time']
 
 
-class SimpleUserResourceHistorySerializer(serializers.ModelSerializer):
+class DisplayUserResourceHistorySerializer(serializers.ModelSerializer):
     resource_id = serializers.IntegerField(read_only=True)
     profile_id = serializers.IntegerField(read_only=True)
 
@@ -275,14 +281,117 @@ class SimpleUserResourceHistorySerializer(serializers.ModelSerializer):
         fields = ['id', 'resource_id', 'profile_id', 'time']
 
 
+class DisplayResourceSeriesSerializer(serializers.ModelSerializer):
+    total_entry = serializers \
+        .SerializerMethodField(method_name='calculate_entry')
+    total_likes = serializers \
+        .SerializerMethodField(method_name='calculate_likes')
+    total_favorites = serializers \
+        .SerializerMethodField(method_name='calculate_favorites')
+    total_downloads = serializers \
+        .SerializerMethodField(method_name='calculate_downloads')
+    total_shares = serializers \
+        .SerializerMethodField(method_name='calculate_shares')
+
+    def calculate_entry(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.entry
+        return count
+
+    def calculate_likes(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.likes.count()
+        return count
+
+    def calculate_favorites(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.favorites.count()
+        return count
+
+    def calculate_downloads(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.downloads.count()
+        return count
+
+    def calculate_shares(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.shares.count()
+        return count
+
+    class Meta:
+        model = models.ResourceSeries
+        fields = ['id', 'title', 'description', 'total_entry', 'total_likes',
+                  'total_favorites', 'total_downloads', 'total_shares', 'time']
+
+
+class DisplayResourceBranchSerializer(serializers.ModelSerializer):
+    series = DisplayResourceSeriesSerializer(read_only=True)
+    resources = MicroResourceSerializer(read_only=True, many=True)
+    total_entry = serializers \
+        .SerializerMethodField(method_name='calculate_entry')
+    total_likes = serializers \
+        .SerializerMethodField(method_name='calculate_likes')
+    total_favorites = serializers \
+        .SerializerMethodField(method_name='calculate_favorites')
+    total_downloads = serializers \
+        .SerializerMethodField(method_name='calculate_downloads')
+    total_shares = serializers \
+        .SerializerMethodField(method_name='calculate_shares')
+
+    def calculate_entry(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.entry
+        return count
+
+    def calculate_likes(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.likes.count()
+        return count
+
+    def calculate_favorites(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.favorites.count()
+        return count
+
+    def calculate_downloads(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.downloads.count()
+        return count
+
+    def calculate_shares(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.shares.count()
+        return count
+
+    class Meta:
+        model = models.ResourceBranch
+        fields = ['id', 'title', 'series', 'resources', 'total_entry', 'total_likes',
+                  'total_favorites', 'total_downloads', 'total_shares', 'time']
+
+
 class ResourceSerializer(serializers.ModelSerializer):
     profile = SimpleProfileSerializer(read_only=True)
-    branch_id = serializers.IntegerField(read_only=True)
+    branch = DisplayResourceBranchSerializer(read_only=True)
     likes = UserResourceLikeSerializer(many=True, read_only=True)
     favorites = UserResourceFavoriteSerializer(many=True, read_only=True)
     downloads = UserResourceDownloadSerializer(many=True, read_only=True)
     shares = UserResourceShareSerializer(many=True, read_only=True)
-    histories = SimpleUserResourceHistorySerializer(many=True, read_only=True)
+    histories = DisplayUserResourceHistorySerializer(many=True, read_only=True)
 
     def create(self, validated_data):
         profile_id = self.context['profile_id']
@@ -294,13 +403,53 @@ class ResourceSerializer(serializers.ModelSerializer):
                   'title', 'description', 'category',
                   'download_type', 'carry', 'no_commercial',
                   'entry', 'cover', 'sticky_review_id',
-                  'time', 'profile', 'branch_id', 'tags',
+                  'time', 'profile', 'branch', 'tags',
                   'likes', 'favorites', 'downloads', 'shares', 'histories']
 
 
 class ResourceBranchSerializer(serializers.ModelSerializer):
     resources = SimpleResourceSerializer(many=True, read_only=True)
     profile = MicroProfileSerializer(read_only=True)
+    total_entry = serializers \
+        .SerializerMethodField(method_name='calculate_entry')
+    total_likes = serializers \
+        .SerializerMethodField(method_name='calculate_likes')
+    total_favorites = serializers \
+        .SerializerMethodField(method_name='calculate_favorites')
+    total_downloads = serializers \
+        .SerializerMethodField(method_name='calculate_downloads')
+    total_shares = serializers \
+        .SerializerMethodField(method_name='calculate_shares')
+
+    def calculate_entry(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.entry
+        return count
+
+    def calculate_likes(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.likes.count()
+        return count
+
+    def calculate_favorites(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.favorites.count()
+        return count
+
+    def calculate_downloads(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.downloads.count()
+        return count
+
+    def calculate_shares(self, branch):
+        count = 0
+        for branch in branch.resources.all():
+            count += branch.shares.count()
+        return count
 
     def create(self, validated_data):
         series_id = self.context['series_id']
@@ -309,12 +458,59 @@ class ResourceBranchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceBranch
-        fields = ['id', 'title', 'resources', 'profile', 'time']
+        fields = ['id', 'title', 'resources', 'profile',
+                  'total_entry', 'total_likes', 'total_favorites',
+                  'total_downloads', 'total_shares', 'time']
 
 
 class ResourceSeriesSerializer(serializers.ModelSerializer):
     branches = ResourceBranchSerializer(many=True, read_only=True)
     profile = MicroProfileSerializer(read_only=True)
+    total_entry = serializers \
+        .SerializerMethodField(method_name='calculate_entry')
+    total_likes = serializers \
+        .SerializerMethodField(method_name='calculate_likes')
+    total_favorites = serializers \
+        .SerializerMethodField(method_name='calculate_favorites')
+    total_downloads = serializers \
+        .SerializerMethodField(method_name='calculate_downloads')
+    total_shares = serializers \
+        .SerializerMethodField(method_name='calculate_shares')
+
+    def calculate_entry(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.entry
+        return count
+
+    def calculate_likes(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.likes.count()
+        return count
+
+    def calculate_favorites(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.favorites.count()
+        return count
+
+    def calculate_downloads(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.downloads.count()
+        return count
+
+    def calculate_shares(self, series):
+        count = 0
+        for branch in series.branches.all():
+            for resource in branch.resources.all():
+                count += resource.shares.count()
+        return count
 
     def create(self, validated_data):
         profile_id = self.context['profile_id']
@@ -322,4 +518,5 @@ class ResourceSeriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceSeries
-        fields = ['id', 'title', 'description', 'branches', 'profile', 'time']
+        fields = ['id', 'title', 'description', 'branches', 'profile', 'total_entry',
+                  'total_likes', 'total_favorites', 'total_downloads', 'total_shares', 'time']
