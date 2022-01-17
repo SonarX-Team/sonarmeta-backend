@@ -1,3 +1,4 @@
+from dataclasses import field
 from django.db.models.fields import IntegerField
 from djoser.serializers import UserSerializer as BaseUserSerializer
 from rest_framework import serializers
@@ -230,6 +231,14 @@ class UserResourceShareSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserResourceShare
         fields = ['id', 'resource_id', 'profile_id']
+
+
+class RecommendResourceSerializer(serializers.ModelSerializer):
+    profile = MicroProfileSerializer(read_only=True)
+    
+    class Meta:
+        model = models.Resource
+        fields = ['id', 'title', 'cover', 'entry', 'profile', 'time']
 
 
 class SimpleResourceSerializer(serializers.ModelSerializer):

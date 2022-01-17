@@ -1,3 +1,4 @@
+from crypt import methods
 from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
@@ -153,6 +154,11 @@ class ResourceBranchViewSet(ModelViewSet):
 
 
 class ResourceViewSet(ModelViewSet):
+    '''
+    This ViewSet's GET method is only used to retrieve,
+    since ResourceSerializer is very complex and it will cause
+    a lot of SQL sentences, which will slow down the system
+    '''
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     queryset = models.Resource.objects.all().prefetch_related('profile', 'branch')
     serializer_class = serializers.ResourceSerializer
@@ -171,6 +177,17 @@ class ResourceViewSet(ModelViewSet):
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
+    # endpoint: sonarmeta/resources/recommendations/
+    # This method is used to recommend resources for Home and Resource page
+    @action(detail=False, methods=['GET'])
+    def recommendations(self, request):
+        resources = models.Resource.objects \
+            .prefetch_related('profile') \
+            .all()
+        serializer = serializers \
+            .RecommendResourceSerializer(resources, many=True)
+        return Response(serializer.data)
+
     # endpoint: sonarmeta/resources/me/
     @action(detail=False, methods=['GET'])
     def me(self, request):
@@ -182,10 +199,10 @@ class ResourceViewSet(ModelViewSet):
             .SimpleResourceSerializer(resources, many=True)
         return Response(serializer.data)
 
-    # endpoint: sonarmeta/resources/remove/
-    # This method is used to remove a resource from a branch
+    # endpoint: sonarmeta/resources/detach/
+    # This method is used to detach a resource from a branch
     @action(detail=False, methods=['DELETE'])
-    def remove(self, request):
+    def detach(self, request):
         resource = models.Resource.objects \
             .get(pk=request.data.get("resource_id"))
         resource.branch_id = None
