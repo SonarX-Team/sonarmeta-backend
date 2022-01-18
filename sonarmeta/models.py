@@ -122,11 +122,13 @@ class ResourceBranch(models.Model):
 
 
 class Resource(models.Model):
+    RESOURCE_STATUS_UNRELEASED = 'U'
     RESOURCE_STATUS_CHECKING = 'C'
     RESOURCE_STATUS_PASSED = 'P'
     RESOURCE_STATUS_FAILED = 'F'
 
     RESOURCE_STATUS_CHOICES = [
+        (RESOURCE_STATUS_UNRELEASED, 'unreleased'),
         (RESOURCE_STATUS_CHECKING, 'checking'),
         (RESOURCE_STATUS_PASSED, 'passed'),
         (RESOURCE_STATUS_FAILED, 'failed'),
@@ -165,7 +167,7 @@ class Resource(models.Model):
     status = models.CharField(
         max_length=1,
         choices=RESOURCE_STATUS_CHOICES,
-        default=RESOURCE_STATUS_CHECKING
+        default=RESOURCE_STATUS_UNRELEASED
     )
     path = models.FileField(upload_to=resource_file_path)
     type_and_authority = models.CharField(
