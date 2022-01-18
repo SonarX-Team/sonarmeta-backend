@@ -10,14 +10,10 @@ from . import models, serializers
 
 
 class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
-    http_method_names = ['get', 'post', 'patch', 'head', 'options']
+    http_method_names = ['get', 'head', 'options']
     queryset = models.Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    permission_classes = [AllowAny]
 
     # endpoint: sonarmeta/profiles/me/
     # GET or PUT current user's profile
@@ -199,25 +195,33 @@ class ResourceViewSet(ModelViewSet):
             .SimpleResourceSerializer(resources, many=True)
         return Response(serializer.data)
 
-    # endpoint: sonarmeta/resources/detach/
-    # This method is used to detach a resource from a branch
-    @action(detail=False, methods=['DELETE'])
-    def detach(self, request):
-        resource = models.Resource.objects \
-            .get(pk=request.data.get("resource_id"))
-        resource.branch_id = None
-        resource.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
     # endpoint: sonarmeta/resources/attach/
     # This method is used to attach a resource to a branch
     @action(detail=False, methods=['POST'])
     def attach(self, request):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
         for item in request.data.get("resource_id_list"):
             resource = models.Resource.objects.get(pk=item)
-            resource.branch_id = request.data.get("branch_id")
-            resource.save()
+            if resource.profile_id == profile_id:
+                resource.branch_id = request.data.get("branch_id")
+                resource.save()
+            else:
+                return Response(status.HTTP_401_UNAUTHORIZED)
         return Response(status=status.HTTP_201_CREATED)
+
+    # endpoint: sonarmeta/resources/detach/
+    # This method is used to detach a resource from a branch
+    @action(detail=False, methods=['DELETE'])
+    def detach(self, request):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        resource = models.Resource.objects \
+            .get(pk=request.data.get("resource_id"))
+        if resource.profile_id == profile_id:
+            resource.branch_id = None
+            resource.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ResourceReviewViewSet(ModelViewSet):

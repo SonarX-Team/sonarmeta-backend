@@ -235,7 +235,7 @@ class UserResourceShareSerializer(serializers.ModelSerializer):
 
 class RecommendResourceSerializer(serializers.ModelSerializer):
     profile = MicroProfileSerializer(read_only=True)
-    
+
     class Meta:
         model = models.Resource
         fields = ['id', 'title', 'cover', 'entry', 'profile', 'time']
@@ -250,7 +250,7 @@ class SimpleResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'description', 'cover', 'entry', 'likes',
+        fields = ['id', 'status', 'title', 'description', 'cover', 'entry', 'likes',
                   'favorites', 'downloads', 'shares', 'branch_id', 'time']
 
 
