@@ -289,8 +289,9 @@ class ResourceReplyViewSet(ModelViewSet):
 
 class UserResourceHistoryViewSet(ModelViewSet):
     '''
-    This ViewSet is not used to GET, since it is from perspective of resources
-    See get histories of user at ProfileViewSet
+    This ViewSet is not used to GET user's entry history
+    Since it is from the perspective of resources
+    See GET histories of user at ProfileViewSet
     '''
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     serializer_class = serializers.UserResourceHistorySerializer

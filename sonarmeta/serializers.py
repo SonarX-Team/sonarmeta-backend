@@ -100,7 +100,7 @@ class ResourceReplySerializer(serializers.ModelSerializer):
     so it is defined before its parent entity serializer
     '''
     review_id = serializers.IntegerField(read_only=True)
-    profile = SimpleProfileSerializer(read_only=True)
+    profile = MicroProfileSerializer(read_only=True)
     likes = UserReplyLikeSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
@@ -137,7 +137,7 @@ class UserReviewLikeSerializer(serializers.ModelSerializer):
 
 class ResourceReviewSerializer(serializers.ModelSerializer):
     resource_id = serializers.IntegerField(read_only=True)
-    profile = SimpleProfileSerializer(read_only=True)
+    profile = MicroProfileSerializer(read_only=True)
     replies = ResourceReplySerializer(many=True, read_only=True)
     likes = UserReviewLikeSerializer(many=True, read_only=True)
 
