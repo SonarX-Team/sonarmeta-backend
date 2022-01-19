@@ -408,12 +408,12 @@ class ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'status', 'path', 'type_and_authority',
+        fields = ['id', 'status', 'path', 'type',
                   'title', 'description', 'category',
-                  'download_type', 'carry', 'no_commercial',
-                  'entry', 'cover', 'sticky_review_id',
-                  'time', 'profile', 'branch', 'tags',
-                  'likes', 'favorites', 'downloads', 'shares', 'histories']
+                  'download_type', 'price', 'carry', 'carry_from',
+                  'no_commercial', 'entry', 'cover', 'sticky_review_id',
+                  'time', 'profile', 'branch', 'tags', 'likes',
+                  'favorites', 'downloads', 'shares', 'histories']
 
 
 class ResourceBranchSerializer(serializers.ModelSerializer):

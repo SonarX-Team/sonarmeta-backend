@@ -134,14 +134,12 @@ class Resource(models.Model):
         (RESOURCE_STATUS_FAILED, 'failed'),
     ]
 
-    RESOURCE_TYPE_AND_AUTHORITY_OPEN_PUBLIC = 'O-Pub'
-    RESOURCE_TYPE_AND_AUTHORITY_CARRY_PUBLIC = 'C-Pub'
-    RESOURCE_TYPE_AND_AUTHORITY_PRIVATE = 'Pri'
+    RESOURCE_TYPE_ORIGINAL = 'O'
+    RESOURCE_TYPE_CARRY = 'C'
 
-    RESOURCE_TYPE_AND_AUTHORITY_CHOICES = [
-        (RESOURCE_TYPE_AND_AUTHORITY_OPEN_PUBLIC, 'open-public'),
-        (RESOURCE_TYPE_AND_AUTHORITY_CARRY_PUBLIC, 'carry-public'),
-        (RESOURCE_TYPE_AND_AUTHORITY_PRIVATE, 'private'),
+    RESOURCE_TYPE_CHOICES = [
+        (RESOURCE_TYPE_ORIGINAL, 'original'),
+        (RESOURCE_TYPE_CARRY, 'carry'),
     ]
 
     RESOURCE_CATEGORY_ANIMALS = 'A'
@@ -170,10 +168,10 @@ class Resource(models.Model):
         default=RESOURCE_STATUS_UNRELEASED
     )
     path = models.FileField(upload_to=resource_file_path)
-    type_and_authority = models.CharField(
+    type = models.CharField(
         max_length=5,
-        choices=RESOURCE_TYPE_AND_AUTHORITY_CHOICES,
-        default=RESOURCE_TYPE_AND_AUTHORITY_OPEN_PUBLIC
+        choices=RESOURCE_TYPE_CHOICES,
+        default=RESOURCE_TYPE_ORIGINAL
     )
     title = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
@@ -188,7 +186,9 @@ class Resource(models.Model):
         choices=RESOURCE_TYPE_DOWNLOAD_CHOICES,
         default=RESOURCE_DOWNLOAD_TYPE_FREE
     )
+    price = models.DecimalField(max_digits=6, decimal_places=2)
     carry = models.BooleanField()
+    carry_from = models.CharField(max_length=255, blank=True, null=True)
     no_commercial = models.BooleanField()
     entry = models.PositiveIntegerField(blank=True, default=0)
     cover = models.ImageField(
