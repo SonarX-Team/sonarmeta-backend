@@ -12,6 +12,8 @@ router.register('messages', views.MessageViewSet, basename='message')
 router.register('series', views.ResourceSeriesViewSet)
 # endpoint: sonarmeta/resources/
 router.register('resources', views.ResourceViewSet, basename='resource')
+# endpoint: sonarmeta/resources-search/
+router.register('resources-search', views.SearchResourceViewSet)
 
 
 profiles_router = routers.NestedDefaultRouter(

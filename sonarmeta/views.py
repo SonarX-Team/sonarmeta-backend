@@ -1,7 +1,7 @@
-from crypt import methods
 from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.filters import SearchFilter
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -158,8 +158,6 @@ class ResourceViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     queryset = models.Resource.objects.all().prefetch_related('profile', 'branch')
     serializer_class = serializers.ResourceSerializer
-    # filter_backends, filter, search, ordering, etc.
-    # pagination_classes
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
@@ -176,7 +174,7 @@ class ResourceViewSet(ModelViewSet):
     # endpoint: sonarmeta/resources/recommendations/
     # This method is used to recommend resources for Home and Resource page
     @action(detail=False, methods=['GET'])
-    def recommendations(self, request):
+    def recommendations(self,request):
         resources = models.Resource.objects \
             .prefetch_related('profile') \
             .all()
@@ -222,6 +220,18 @@ class ResourceViewSet(ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class SearchResourceViewSet(ModelViewSet):
+    '''
+    This method is used to search resources
+    '''
+    http_method_names = ['get', 'head', 'options']
+    queryset = models.Resource.objects.all().prefetch_related('profile')        
+    serializer_class = serializers.SearchResourceSerializer
+    permission_classes = [AllowAny]
+    filter_backends = [SearchFilter]
+    search_fields = ['title', 'tags']
 
 
 class ResourceReviewViewSet(ModelViewSet):

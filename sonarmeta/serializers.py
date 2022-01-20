@@ -241,6 +241,19 @@ class RecommendResourceSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'cover', 'entry', 'profile', 'time']
 
 
+class SearchResourceSerializer(serializers.ModelSerializer):
+    profile = MicroProfileSerializer(read_only=True)
+    likes = UserResourceLikeSerializer(many=True, read_only=True)
+    favorites = UserResourceFavoriteSerializer(many=True, read_only=True)
+    downloads = UserResourceDownloadSerializer(many=True, read_only=True)
+    shares = UserResourceShareSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Resource
+        fields = ['id', 'status', 'title', 'description', 'cover', 'profile',
+                  'entry', 'likes', 'favorites', 'downloads', 'shares', 'time']
+
+
 class SimpleResourceSerializer(serializers.ModelSerializer):
     branch_id = serializers.IntegerField(read_only=True)
     likes = UserResourceLikeSerializer(many=True, read_only=True)
