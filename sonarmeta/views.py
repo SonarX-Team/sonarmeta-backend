@@ -1,7 +1,8 @@
-from django.db.models import Count, Q
+from ast import Or
+from django.db.models import Count, Q, Sum
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -112,17 +113,25 @@ class ResourceSeriesViewSet(ModelViewSet):
             series.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    # endpoint: sonarmeta/series/me/
-    @action(detail=False, methods=['GET'])
-    def me(self, request):
-        profile_id = models.Profile.objects.get(user_id=request.user.id).id
-        series = models.ResourceSeries.objects \
+
+class MeResourceSeriesViewSet(ModelViewSet):
+    '''
+    This ViewSet is used to get current profile's series in series management page
+    Searching, sorting and Pagination is also the responsibilities of this ViewSet
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.ResourceSeriesSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['title']
+
+    def get_queryset(self):
+        profile_id = models.Profile.objects.get(
+            user_id=self.request.user.id).id
+        return models.ResourceSeries.objects \
             .prefetch_related("branches") \
             .filter(Q(branches__profile__id=profile_id) | Q(profile_id=profile_id)) \
             .distinct()
-        serializer = serializers \
-            .ResourceSeriesSerializer(series, many=True)
-        return Response(serializer.data)
 
 
 class ResourceBranchViewSet(ModelViewSet):
@@ -174,7 +183,7 @@ class ResourceViewSet(ModelViewSet):
     # endpoint: sonarmeta/resources/recommendations/
     # This method is used to recommend resources for Home and Resource page
     @action(detail=False, methods=['GET'])
-    def recommendations(self,request):
+    def recommendations(self, request):
         resources = models.Resource.objects \
             .prefetch_related('profile') \
             .all()
@@ -227,7 +236,7 @@ class SearchResourceViewSet(ModelViewSet):
     This method is used to search resources
     '''
     http_method_names = ['get', 'head', 'options']
-    queryset = models.Resource.objects.all().prefetch_related('profile')        
+    queryset = models.Resource.objects.all().prefetch_related('profile')
     serializer_class = serializers.SearchResourceSerializer
     permission_classes = [AllowAny]
     filter_backends = [SearchFilter]

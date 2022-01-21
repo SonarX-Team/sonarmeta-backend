@@ -10,6 +10,8 @@ router.register('profiles', views.ProfileViewSet)
 router.register('messages', views.MessageViewSet, basename='message')
 # endpoint: sonarmeta/series/
 router.register('series', views.ResourceSeriesViewSet)
+# endpoint: sonarmeta/series-me/
+router.register('series-me', views.MeResourceSeriesViewSet, basename='series')
 # endpoint: sonarmeta/resources/
 router.register('resources', views.ResourceViewSet, basename='resource')
 # endpoint: sonarmeta/resources-search/
