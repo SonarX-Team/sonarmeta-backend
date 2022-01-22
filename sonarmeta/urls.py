@@ -1,3 +1,5 @@
+from cgitb import lookup
+from django.template import base
 from django.urls import path, include
 from rest_framework_nested import routers
 from . import views
@@ -16,11 +18,12 @@ router.register('series-me', views.MeResourceSeriesViewSet, basename='series')
 router.register('resources', views.ResourceViewSet, basename='resource')
 # endpoint: sonarmeta/resources-search/
 router.register('resources-search', views.SearchResourceViewSet)
+# endpoint: sonarmeta/resources-me/
+router.register('resources-me', views.MeResourceViewSet, basename='resource')
 
 
 profiles_router = routers.NestedDefaultRouter(
     router, 'profiles', lookup='profile')
-
 # endpoint: sonarmeta/profiles/{profile_pk}/subscribe
 profiles_router.register(
     'subscribe', views.UserSubscribeViewSet, basename='profile-subscribe')
@@ -28,15 +31,20 @@ profiles_router.register(
 
 series_router = routers.NestedDefaultRouter(
     router, 'series', lookup='series')
-
 # endpoint: sonarmeta/series/{series_pk}/branches/
 series_router.register(
-    'branches', views.ResourceBranchViewSet, basename='series-branches')
+    'branches', views.ResourceBranchViewSet, basename='series-branch')
+
+
+branches_router = routers.NestedDefaultRouter(
+    series_router, 'branches', lookup='branch')
+# endpoint: sonarmeta/series/{series_pk}/branches/{branch_pk}/resources/
+branches_router.register(
+    'resources', views.BranchResourceViewSet, basename='series-branch-resource')
 
 
 resources_router = routers.NestedDefaultRouter(
     router, 'resources', lookup='resource')
-
 # endpoint: sonarmeta/resources/{resource_pk}/reviews/
 resources_router.register(
     'reviews', views.ResourceReviewViewSet, basename='resource-review')
@@ -59,7 +67,6 @@ resources_router.register(
 
 reviews_router = routers.NestedDefaultRouter(
     resources_router, 'reviews', lookup='review')
-
 # endpoint: sonarmeta/resources/{resource_pk}/reviews/{review_pk}/replies/
 reviews_router.register('replies', views.ResourceReplyViewSet,
                         basename='resource-review-reply')
@@ -70,7 +77,6 @@ reviews_router.register('likes', views.UserReviewLikeViewSet,
 
 replies_router = routers.NestedDefaultRouter(
     reviews_router, 'replies', lookup='reply')
-
 # endpoint: sonarmeta/resources/{resource_pk}/reviews/{review_pk}/replies/{reply_pk}/likes
 replies_router.register('likes', views.UserReplyLikeViewSet,
                         basename='resource-review-reply-like')
@@ -81,6 +87,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('', include(profiles_router.urls)),
     path('', include(series_router.urls)),
+    path('', include(branches_router.urls)),
     path('', include(resources_router.urls)),
     path('', include(reviews_router.urls)),
     path('', include(replies_router.urls)),
