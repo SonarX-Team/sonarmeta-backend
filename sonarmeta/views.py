@@ -192,6 +192,17 @@ class ResourceViewSet(ModelViewSet):
             .RecommendResourceSerializer(resources, many=True)
         return Response(serializer.data)
 
+    # endpoint: sonarmeta/resources/recommendationssearch/
+    # This method is used to recommend resources for Home and Resource page
+    @action(detail=False, methods=['GET'])
+    def recommendationssearch(self, request):
+        resources = models.Resource.objects \
+            .prefetch_related('profile') \
+            .all()
+        serializer = serializers \
+            .SearchResourceSerializer(resources, many=True)
+        return Response(serializer.data)
+
     # endpoint: sonarmeta/resources/me/
     @action(detail=False, methods=['GET'])
     def me(self, request):
