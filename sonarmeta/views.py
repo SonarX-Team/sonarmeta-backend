@@ -113,6 +113,17 @@ class ResourceSeriesViewSet(ModelViewSet):
             series.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    # endpoint: sonarmeta/series/recommendations/
+    # This method is used to recommend series for Series page
+    @action(detail=False, methods=['GET'])
+    def recommendations(self, request):
+        series = models.ResourceSeries.objects \
+            .prefetch_related('profile') \
+            .all()
+        serializer = serializers \
+            .DisplayResourceSeriesSerializer(series, many=True)
+        return Response(serializer.data)
+
 
 class MeResourceSeriesViewSet(ModelViewSet):
     '''
