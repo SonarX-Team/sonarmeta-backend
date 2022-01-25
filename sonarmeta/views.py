@@ -68,6 +68,27 @@ class UserSubscribeViewSet(ModelViewSet):
         }
 
 
+class UserBlacklistViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'delete', 'head', 'options']
+    serializer_class = serializers.UserBlacklistSerializer
+
+    def get_queryset(self):
+        profile_id = models.Profile.objects \
+            .get(user_id=self.request.user.id).id
+        return models.UserBlacklist.objects.filter(preventer_id=profile_id)
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_serializer_context(self):
+        return {
+            'be_prevented_id': self.kwargs['profile_pk'],
+            'preventer_id': models.Profile.objects.get(user_id=self.request.user.id).id,
+        }
+
+
 class MessageViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.MessageSerializer

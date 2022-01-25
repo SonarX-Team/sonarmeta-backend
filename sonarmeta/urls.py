@@ -24,9 +24,12 @@ router.register('resources-me', views.MeResourceViewSet, basename='resource')
 
 profiles_router = routers.NestedDefaultRouter(
     router, 'profiles', lookup='profile')
-# endpoint: sonarmeta/profiles/{profile_pk}/subscribe
+# endpoint: sonarmeta/profiles/{profile_pk}/subscribe/
 profiles_router.register(
     'subscribe', views.UserSubscribeViewSet, basename='profile-subscribe')
+# endpoint: sonarmeta/profiles/{profile_pk}/blacklist/
+profiles_router.register(
+    'blacklist', views.UserBlacklistViewSet, basename='profile-blacklist')
 
 
 series_router = routers.NestedDefaultRouter(

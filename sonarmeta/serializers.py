@@ -29,15 +29,36 @@ class UserSubscribeSerializer(serializers.ModelSerializer):
         fields = ['id', 'creator_id', 'subscriber_id']
 
 
+class UserBlacklistSerializer(serializers.ModelSerializer):
+    '''
+    This serializer is used to provide blacklist relationships,
+    which will be nested into other serializers
+    '''
+    be_prevented_id = serializers.IntegerField(read_only=True)
+    preventer_id = serializers.IntegerField(read_only=True)
+
+    def create(self, validated_data):
+        be_prevented_id = self.context['be_prevented_id']
+        preventer_id = self.context['preventer_id']
+        return models.UserBlacklist.objects \
+            .create(be_prevented_id=be_prevented_id, preventer_id=preventer_id, **validated_data)
+
+    class Meta:
+        model = models.UserBlacklist
+        fields = ['id', 'be_prevented_id', 'preventer_id']
+
+
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     be_followed = UserSubscribeSerializer(many=True, read_only=True)
     follow = UserSubscribeSerializer(many=True, read_only=True)
+    be_prevented = UserBlacklistSerializer(many=True, read_only=True)
+    prevent = UserBlacklistSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Profile
-        fields = ['id', 'user', 'avatar', 'birth_date', 'history_flag',
-                  'description', 'gender', 'be_followed', 'follow']
+        fields = ['id', 'user', 'avatar', 'birth_date', 'history_flag', 'description',
+                  'gender', 'be_followed', 'follow', 'be_prevented', 'prevent']
 
 
 class SimpleProfileSerializer(serializers.ModelSerializer):
@@ -48,11 +69,14 @@ class SimpleProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     be_followed = UserSubscribeSerializer(many=True, read_only=True)
     follow = UserSubscribeSerializer(many=True, read_only=True)
+    be_prevented = UserBlacklistSerializer(many=True, read_only=True)
+    prevent = UserBlacklistSerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Profile
         fields = ['id', 'user', 'avatar', 'history_flag',
-                  'description', 'be_followed', 'follow']
+                  'description', 'be_followed', 'follow',
+                  'be_prevented', 'prevent']
 
 
 class MicroProfileSerializer(serializers.ModelSerializer):
@@ -100,7 +124,7 @@ class ResourceReplySerializer(serializers.ModelSerializer):
     so it is defined before its parent entity serializer
     '''
     review_id = serializers.IntegerField(read_only=True)
-    profile = MicroProfileSerializer(read_only=True)
+    profile = SimpleProfileSerializer(read_only=True)
     likes = UserReplyLikeSerializer(many=True, read_only=True)
 
     def create(self, validated_data):
@@ -137,7 +161,7 @@ class UserReviewLikeSerializer(serializers.ModelSerializer):
 
 class ResourceReviewSerializer(serializers.ModelSerializer):
     resource_id = serializers.IntegerField(read_only=True)
-    profile = MicroProfileSerializer(read_only=True)
+    profile = SimpleProfileSerializer(read_only=True)
     replies = ResourceReplySerializer(many=True, read_only=True)
     likes = UserReviewLikeSerializer(many=True, read_only=True)
 

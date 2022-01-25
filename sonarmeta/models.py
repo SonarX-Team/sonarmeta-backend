@@ -69,6 +69,23 @@ class UserSubscribe(models.Model):
         unique_together = [['creator', 'subscriber']]
 
 
+class UserBlacklist(models.Model):
+    be_prevented = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name='be_prevented')
+    preventer = models.ForeignKey(
+        Profile, on_delete=models.CASCADE, related_name='prevent')
+    
+    def clean(self):
+        if self.be_prevented == self.preventer:
+            raise ValidationError('You cannot prevent yourself.')
+    
+    def __str__(self):
+        return f'{self.be_prevented} is prevented by {self.preventer}'
+
+    class Meta:
+        unique_together = [['be_prevented', 'preventer']]
+
+
 class Message(models.Model):
     MESSAGE_TYPE_LIKE = 'L'
     MESSAGE_TYPE_REPLY = 'R'

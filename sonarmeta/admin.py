@@ -26,6 +26,13 @@ class UserSubscribeAdmin(admin.ModelAdmin):
     search_fields = ['creator']
 
 
+@admin.register(models.UserBlacklist)
+class UserBlacklistAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    autocomplete_fields = ['be_prevented', 'preventer']
+    search_fields = ['preventer']
+
+
 @admin.register(models.Message)
 class MessageAdmin(admin.ModelAdmin):
     list_display = ['content', 'type', 'profile', 'time']
