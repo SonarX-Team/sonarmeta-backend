@@ -219,7 +219,7 @@ class ResourceViewSet(ModelViewSet):
     def recommendations(self, request):
         resources = models.Resource.objects \
             .prefetch_related('profile') \
-            .filter(status='p')
+            .filter(status='P')
         serializer = serializers \
             .RecommendResourceSerializer(resources, many=True)
         return Response(serializer.data)
