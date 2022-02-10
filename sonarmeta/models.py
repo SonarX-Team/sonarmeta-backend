@@ -8,11 +8,6 @@ def profile_avatar_path(instance, filename):
     return f'avatars/profile_{instance.id}/{filename}'
 
 
-def resource_file_path(instance, filename):
-    # Resource file will be uploaded to MEDIA_ROOT/resource_<id>/<filename>
-    return f'resources/resource_{instance.id}/{filename}'
-
-
 def resource_cover_path(instance, filename):
     # Resource file will be uploaded to MEDIA_ROOT/resource_<id>/<filename>
     return f'resource_covers/resource_{instance.id}/{filename}'
@@ -74,11 +69,11 @@ class UserBlacklist(models.Model):
         Profile, on_delete=models.CASCADE, related_name='be_prevented')
     preventer = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name='prevent')
-    
+
     def clean(self):
         if self.be_prevented == self.preventer:
             raise ValidationError('You cannot prevent yourself.')
-    
+
     def __str__(self):
         return f'{self.be_prevented} is prevented by {self.preventer}'
 
@@ -184,7 +179,7 @@ class Resource(models.Model):
         choices=RESOURCE_STATUS_CHOICES,
         default=RESOURCE_STATUS_UNRELEASED
     )
-    path = models.FileField(upload_to=resource_file_path)
+    path = models.CharField(max_length=1024)
     type = models.CharField(
         max_length=5,
         choices=RESOURCE_TYPE_CHOICES,

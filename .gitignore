@@ -16,3 +16,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+
+# settings.py
+# We will set settings.py directly on the server
+sonarmetabackend/settings.py
