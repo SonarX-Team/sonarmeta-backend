@@ -57,7 +57,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Profile
-        fields = ['id', 'user', 'avatar_img', 'birth_date', 'history_flag', 'description',
+        fields = ['id', 'user', 'avatar', 'birth_date', 'history_flag', 'description',
                   'gender', 'be_followed', 'follow', 'be_prevented', 'prevent']
 
 
@@ -74,7 +74,7 @@ class SimpleProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Profile
-        fields = ['id', 'user', 'avatar_img', 'history_flag',
+        fields = ['id', 'user', 'avatar', 'history_flag',
                   'description', 'be_followed', 'follow',
                   'be_prevented', 'prevent']
 
@@ -88,7 +88,7 @@ class MicroProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Profile
-        fields = ['id', 'user', 'avatar_img', 'history_flag']
+        fields = ['id', 'user', 'avatar', 'history_flag']
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -262,7 +262,7 @@ class RecommendResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'cover_img', 'entry', 'profile', 'time']
+        fields = ['id', 'title', 'cover', 'entry', 'profile', 'time']
 
 
 class SearchResourceSerializer(serializers.ModelSerializer):
@@ -274,7 +274,7 @@ class SearchResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'status', 'title', 'description', 'cover_img', 'profile',
+        fields = ['id', 'status', 'title', 'description', 'cover', 'profile',
                   'entry', 'likes', 'favorites', 'downloads', 'shares', 'time']
 
 
@@ -287,14 +287,14 @@ class SimpleResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'status', 'title', 'description', 'cover_img', 'entry', 'likes',
+        fields = ['id', 'status', 'title', 'description', 'cover', 'entry', 'likes',
                   'favorites', 'downloads', 'shares', 'branch_id', 'time']
 
 
 class MicroResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'cover_img', 'entry', 'time']
+        fields = ['id', 'title', 'cover', 'entry', 'time']
 
 
 class UserResourceHistorySerializer(serializers.ModelSerializer):
@@ -448,7 +448,7 @@ class ResourceSerializer(serializers.ModelSerializer):
         fields = ['id', 'status', 'oss_path', 'type',
                   'title', 'description', 'category',
                   'download_type', 'price', 'carry', 'carry_from',
-                  'no_commercial', 'entry', 'cover_img', 'sticky_review_id',
+                  'no_commercial', 'entry', 'cover', 'sticky_review_id',
                   'time', 'profile', 'branch', 'tags', 'likes',
                   'favorites', 'downloads', 'shares', 'histories']
 
