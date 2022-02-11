@@ -14,7 +14,7 @@ class Profile(models.Model):
         (PROFILE_GENDER_SECRET, 'secret'),
     ]
 
-    avatar_img = models.TextField(null=True, blank=True)
+    avatar = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     gender = models.CharField(
@@ -165,7 +165,7 @@ class Resource(models.Model):
         choices=RESOURCE_STATUS_CHOICES,
         default=RESOURCE_STATUS_UNRELEASED
     )
-    oss_path = models.TextField()
+    path = models.TextField()
     type = models.CharField(
         max_length=5,
         choices=RESOURCE_TYPE_CHOICES,
@@ -189,7 +189,7 @@ class Resource(models.Model):
     carry_from = models.CharField(max_length=255, blank=True, null=True)
     no_commercial = models.BooleanField()
     entry = models.PositiveIntegerField(blank=True, default=0)
-    cover_img = models.TextField(null=True, blank=True)
+    cover = models.TextField(null=True, blank=True)
     sticky_review_id = models.PositiveIntegerField(null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
