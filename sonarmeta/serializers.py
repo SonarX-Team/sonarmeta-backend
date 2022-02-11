@@ -445,7 +445,7 @@ class ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'status', 'oss_path', 'type',
+        fields = ['id', 'status', 'path', 'type',
                   'title', 'description', 'category',
                   'download_type', 'price', 'carry', 'carry_from',
                   'no_commercial', 'entry', 'cover', 'sticky_review_id',
