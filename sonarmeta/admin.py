@@ -8,11 +8,11 @@ class ProfileAdmin(admin.ModelAdmin):
     list_select_related = ['user']
     list_per_page = 20
     autocomplete_fields = ['user']
-    search_fields = ['user__username__i', 'user__phone']
+    search_fields = ['user__username__i', 'user__username']
 
-    @admin.display(ordering='user__phone')
+    @admin.display(ordering='user__username')
     def phone(self, profile):
-        return profile.user.phone
+        return profile.user.username
 
     @admin.display(ordering='user__email')
     def email(self, profile):
