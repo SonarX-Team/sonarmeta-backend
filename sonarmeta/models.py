@@ -3,16 +3,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 
-def profile_avatar_path(instance, filename):
-    # Avatar file will be uploaded to MEDIA_ROOT/profile_<id>/<filename>
-    return f'avatars/profile_{instance.id}/{filename}'
-
-
-def resource_cover_path(instance, filename):
-    # Resource file will be uploaded to MEDIA_ROOT/resource_<id>/<filename>
-    return f'resource_covers/resource_{instance.id}/{filename}'
-
-
 class Profile(models.Model):
     PROFILE_GENDER_MALE = 'M'
     PROFILE_GENDER_FEMALE = 'F'
@@ -24,11 +14,7 @@ class Profile(models.Model):
         (PROFILE_GENDER_SECRET, 'secret'),
     ]
 
-    avatar = models.ImageField(
-        null=True,
-        blank=True,
-        upload_to=profile_avatar_path
-    )
+    avatar = models.CharField(max_length=1024, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
     gender = models.CharField(
@@ -203,11 +189,7 @@ class Resource(models.Model):
     carry_from = models.CharField(max_length=255, blank=True, null=True)
     no_commercial = models.BooleanField()
     entry = models.PositiveIntegerField(blank=True, default=0)
-    cover = models.ImageField(
-        upload_to=resource_cover_path,
-        null=True,
-        blank=True
-    )
+    cover = models.CharField(max_length=1024, null=True, blank=True)
     sticky_review_id = models.PositiveIntegerField(null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
