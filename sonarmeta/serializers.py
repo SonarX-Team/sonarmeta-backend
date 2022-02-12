@@ -287,8 +287,8 @@ class SimpleResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'status', 'title', 'description', 'cover', 'entry', 'likes',
-                  'favorites', 'downloads', 'shares', 'branch_id', 'time']
+        fields = ['id', 'status', 'path', 'title', 'description', 'cover', 'entry',
+                  'likes', 'favorites', 'downloads', 'shares', 'branch_id', 'time']
 
 
 class MicroResourceSerializer(serializers.ModelSerializer):
@@ -446,9 +446,9 @@ class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Resource
         fields = ['id', 'status', 'path', 'type',
-                  'title', 'description', 'category', 'download_type', 
-                  'price', 'no_carry', 'carry_from', 'no_commercial', 
-                  'entry', 'cover', 'sticky_review_id', 'status_change_timestamp', 
+                  'title', 'description', 'category', 'download_type',
+                  'price', 'no_carry', 'carry_from', 'no_commercial',
+                  'entry', 'cover', 'sticky_review_id', 'status_change_timestamp',
                   'time', 'profile', 'branch', 'tags', 'likes',
                   'favorites', 'downloads', 'shares', 'histories']
 
