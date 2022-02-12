@@ -447,7 +447,7 @@ class ResourceSerializer(serializers.ModelSerializer):
         model = models.Resource
         fields = ['id', 'status', 'path', 'type',
                   'title', 'description', 'category',
-                  'download_type', 'price', 'carry', 'carry_from',
+                  'download_type', 'price', 'no_carry', 'carry_from',
                   'no_commercial', 'entry', 'cover', 'sticky_review_id',
                   'time', 'profile', 'branch', 'tags', 'likes',
                   'favorites', 'downloads', 'shares', 'histories']

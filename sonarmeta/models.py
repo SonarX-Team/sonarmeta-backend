@@ -167,7 +167,7 @@ class Resource(models.Model):
     )
     path = models.TextField()
     type = models.CharField(
-        max_length=5,
+        max_length=1,
         choices=RESOURCE_TYPE_CHOICES,
         default=RESOURCE_TYPE_ORIGINAL
     )
@@ -185,7 +185,7 @@ class Resource(models.Model):
         default=RESOURCE_DOWNLOAD_TYPE_FREE
     )
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    carry = models.BooleanField()
+    no_carry = models.BooleanField()
     carry_from = models.CharField(max_length=255, blank=True, null=True)
     no_commercial = models.BooleanField()
     entry = models.PositiveIntegerField(blank=True, default=0)
