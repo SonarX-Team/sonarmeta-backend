@@ -23,7 +23,7 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
         # if there is no profile matched to User
         # then it will be created automatically
         (profile, created) = models.Profile.objects.get_or_create(
-            user_id=request.user.id)
+            user_id=request.user.id, username=f'sonarmeta-{request.user.id}')
 
         if request.method == 'GET':
             serializer = serializers.ProfileSerializer(profile)

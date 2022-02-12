@@ -57,7 +57,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Profile
-        fields = ['id', 'user', 'avatar', 'birth_date', 'history_flag', 'description',
+        fields = ['id', 'user', 'username', 'avatar', 'birth_date', 'history_flag', 'description',
                   'gender', 'be_followed', 'follow', 'be_prevented', 'prevent']
 
 
@@ -74,7 +74,7 @@ class SimpleProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Profile
-        fields = ['id', 'user', 'avatar', 'history_flag',
+        fields = ['id', 'user', 'username', 'avatar', 'history_flag',
                   'description', 'be_followed', 'follow',
                   'be_prevented', 'prevent']
 
@@ -88,7 +88,7 @@ class MicroProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Profile
-        fields = ['id', 'user', 'avatar', 'history_flag']
+        fields = ['id', 'user', 'username', 'avatar', 'history_flag']
 
 
 class MessageSerializer(serializers.ModelSerializer):

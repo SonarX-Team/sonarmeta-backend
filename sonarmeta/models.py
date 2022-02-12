@@ -14,6 +14,7 @@ class Profile(models.Model):
         (PROFILE_GENDER_SECRET, 'secret'),
     ]
 
+    username = models.CharField(max_length=255, unique=True)
     avatar = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
@@ -27,7 +28,7 @@ class Profile(models.Model):
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.user.username
+        return self.username
 
     class Meta:
         ordering = ['user']

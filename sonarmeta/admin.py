@@ -4,11 +4,11 @@ from . import models
 
 @admin.register(models.Profile)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ['user', 'phone', 'email', 'description']
+    list_display = ['username', 'phone', 'email', 'description']
     list_select_related = ['user']
     list_per_page = 20
     autocomplete_fields = ['user']
-    search_fields = ['user__username__i', 'user__username']
+    search_fields = ['username__i', 'username']
 
     @admin.display(ordering='user__username')
     def phone(self, profile):
