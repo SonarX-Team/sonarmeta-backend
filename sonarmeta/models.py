@@ -14,7 +14,7 @@ class Profile(models.Model):
         (PROFILE_GENDER_SECRET, 'secret'),
     ]
 
-    username = models.CharField(max_length=255)
+    username = models.CharField(max_length=255, unique=True)
     avatar = models.TextField(null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     birth_date = models.DateField(null=True, blank=True)
