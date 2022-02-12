@@ -1,4 +1,5 @@
 from ast import Or
+from operator import truediv
 from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
@@ -22,8 +23,11 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
     def me(self, request):
         # if there is no profile matched to User
         # then it will be created automatically
-        (profile, created) = models.Profile.objects.get_or_create(
-            user_id=request.user.id, username=f'sonarmeta-{request.user.id}')
+        try:
+            profile = models.Profile.objects.get(user_id=request.user.id)
+        except models.Profile.DoesNotExist:
+            profile = models.Profile.objects.create(
+                user_id=request.user.id, username=f'sonarmeta-{request.user.id}')
 
         if request.method == 'GET':
             serializer = serializers.ProfileSerializer(profile)
