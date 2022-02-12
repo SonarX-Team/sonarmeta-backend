@@ -193,6 +193,8 @@ class Resource(models.Model):
     cover = models.TextField(null=True, blank=True)
     sticky_review_id = models.PositiveIntegerField(null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
+    status_change_timestamp = models.CharField(
+        max_length=255, null=True, blank=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     branch = models.ForeignKey(
         ResourceBranch,
