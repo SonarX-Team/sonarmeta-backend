@@ -167,6 +167,7 @@ class Resource(models.Model):
         default=RESOURCE_STATUS_UNRELEASED
     )
     path = models.TextField()
+    path_folder_list = models.TextField()
     type = models.CharField(
         max_length=1,
         choices=RESOURCE_TYPE_CHOICES,
