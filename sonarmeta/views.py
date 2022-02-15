@@ -12,7 +12,7 @@ from . import models, serializers
 
 
 class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
-    http_method_names = ['get', 'head', 'options']
+    http_method_names = ['get', 'patch', 'head', 'options']
     queryset = models.Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
     permission_classes = [AllowAny]
