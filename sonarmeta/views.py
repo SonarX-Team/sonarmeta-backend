@@ -405,7 +405,7 @@ class UserResourceHistoryViewSet(ModelViewSet):
     See GET histories of user at ProfileViewSet
     '''
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
-    serializer_class = serializers.UserResourceHistorySerializer
+    serializer_class = serializers.DisplayUserResourceHistorySerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
@@ -449,7 +449,7 @@ class UserResourceLikeViewSet(ModelViewSet):
 
 class UserResourceFavoriteViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
-    serializer_class = serializers.UserResourceFavoriteSerializer
+    serializer_class = serializers.DisplayUserResourceFavoriteSerializer
 
     # user resource favorite is designed to list at the resource's side
     # so get its queryset by resource id
