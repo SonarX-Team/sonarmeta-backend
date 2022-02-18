@@ -197,12 +197,7 @@ class UserResourceLikeSerializer(serializers.ModelSerializer):
         fields = ['id', 'resource_id', 'profile_id']
 
 
-class UserResourceFavoriteSerializer(serializers.ModelSerializer):
-    '''
-    This serializer will be used in resource serializer
-    to provide favorites related to a certain resource
-    so it is defined before its parent entity serializer
-    '''
+class DisplayUserResourceFavoriteSerializer(serializers.ModelSerializer):
     resource_id = serializers.IntegerField(read_only=True)
     profile_id = serializers.IntegerField(read_only=True)
 
@@ -268,7 +263,8 @@ class RecommendResourceSerializer(serializers.ModelSerializer):
 class SearchResourceSerializer(serializers.ModelSerializer):
     profile = MicroProfileSerializer(read_only=True)
     likes = UserResourceLikeSerializer(many=True, read_only=True)
-    favorites = UserResourceFavoriteSerializer(many=True, read_only=True)
+    favorites = DisplayUserResourceFavoriteSerializer(
+        many=True, read_only=True)
     downloads = UserResourceDownloadSerializer(many=True, read_only=True)
     shares = UserResourceShareSerializer(many=True, read_only=True)
 
@@ -281,7 +277,8 @@ class SearchResourceSerializer(serializers.ModelSerializer):
 class SimpleResourceSerializer(serializers.ModelSerializer):
     branch_id = serializers.IntegerField(read_only=True)
     likes = UserResourceLikeSerializer(many=True, read_only=True)
-    favorites = UserResourceFavoriteSerializer(many=True, read_only=True)
+    favorites = DisplayUserResourceFavoriteSerializer(
+        many=True, read_only=True)
     downloads = UserResourceDownloadSerializer(many=True, read_only=True)
     shares = UserResourceShareSerializer(many=True, read_only=True)
 
@@ -295,6 +292,26 @@ class MicroResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Resource
         fields = ['id', 'title', 'cover', 'entry', 'time']
+
+
+class UserResourceFavoriteSerializer(serializers.ModelSerializer):
+    '''
+    This serializer will be used in resource serializer
+    to provide favorites related to a certain resource
+    so it is defined before its parent entity serializer
+    '''
+    resource = SimpleResourceSerializer(read_only=True)
+    profile = MicroProfileSerializer(read_only=True)
+
+    def create(self, validated_data):
+        resource_id = self.context['resource_id']
+        profile_id = self.context['profile_id']
+        return models.UserResourceFavorite.objects \
+            .create(resource_id=resource_id, profile_id=profile_id, **validated_data)
+
+    class Meta:
+        model = models.UserResourceFavorite
+        fields = ['id', 'resource', 'profile']
 
 
 class UserResourceHistorySerializer(serializers.ModelSerializer):
@@ -434,7 +451,8 @@ class ResourceSerializer(serializers.ModelSerializer):
     profile = SimpleProfileSerializer(read_only=True)
     branch = DisplayResourceBranchSerializer(read_only=True)
     likes = UserResourceLikeSerializer(many=True, read_only=True)
-    favorites = UserResourceFavoriteSerializer(many=True, read_only=True)
+    favorites = DisplayUserResourceFavoriteSerializer(
+        many=True, read_only=True)
     downloads = UserResourceDownloadSerializer(many=True, read_only=True)
     shares = UserResourceShareSerializer(many=True, read_only=True)
     histories = DisplayUserResourceHistorySerializer(many=True, read_only=True)

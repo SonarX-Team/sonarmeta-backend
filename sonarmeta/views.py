@@ -39,18 +39,6 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
             serializer.save()
             return Response(serializer.data)
 
-    # endpoint: sonarmeta/profiles/histories/
-    # GET current user's histories
-    @action(detail=False, methods=['GET'])
-    def histories(self, request):
-        profile_id = models.Profile.objects.get(user_id=request.user.id).id
-        histories = models.UserResourceHistory.objects \
-            .prefetch_related('profile') \
-            .filter(profile_id=profile_id)
-        serializer = serializers \
-            .UserResourceHistorySerializer(histories, many=True)
-        return Response(serializer.data)
-
     # endpoint: sonarmeta/profiles/favorites/
     # GET current user's favorites
     @action(detail=False, methods=['GET'])
@@ -61,6 +49,18 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
             .filter(profile_id=profile_id)
         serializer = serializers \
             .UserResourceFavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+
+    # endpoint: sonarmeta/profiles/histories/
+    # GET current user's histories
+    @action(detail=False, methods=['GET'])
+    def histories(self, request):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        histories = models.UserResourceHistory.objects \
+            .prefetch_related('profile') \
+            .filter(profile_id=profile_id)
+        serializer = serializers \
+            .UserResourceHistorySerializer(histories, many=True)
         return Response(serializer.data)
 
 
