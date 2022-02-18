@@ -51,6 +51,18 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
             .UserResourceHistorySerializer(histories, many=True)
         return Response(serializer.data)
 
+    # endpoint: sonarmeta/profiles/favorites/
+    # GET current user's favorites
+    @action(detail=False, methods=['GET'])
+    def favorites(self, request):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        favorites = models.UserResourceFavorite.objects \
+            .prefetch_related('profile') \
+            .filter(profile_id=profile_id)
+        serializer = serializers \
+            .UserResourceFavoriteSerializer(favorites, many=True)
+        return Response(serializer.data)
+
 
 class UserSubscribeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
