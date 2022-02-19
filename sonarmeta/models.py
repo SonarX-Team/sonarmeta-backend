@@ -251,11 +251,13 @@ class UserResourceFavorite(models.Model):
     resource = models.ForeignKey(
         Resource, on_delete=models.CASCADE, related_name='favorites')
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'{self.profile} collected {self.resource}'
 
     class Meta:
+        ordering = ['-time']
         unique_together = [['resource', 'profile']]
 
 
