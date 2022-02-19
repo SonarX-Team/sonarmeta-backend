@@ -20,6 +20,10 @@ router.register('resources', views.ResourceViewSet, basename='resource')
 router.register('resources-search', views.SearchResourceViewSet)
 # endpoint: sonarmeta/resources-me/
 router.register('resources-me', views.MeResourceViewSet, basename='resource')
+# endpoint: sonarmeta/histories-me/
+router.register('histories-me', views.UserHistoryViewSet, basename='user-history')
+# endpoint: sonarmeta/favorites-me/
+router.register('favorites-me', views.SearchFavoriteViewSet, basename='user-favorite')
 
 
 profiles_router = routers.NestedDefaultRouter(

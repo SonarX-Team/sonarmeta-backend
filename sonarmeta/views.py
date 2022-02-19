@@ -51,17 +51,41 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
             .UserResourceFavoriteSerializer(favorites, many=True)
         return Response(serializer.data)
 
-    # endpoint: sonarmeta/profiles/histories/
-    # GET current user's histories
-    @action(detail=False, methods=['GET'])
-    def histories(self, request):
-        profile_id = models.Profile.objects.get(user_id=request.user.id).id
-        histories = models.UserResourceHistory.objects \
+
+class UserFavoriteViewSet(ModelViewSet):
+    '''
+    This method is used to search resource histories
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.UserResourceFavoriteSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter]
+    search_fields = ['title', 'tags']
+
+    def get_queryset(self):
+        profile_id = models.Profile.objects \
+            .get(user_id=self.request.user.id).id
+        return models.UserResourceFavorite.objects \
             .prefetch_related('profile') \
             .filter(profile_id=profile_id)
-        serializer = serializers \
-            .UserResourceHistorySerializer(histories, many=True)
-        return Response(serializer.data)
+
+
+class UserHistoryViewSet(ModelViewSet):
+    '''
+    This method is used to search resource histories
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.UserResourceHistorySerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [SearchFilter]
+    search_fields = ['title', 'tags']
+
+    def get_queryset(self):
+        profile_id = models.Profile.objects \
+            .get(user_id=self.request.user.id).id
+        return models.UserResourceHistory.objects \
+            .prefetch_related('profile') \
+            .filter(profile_id=profile_id)
 
 
 class UserSubscribeViewSet(ModelViewSet):
