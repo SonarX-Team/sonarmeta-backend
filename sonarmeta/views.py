@@ -48,7 +48,7 @@ class UserFavoriteViewSet(ModelViewSet):
     serializer_class = serializers.UserResourceFavoriteSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [SearchFilter]
-    search_fields = ['title', 'tags']
+    search_fields = ['resource__title', 'resource__tags']
 
     def get_queryset(self):
         profile_id = models.Profile.objects \
@@ -66,7 +66,7 @@ class UserHistoryViewSet(ModelViewSet):
     serializer_class = serializers.UserResourceHistorySerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [SearchFilter]
-    search_fields = ['title', 'tags']
+    search_fields = ['resource__title', 'resource__tags']
 
     def get_queryset(self):
         profile_id = models.Profile.objects \
