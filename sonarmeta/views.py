@@ -40,9 +40,9 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
             serializer.save()
             return Response(serializer.data)
 
-    # endpoint: sonarmeta/profiles/subscribes/
+    # endpoint: sonarmeta/profiles/subscribers/
     @action(detail=False, methods=['GET'])
-    def subscribes(self, request):
+    def subscribers(self, request):
         profile = models.Profile.objects.get(user_id=request.user.id)
         serializer = serializers.SubscribeProfileSerializer(profile)
         return Response(serializer.data)
