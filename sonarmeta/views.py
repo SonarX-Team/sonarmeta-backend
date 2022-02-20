@@ -1,4 +1,5 @@
 from ast import Or
+from crypt import methods
 from operator import truediv
 from django.db.models import Count, Q
 from rest_framework import status
@@ -38,6 +39,13 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data)
+
+    # endpoint: sonarmeta/profiles/subscribes/
+    @action(detail=False, methods=['GET'])
+    def subscribes(self, request):
+        profile = models.Profile.objects.get(user_id=request.user.id)
+        serializer = serializers.SubscribeProfileSerializer(profile)
+        return Response(serializer.data)
 
 
 class UserFavoriteViewSet(ModelViewSet):
