@@ -306,10 +306,11 @@ class UserResourceShareSerializer(serializers.ModelSerializer):
 
 class RecommendResourceSerializer(serializers.ModelSerializer):
     profile = MicroProfileSerializer(read_only=True)
+    entries = UserResourceEntrySerializer(many=True, read_only=True)
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'cover', 'profile', 'time']
+        fields = ['id', 'title', 'cover', 'profile', 'entries', 'time']
 
 
 class SearchResourceSerializer(serializers.ModelSerializer):
