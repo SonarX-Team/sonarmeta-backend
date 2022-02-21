@@ -209,6 +209,26 @@ class ResourceReviewSerializer(serializers.ModelSerializer):
                   'content', 'replies', 'likes', 'time']
 
 
+class UserResourceEntrySerializer(serializers.ModelSerializer):
+    '''
+    This serializer will be used in resource serializer
+    to provide entries related to a certain resource
+    so it is defined before its parent entity serializer
+    '''
+    resource_id = serializers.IntegerField(read_only=True)
+    profile_id = serializers.IntegerField(read_only=True)
+
+    def create(self, validated_data):
+        resource_id = self.context['resource_id']
+        profile_id = self.context['profile_id']
+        return models.UserResourceEntry.objects \
+            .create(resource_id=resource_id, profile_id=profile_id, **validated_data)
+
+    class Meta:
+        model = models.UserResourceEntry
+        fields = ['id', 'resource_id', 'profile_id', 'time']
+
+
 class UserResourceLikeSerializer(serializers.ModelSerializer):
     '''
     This serializer will be used in resource serializer
@@ -289,11 +309,12 @@ class RecommendResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'cover', 'entry', 'profile', 'time']
+        fields = ['id', 'title', 'cover', 'profile', 'time']
 
 
 class SearchResourceSerializer(serializers.ModelSerializer):
     profile = MicroProfileSerializer(read_only=True)
+    entries = UserResourceEntrySerializer(many=True, read_only=True)
     likes = UserResourceLikeSerializer(many=True, read_only=True)
     favorites = DisplayUserResourceFavoriteSerializer(
         many=True, read_only=True)
@@ -303,11 +324,12 @@ class SearchResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Resource
         fields = ['id', 'status', 'title', 'description', 'cover', 'profile',
-                  'entry', 'likes', 'favorites', 'downloads', 'shares', 'time']
+                  'entries', 'likes', 'favorites', 'downloads', 'shares', 'time']
 
 
 class SimpleResourceSerializer(serializers.ModelSerializer):
     branch_id = serializers.IntegerField(read_only=True)
+    entries = UserResourceEntrySerializer(many=True, read_only=True)
     likes = UserResourceLikeSerializer(many=True, read_only=True)
     favorites = DisplayUserResourceFavoriteSerializer(
         many=True, read_only=True)
@@ -316,14 +338,14 @@ class SimpleResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'status', 'path', 'path_folder_list', 'title', 'description', 'cover', 'entry',
-                  'likes', 'favorites', 'downloads', 'shares', 'branch_id', 'time']
+        fields = ['id', 'status', 'path', 'path_folder_list', 'title', 'description', 'cover',
+                  'entries', 'likes', 'favorites', 'downloads', 'shares', 'branch_id', 'time']
 
 
 class MicroResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'cover', 'entry', 'time']
+        fields = ['id', 'title', 'cover', 'time']
 
 
 class UserResourceFavoriteSerializer(serializers.ModelSerializer):
@@ -392,7 +414,7 @@ class DisplayResourceSeriesSerializer(serializers.ModelSerializer):
         count = 0
         for branch in series.branches.all():
             for resource in branch.resources.all():
-                count += resource.entry
+                count += resource.entries.count()
         return count
 
     def calculate_likes(self, series):
@@ -446,7 +468,7 @@ class DisplayResourceBranchSerializer(serializers.ModelSerializer):
     def calculate_entry(self, branch):
         count = 0
         for branch in branch.resources.all():
-            count += branch.entry
+            count += branch.entries.count()
         return count
 
     def calculate_likes(self, branch):
@@ -482,6 +504,7 @@ class DisplayResourceBranchSerializer(serializers.ModelSerializer):
 class ResourceSerializer(serializers.ModelSerializer):
     profile = SimpleProfileSerializer(read_only=True)
     branch = DisplayResourceBranchSerializer(read_only=True)
+    entries = UserResourceEntrySerializer(many=True, read_only=True)
     likes = UserResourceLikeSerializer(many=True, read_only=True)
     favorites = DisplayUserResourceFavoriteSerializer(
         many=True, read_only=True)
@@ -498,7 +521,7 @@ class ResourceSerializer(serializers.ModelSerializer):
         fields = ['id', 'status', 'path', 'path_folder_list', 'type',
                   'title', 'description', 'category', 'download_type',
                   'price', 'no_carry', 'carry_from', 'no_commercial',
-                  'entry', 'cover', 'sticky_review_id', 'status_change_timestamp',
+                  'entries', 'cover', 'sticky_review_id', 'status_change_timestamp',
                   'time', 'profile', 'branch', 'tags', 'likes',
                   'favorites', 'downloads', 'shares', 'histories']
 
@@ -520,7 +543,7 @@ class ResourceBranchSerializer(serializers.ModelSerializer):
     def calculate_entry(self, branch):
         count = 0
         for branch in branch.resources.all():
-            count += branch.entry
+            count += branch.entries.count()
         return count
 
     def calculate_likes(self, branch):
@@ -577,7 +600,7 @@ class ResourceSeriesSerializer(serializers.ModelSerializer):
         count = 0
         for branch in series.branches.all():
             for resource in branch.resources.all():
-                count += resource.entry
+                count += resource.entries.count()
         return count
 
     def calculate_likes(self, series):

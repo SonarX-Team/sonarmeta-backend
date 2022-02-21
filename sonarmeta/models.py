@@ -1,3 +1,4 @@
+from pyexpat import model
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -192,7 +193,6 @@ class Resource(models.Model):
     no_carry = models.BooleanField()
     carry_from = models.CharField(max_length=255, blank=True, null=True)
     no_commercial = models.BooleanField()
-    entry = models.PositiveIntegerField(blank=True, default=0)
     cover = models.TextField(null=True, blank=True)
     sticky_review_id = models.PositiveIntegerField(null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
@@ -235,6 +235,16 @@ class ResourceReply(models.Model):
 
     def __str__(self):
         return self.content
+
+
+class UserResourceEntry(models.Model):
+    resource = models.ForeignKey(
+        Resource, on_delete=models.CASCADE, related_name='entries')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.profile} viewed {self.resource} at {self.time}'
 
 
 class UserResourceLike(models.Model):

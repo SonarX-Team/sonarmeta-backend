@@ -21,9 +21,11 @@ router.register('resources-search', views.SearchResourceViewSet)
 # endpoint: sonarmeta/resources-me/
 router.register('resources-me', views.MeResourceViewSet, basename='resource')
 # endpoint: sonarmeta/histories-me/
-router.register('histories-me', views.UserHistoryViewSet, basename='user-history')
+router.register('histories-me', views.UserHistoryViewSet,
+                basename='user-history')
 # endpoint: sonarmeta/favorites-me/
-router.register('favorites-me', views.UserFavoriteViewSet, basename='user-favorite')
+router.register('favorites-me', views.UserFavoriteViewSet,
+                basename='user-favorite')
 
 
 profiles_router = routers.NestedDefaultRouter(
@@ -58,6 +60,9 @@ resources_router.register(
 # endpoint: sonarmeta/resources/{resource_pk}/histories/
 resources_router.register(
     'histories', views.UserResourceHistoryViewSet, basename='resource-history')
+# endpoint: sonarmeta/resources/{resource_pk}/entries/
+resources_router.register(
+    'entries', views.UserResourceEntryViewSet, basename='resource-entry')
 # endpoint: sonarmeta/resources/{resource_pk}/likes/
 resources_router.register(
     'likes', views.UserResourceLikeViewSet, basename='resource-like')

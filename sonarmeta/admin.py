@@ -80,6 +80,12 @@ class ResourceReplyAdmin(admin.ModelAdmin):
     search_fields = ['content']
 
 
+@admin.register(models.UserResourceEntry)
+class UserResourceEntryAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    autocomplete_fields = ['resource', 'profile']
+
+
 @admin.register(models.UserResourceLike)
 class UserResourceLikeAdmin(admin.ModelAdmin):
     list_per_page = 20

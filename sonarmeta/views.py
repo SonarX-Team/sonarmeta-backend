@@ -467,6 +467,31 @@ class UserResourceLikeViewSet(ModelViewSet):
         }
 
 
+class UserResourceEntryViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'delete', 'head', 'options']
+    serializer_class = serializers.UserResourceEntrySerializer
+
+    # user resource entry is designed to list at the resource's side
+    # so get its queryset by resource id
+    def get_queryset(self):
+        return models.UserResourceEntry.objects \
+            .prefetch_related('profile__user') \
+            .filter(resource_id=self.kwargs['resource_pk'])
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_serializer_context(self):
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_context()
+        return {
+            'resource_id': self.kwargs['resource_pk'],
+            'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
+        }
+
+
 class UserResourceFavoriteViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.DisplayUserResourceFavoriteSerializer
