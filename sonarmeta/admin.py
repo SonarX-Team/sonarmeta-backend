@@ -57,7 +57,7 @@ class ResourceBranchAdmin(admin.ModelAdmin):
 
 @admin.register(models.Resource)
 class ResourceAdmin(admin.ModelAdmin):
-    list_display = ['title', 'entry', 'branch', 'profile', 'time']
+    list_display = ['title', 'branch', 'profile', 'time']
     list_per_page = 20
     autocomplete_fields = ['branch', 'profile']
     search_fields = ['title']
