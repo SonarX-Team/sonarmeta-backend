@@ -468,7 +468,7 @@ class UserResourceLikeViewSet(ModelViewSet):
 
 
 class UserResourceEntryViewSet(ModelViewSet):
-    http_method_names = ['get', 'post', 'delete', 'head', 'options']
+    http_method_names = ['get', 'post', 'head', 'options']
     serializer_class = serializers.UserResourceEntrySerializer
 
     # user resource entry is designed to list at the resource's side

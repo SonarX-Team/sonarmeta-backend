@@ -246,6 +246,9 @@ class UserResourceEntry(models.Model):
     def __str__(self):
         return f'{self.profile} viewed {self.resource} at {self.time}'
 
+    class Meta:
+        ordering = ['-time']
+
 
 class UserResourceLike(models.Model):
     resource = models.ForeignKey(
