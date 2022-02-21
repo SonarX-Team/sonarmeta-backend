@@ -50,7 +50,7 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
 
 class UserFavoriteViewSet(ModelViewSet):
     '''
-    This method is used to search resource histories
+    This viewset is used to get histories of current profile
     '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.UserResourceFavoriteSerializer
@@ -68,7 +68,7 @@ class UserFavoriteViewSet(ModelViewSet):
 
 class UserHistoryViewSet(ModelViewSet):
     '''
-    This method is used to search resource histories
+    This viewset is used to get resource histories of current profile
     '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.UserResourceHistorySerializer
@@ -313,7 +313,7 @@ class ResourceViewSet(ModelViewSet):
 
 class SearchResourceViewSet(ModelViewSet):
     '''
-    This method is used to search resources
+    This viewset is used to search resources
     '''
     http_method_names = ['get', 'head', 'options']
     queryset = models.Resource.objects.all().prefetch_related('profile')
@@ -325,7 +325,7 @@ class SearchResourceViewSet(ModelViewSet):
 
 class MeResourceViewSet(ModelViewSet):
     '''
-    This method is used to get resources of the current profile
+    This viewset is used to get resources of the current profile
     '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.SimpleResourceSerializer
@@ -341,7 +341,7 @@ class MeResourceViewSet(ModelViewSet):
 
 class BranchResourceViewSet(ModelViewSet):
     '''
-    This method is used to get resources of a certain branch
+    This viewset is used to get resources of a certain branch
     Only be used at the series management page, and do searching
     '''
     http_method_names = ['get', 'head', 'options']

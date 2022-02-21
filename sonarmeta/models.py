@@ -39,6 +39,7 @@ class UserSubscribe(models.Model):
         Profile, on_delete=models.CASCADE, related_name='be_followed')
     subscriber = models.ForeignKey(
         Profile, on_delete=models.CASCADE, related_name='follow')
+    time = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
         if self.creator == self.subscriber:
@@ -48,6 +49,7 @@ class UserSubscribe(models.Model):
         return f'{self.creator} is subscribed by {self.subscriber}'
 
     class Meta:
+        ordering = ['-time']
         unique_together = [['creator', 'subscriber']]
 
 
