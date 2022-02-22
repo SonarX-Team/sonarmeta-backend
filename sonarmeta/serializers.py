@@ -344,9 +344,11 @@ class SimpleResourceSerializer(serializers.ModelSerializer):
 
 
 class MicroResourceSerializer(serializers.ModelSerializer):
+    entries = UserResourceEntrySerializer(many=True, read_only=True)
+
     class Meta:
         model = models.Resource
-        fields = ['id', 'title', 'cover', 'time']
+        fields = ['id', 'title', 'cover', 'entries', 'time']
 
 
 class UserResourceFavoriteSerializer(serializers.ModelSerializer):
@@ -400,7 +402,7 @@ class DisplayUserResourceHistorySerializer(serializers.ModelSerializer):
 
 
 class DisplayResourceSeriesSerializer(serializers.ModelSerializer):
-    total_entry = serializers \
+    total_entries = serializers \
         .SerializerMethodField(method_name='calculate_entry')
     total_likes = serializers \
         .SerializerMethodField(method_name='calculate_likes')
@@ -448,14 +450,14 @@ class DisplayResourceSeriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceSeries
-        fields = ['id', 'title', 'description', 'total_entry', 'total_likes',
+        fields = ['id', 'title', 'description', 'total_entries', 'total_likes',
                   'total_favorites', 'total_downloads', 'total_shares', 'time']
 
 
 class DisplayResourceBranchSerializer(serializers.ModelSerializer):
     series = DisplayResourceSeriesSerializer(read_only=True)
     resources = MicroResourceSerializer(read_only=True, many=True)
-    total_entry = serializers \
+    total_entries = serializers \
         .SerializerMethodField(method_name='calculate_entry')
     total_likes = serializers \
         .SerializerMethodField(method_name='calculate_likes')
@@ -498,7 +500,7 @@ class DisplayResourceBranchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceBranch
-        fields = ['id', 'title', 'series', 'resources', 'total_entry', 'total_likes',
+        fields = ['id', 'title', 'series', 'resources', 'total_entries', 'total_likes',
                   'total_favorites', 'total_downloads', 'total_shares', 'time']
 
 
@@ -530,7 +532,7 @@ class ResourceSerializer(serializers.ModelSerializer):
 class ResourceBranchSerializer(serializers.ModelSerializer):
     resources = SimpleResourceSerializer(many=True, read_only=True)
     profile = MicroProfileSerializer(read_only=True)
-    total_entry = serializers \
+    total_entries = serializers \
         .SerializerMethodField(method_name='calculate_entry')
     total_likes = serializers \
         .SerializerMethodField(method_name='calculate_likes')
@@ -579,14 +581,14 @@ class ResourceBranchSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ResourceBranch
         fields = ['id', 'title', 'resources', 'profile',
-                  'total_entry', 'total_likes', 'total_favorites',
+                  'total_entries', 'total_likes', 'total_favorites',
                   'total_downloads', 'total_shares', 'time']
 
 
 class ResourceSeriesSerializer(serializers.ModelSerializer):
     branches = ResourceBranchSerializer(many=True, read_only=True)
     profile = MicroProfileSerializer(read_only=True)
-    total_entry = serializers \
+    total_entries = serializers \
         .SerializerMethodField(method_name='calculate_entry')
     total_likes = serializers \
         .SerializerMethodField(method_name='calculate_likes')
@@ -638,5 +640,5 @@ class ResourceSeriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceSeries
-        fields = ['id', 'title', 'description', 'branches', 'profile', 'total_entry',
+        fields = ['id', 'title', 'description', 'branches', 'profile', 'total_entries',
                   'total_likes', 'total_favorites', 'total_downloads', 'total_shares', 'time']
