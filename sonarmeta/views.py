@@ -297,8 +297,6 @@ class RecommendationResourceViewSet(ModelViewSet):
     serializer_class = serializers.RecommendResourceSerializer
     permission_classes = [AllowAny]
     pagination_class = pagination.TwelvePagination
-    filter_backends = [SearchFilter]
-    search_fields = ['title', 'tags']
 
 
 class SearchResourceViewSet(ModelViewSet):
