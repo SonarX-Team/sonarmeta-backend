@@ -1,15 +1,12 @@
-from ast import Or
-from crypt import methods
-from operator import truediv
 from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
-from . import models, serializers
+from . import models, serializers, pagination
 
 
 class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
@@ -55,6 +52,7 @@ class UserFavoriteViewSet(ModelViewSet):
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.UserResourceFavoriteSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter]
     search_fields = ['resource__title', 'resource__tags']
 
@@ -73,6 +71,7 @@ class UserHistoryViewSet(ModelViewSet):
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.UserResourceHistorySerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter]
     search_fields = ['resource__title', 'resource__tags']
 
@@ -87,6 +86,7 @@ class UserHistoryViewSet(ModelViewSet):
 class UserSubscribeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.UserSubscribeSerializer
+    pagination_class = pagination.TwelvePagination
 
     def get_queryset(self):
         return models.UserSubscribe.objects \
@@ -107,6 +107,7 @@ class UserSubscribeViewSet(ModelViewSet):
 class UserBlacklistViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.UserBlacklistSerializer
+    pagination_class = pagination.TwelvePagination
 
     def get_queryset(self):
         profile_id = models.Profile.objects \
@@ -140,6 +141,7 @@ class ResourceSeriesViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     queryset = models.ResourceSeries.objects.all()
     serializer_class = serializers.ResourceSeriesSerializer
+    pagination_class = pagination.TwelvePagination
 
     def get_permissions(self):
         if self.request.method == 'POST' or self.request.method == 'DELETE':
@@ -190,6 +192,7 @@ class MeResourceSeriesViewSet(ModelViewSet):
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.ResourceSeriesSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter]
     search_fields = ['title']
 
@@ -205,6 +208,7 @@ class MeResourceSeriesViewSet(ModelViewSet):
 class ResourceBranchViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceBranchSerializer
+    pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter]
     search_fields = ['title']
 
@@ -227,7 +231,11 @@ class ResourceBranchViewSet(ModelViewSet):
         }
 
 
-class ResourceViewSet(ModelViewSet):
+class ResourceViewSet(CreateModelMixin,
+                      RetrieveModelMixin,
+                      UpdateModelMixin,
+                      DestroyModelMixin,
+                      GenericViewSet):
     '''
     This ViewSet's GET method is only used to retrieve,
     since ResourceSerializer is very complex and it will cause
@@ -248,39 +256,6 @@ class ResourceViewSet(ModelViewSet):
         return {
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
-
-    # endpoint: sonarmeta/resources/recommendations/
-    # This method is used to recommend resources for Home and Resource page
-    @action(detail=False, methods=['GET'])
-    def recommendations(self, request):
-        resources = models.Resource.objects \
-            .prefetch_related('profile') \
-            .filter(status='P')
-        serializer = serializers \
-            .RecommendResourceSerializer(resources, many=True)
-        return Response(serializer.data)
-
-    # endpoint: sonarmeta/resources/recommendationssearch/
-    # This method is used to recommend resources for Home and Resource page
-    @action(detail=False, methods=['GET'])
-    def recommendationssearch(self, request):
-        resources = models.Resource.objects \
-            .prefetch_related('profile') \
-            .all()
-        serializer = serializers \
-            .SearchResourceSerializer(resources, many=True)
-        return Response(serializer.data)
-
-    # endpoint: sonarmeta/resources/me/
-    @action(detail=False, methods=['GET'])
-    def me(self, request):
-        profile_id = models.Profile.objects.get(user_id=request.user.id).id
-        resources = models.Resource.objects \
-            .prefetch_related('profile') \
-            .filter(profile_id=profile_id)
-        serializer = serializers \
-            .SimpleResourceSerializer(resources, many=True)
-        return Response(serializer.data)
 
     # endpoint: sonarmeta/resources/attach/
     # This method is used to attach a resource to a branch
@@ -311,6 +286,21 @@ class ResourceViewSet(ModelViewSet):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
+class RecommendationResourceViewSet(ModelViewSet):
+    '''
+    This viewset is used to recommend resources
+    '''
+    http_method_names = ['get', 'head', 'options']
+    queryset = models.Resource.objects \
+        .prefetch_related('profile') \
+        .filter(status='P')
+    serializer_class = serializers.RecommendResourceSerializer
+    permission_classes = [AllowAny]
+    pagination_class = pagination.TwelvePagination
+    filter_backends = [SearchFilter]
+    search_fields = ['title', 'tags']
+
+
 class SearchResourceViewSet(ModelViewSet):
     '''
     This viewset is used to search resources
@@ -319,6 +309,7 @@ class SearchResourceViewSet(ModelViewSet):
     queryset = models.Resource.objects.all().prefetch_related('profile')
     serializer_class = serializers.SearchResourceSerializer
     permission_classes = [AllowAny]
+    pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter]
     search_fields = ['title', 'tags']
 
@@ -330,6 +321,7 @@ class MeResourceViewSet(ModelViewSet):
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.SimpleResourceSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter]
     search_fields = ['title', 'tags']
 
@@ -347,6 +339,7 @@ class BranchResourceViewSet(ModelViewSet):
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.SimpleResourceSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter]
     search_fields = ['title', 'tags']
 
@@ -358,6 +351,7 @@ class BranchResourceViewSet(ModelViewSet):
 class ResourceReviewViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceReviewSerializer
+    pagination_class = pagination.TwelvePagination
 
     # user resource review is designed to list at the review's side
     # so get its queryset by resource id and sort by heat
@@ -396,6 +390,7 @@ class ResourceReviewViewSet(ModelViewSet):
 class ResourceReplyViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceReplySerializer
+    pagination_class = pagination.TwelvePagination
 
     # user resource reply is designed to list at the reply's side
     # so get its queryset by review id
@@ -442,14 +437,14 @@ class UserResourceHistoryViewSet(ModelViewSet):
         }
 
 
-class UserResourceLikeViewSet(ModelViewSet):
-    http_method_names = ['get', 'post', 'delete', 'head', 'options']
-    serializer_class = serializers.UserResourceLikeSerializer
+class UserResourceEntryViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'head', 'options']
+    serializer_class = serializers.UserResourceEntrySerializer
 
-    # user resource like is designed to list at the resource's side
+    # user resource entry is designed to list at the resource's side
     # so get its queryset by resource id
     def get_queryset(self):
-        return models.UserResourceLike.objects \
+        return models.UserResourceEntry.objects \
             .prefetch_related('profile__user') \
             .filter(resource_id=self.kwargs['resource_pk'])
 
@@ -467,14 +462,14 @@ class UserResourceLikeViewSet(ModelViewSet):
         }
 
 
-class UserResourceEntryViewSet(ModelViewSet):
-    http_method_names = ['get', 'post', 'head', 'options']
-    serializer_class = serializers.UserResourceEntrySerializer
+class UserResourceLikeViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'delete', 'head', 'options']
+    serializer_class = serializers.UserResourceLikeSerializer
 
-    # user resource entry is designed to list at the resource's side
+    # user resource like is designed to list at the resource's side
     # so get its queryset by resource id
     def get_queryset(self):
-        return models.UserResourceEntry.objects \
+        return models.UserResourceLike.objects \
             .prefetch_related('profile__user') \
             .filter(resource_id=self.kwargs['resource_pk'])
 
