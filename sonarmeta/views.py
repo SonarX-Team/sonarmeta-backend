@@ -348,7 +348,7 @@ class BranchResourceViewSet(ModelViewSet):
         return models.Resource.objects.prefetch_related('profile').filter(branch_id=branch_id)
 
 
-class ResourceReviewViewSet(ModelViewSet):
+class ResourceReviewHeatViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceReviewSerializer
     pagination_class = pagination.TwelvePagination
@@ -375,16 +375,24 @@ class ResourceReviewViewSet(ModelViewSet):
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
-    # endpoint: sonarmeta/resources/{resource_pk}/reviews/newest/
-    # GET reviews by newest
-    @action(detail=False, methods=['GET'])
-    def newest(self, request, *args, **kwargs):
-        reviews = models.ResourceReview.objects \
+
+class ResourceReviewNewestViewSet(ModelViewSet):
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.ResourceReviewSerializer
+    pagination_class = pagination.TwelvePagination
+
+    # user resource review is designed to list at the review's side
+    # so get its queryset by resource id and sort by time
+    def get_queryset(self):
+        return models.ResourceReview.objects \
             .prefetch_related('profile__user') \
-            .filter(resource_id=kwargs['resource_pk']) \
+            .filter(resource_id=self.kwargs['resource_pk']) \
             .order_by('-time')
-        serializer = serializers.ResourceReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
 
 
 class ResourceReplyViewSet(ModelViewSet):

@@ -59,7 +59,10 @@ resources_router = routers.NestedDefaultRouter(
     router, 'resources', lookup='resource')
 # endpoint: sonarmeta/resources/{resource_pk}/reviews/
 resources_router.register(
-    'reviews', views.ResourceReviewViewSet, basename='resource-review')
+    'reviews', views.ResourceReviewHeatViewSet, basename='resource-review')
+# endpoint: sonarmeta/resources/{resource_pk}/reviews-newest/
+resources_router.register(
+    'reviews-newest', views.ResourceReviewNewestViewSet, basename='resource-review')
 # endpoint: sonarmeta/resources/{resource_pk}/histories/
 resources_router.register(
     'histories', views.UserResourceHistoryViewSet, basename='resource-history')
