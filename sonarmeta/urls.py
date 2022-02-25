@@ -17,7 +17,7 @@ router.register('series-me', views.MeResourceSeriesViewSet, basename='series')
 # endpoint: sonarmeta/resources/
 router.register('resources', views.ResourceViewSet, basename='resource')
 # endpoint: sonarmeta/resources-recommendation/
-router.register('resources', views.RecommendationResourceViewSet,
+router.register('resources-recommendation', views.RecommendationResourceViewSet,
                 basename='resource')
 # endpoint: sonarmeta/resources-search/
 router.register('resources-search', views.SearchResourceViewSet)
