@@ -6,10 +6,11 @@ from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, UpdateMo
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from django_filters.rest_framework import DjangoFilterBackend
 from . import models, serializers, pagination
 
 
-class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
+class ProfileViewSet(RetrieveModelMixin, GenericViewSet): 
     http_method_names = ['get', 'patch', 'head', 'options']
     queryset = models.Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
@@ -320,7 +321,8 @@ class MeResourceViewSet(ModelViewSet):
     serializer_class = serializers.SimpleResourceSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filterset_fields = ["status"]
     search_fields = ['title', 'tags']
 
     def get_queryset(self):
