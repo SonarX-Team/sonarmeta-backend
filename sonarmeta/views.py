@@ -85,6 +85,8 @@ class UserFollowsViewset(ModelViewSet):
     serializer_class = serializers.UserFollowsSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
+    filter_backends = [SearchFilter]
+    search_fields = ['creator__username']
 
     def get_queryset(self):
         profile_id = models.Profile.objects \
@@ -101,6 +103,8 @@ class UserFollowersViewset(ModelViewSet):
     serializer_class = serializers.UserFollowersSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
+    filter_backends = [SearchFilter]
+    search_fields = ['subscriber__username']
 
     def get_queryset(self):
         profile_id = models.Profile.objects \
