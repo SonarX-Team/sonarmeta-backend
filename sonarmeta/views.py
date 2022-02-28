@@ -90,7 +90,7 @@ class UserFollowsViewset(ModelViewSet):
         profile_id = models.Profile.objects \
             .get(user_id=self.request.user.id).id
         return models.UserSubscribe.objects \
-            .filter(creator_id=profile_id)
+            .filter(subscriber_id=profile_id)
 
 
 class UserFollowersViewset(ModelViewSet):
@@ -106,7 +106,7 @@ class UserFollowersViewset(ModelViewSet):
         profile_id = models.Profile.objects \
             .get(user_id=self.request.user.id).id
         return models.UserSubscribe.objects \
-            .filter(subscriber_id=profile_id)
+            .filter(creator_id=profile_id)
 
 
 class UserSubscribeViewSet(ModelViewSet):
