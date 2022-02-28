@@ -38,17 +38,10 @@ class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
             serializer.save()
             return Response(serializer.data)
 
-    # endpoint: sonarmeta/profiles/subscribers/
-    @action(detail=False, methods=['GET'])
-    def subscribers(self, request):
-        profile = models.Profile.objects.get(user_id=request.user.id)
-        serializer = serializers.SubscribeProfileSerializer(profile)
-        return Response(serializer.data)
-
 
 class UserFavoriteViewSet(ModelViewSet):
     '''
-    This viewset is used to get histories of current profile
+    This viewset is used to get histories of the current profile
     '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.UserResourceFavoriteSerializer
@@ -67,7 +60,7 @@ class UserFavoriteViewSet(ModelViewSet):
 
 class UserHistoryViewSet(ModelViewSet):
     '''
-    This viewset is used to get resource histories of current profile
+    This viewset is used to get resource histories of the current profile
     '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.UserResourceHistorySerializer
@@ -84,10 +77,41 @@ class UserHistoryViewSet(ModelViewSet):
             .filter(profile_id=profile_id)
 
 
+class UserFollowsViewset(ModelViewSet):
+    '''
+    This viewset is used to get follows of the current profile
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.TinyProfileSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwelvePagination
+
+    def get_queryset(self):
+        profile_id = models.Profile.objects \
+            .get(user_id=self.request.user.id).id
+        return models.UserSubscribe.objects \
+            .filter(creator_id=profile_id)
+
+
+class UserFollowersViewset(ModelViewSet):
+    '''
+    This viewset is used to get followers of the current profile
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.TinyProfileSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwelvePagination
+
+    def get_queryset(self):
+        profile_id = models.Profile.objects \
+            .get(user_id=self.request.user.id).id
+        return models.UserSubscribe.objects \
+            .filter(subscriber_id=profile_id)
+
+
 class UserSubscribeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.UserSubscribeSerializer
-    pagination_class = pagination.TwelvePagination
 
     def get_queryset(self):
         return models.UserSubscribe.objects \

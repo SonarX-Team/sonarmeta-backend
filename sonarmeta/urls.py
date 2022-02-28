@@ -23,6 +23,10 @@ router.register('resources-recommendation', views.RecommendationResourceViewSet,
 router.register('resources-search', views.SearchResourceViewSet)
 # endpoint: sonarmeta/resources-me/
 router.register('resources-me', views.MeResourceViewSet, basename='resource')
+# endpoint: sonarmeta/follows-me/
+router.register('follows-me', views.UserFollowsViewset, basename='subscribe')
+# endpoint: sonarmeta/followers-me/
+router.register('followers-me', views.UserFollowersViewset, basename='subscribe')
 # endpoint: sonarmeta/histories-me/
 router.register('histories-me', views.UserHistoryViewSet,
                 basename='user-history')
