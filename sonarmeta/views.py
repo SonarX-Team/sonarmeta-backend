@@ -82,7 +82,7 @@ class UserFollowsViewset(ModelViewSet):
     This viewset is used to get follows of the current profile
     '''
     http_method_names = ['get', 'head', 'options']
-    serializer_class = serializers.TinyProfileSerializer
+    serializer_class = serializers.UserFollowsSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
 
@@ -98,7 +98,7 @@ class UserFollowersViewset(ModelViewSet):
     This viewset is used to get followers of the current profile
     '''
     http_method_names = ['get', 'head', 'options']
-    serializer_class = serializers.TinyProfileSerializer
+    serializer_class = serializers.UserFollowersSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
 

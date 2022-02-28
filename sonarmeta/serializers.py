@@ -93,12 +93,37 @@ class MicroProfileSerializer(serializers.ModelSerializer):
 
 class TinyProfileSerializer(serializers.ModelSerializer):
     '''
-    This serializer is used to provide avatar, username, description
+    This serializer is used to provide avatar, username, description,
+    which will be nested into UserSubscribeDetailSerializer
     '''
 
     class Meta:
         model = models.Profile
         fields = ['id', 'username', 'avatar', 'description']
+
+
+class UserFollowsSerializer(serializers.ModelSerializer):
+    '''
+    This serializer is used to provide follows to the current profile
+    '''
+    creator_id = serializers.IntegerField(read_only=True)
+    subscriber = TinyProfileSerializer(read_only=True)
+
+    class Meta:
+        model = models.UserSubscribe
+        fields = ['id', 'creator_id', 'subscriber']
+
+
+class UserFollowersSerializer(serializers.ModelSerializer):
+    '''
+    This serializer is used to provide followers to the current profile
+    '''
+    creator = TinyProfileSerializer(read_only=True)
+    subscriber_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = models.UserSubscribe
+        fields = ['id', 'creator', 'subscriber_id']
 
 
 class MessageSerializer(serializers.ModelSerializer):
