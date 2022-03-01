@@ -61,9 +61,9 @@ branches_router.register(
 
 resources_router = routers.NestedDefaultRouter(
     router, 'resources', lookup='resource')
-# endpoint: sonarmeta/resources/{resource_pk}/reviews/
+# endpoint: sonarmeta/resources/{resource_pk}/reviews-heat/
 resources_router.register(
-    'reviews', views.ResourceReviewHeatViewSet, basename='resource-review')
+    'reviews-heat', views.ResourceReviewHeatViewSet, basename='resource-review')
 # endpoint: sonarmeta/resources/{resource_pk}/reviews-newest/
 resources_router.register(
     'reviews-newest', views.ResourceReviewNewestViewSet, basename='resource-review')
