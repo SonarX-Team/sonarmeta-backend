@@ -410,10 +410,9 @@ class ResourceReviewHeatViewSet(ModelViewSet):
     def sticky(self, request, *args, **kwargs):
         resource = models.Resource.objects.get(pk=kwargs['resource_pk'])
         review = models.ResourceReview.objects \
-            .prefetch_related('profile__user') \
-            .filter(pk=resource.sticky_review_id)
-        # serializer = serializers.ResourceReviewSerializer(review)
-        return Response(resource.sticky_review_id)
+            .get(pk=resource.sticky_review_id)
+        serializer = serializers.ResourceReviewSerializer(review)
+        return Response(serializer.data)
 
 
 class ResourceReviewNewestViewSet(ModelViewSet):
