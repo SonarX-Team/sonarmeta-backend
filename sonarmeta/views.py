@@ -411,7 +411,8 @@ class ResourceReviewHeatViewSet(ModelViewSet):
         resource = models.Resource.objects.get(pk=kwargs['resource_pk'])
         review = models.ResourceReview.objects \
             .prefetch_related('profile__user') \
-            .filter(id=resource.sticky_review_id)
+            .filter(pk=resource.sticky_review_id)
+        print(resource.sticky_review_id)
         serializer = serializers.ResourceReviewSerializer(review)
         return Response(serializer.data)
 
