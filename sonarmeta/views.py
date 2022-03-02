@@ -1,3 +1,4 @@
+from crypt import methods
 from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
@@ -10,7 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from . import models, serializers, pagination
 
 
-class ProfileViewSet(RetrieveModelMixin, GenericViewSet): 
+class ProfileViewSet(RetrieveModelMixin, GenericViewSet):
     http_method_names = ['get', 'patch', 'head', 'options']
     queryset = models.Profile.objects.all()
     serializer_class = serializers.ProfileSerializer
@@ -402,6 +403,17 @@ class ResourceReviewHeatViewSet(ModelViewSet):
             'resource_id': self.kwargs['resource_pk'],
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
+
+    # endpoint: sonarmeta/resources/{resource_pk}/reviews/sticky/
+    # This method is used to get the sticky review of its resource
+    @action(detail=False, methods=['GET'])
+    def sticky(self, request, *args, **kwargs):
+        resource = models.Resource.objects.get(pk=kwargs['resource_pk'])
+        review = models.ResourceReview.objects \
+            .prefetch_related('profile__user') \
+            .filter(id=resource.sticky_review_id)
+        serializer = serializers.ResourceReviewSerializer(review)
+        return Response(serializer.data)
 
 
 class ResourceReviewNewestViewSet(ModelViewSet):
