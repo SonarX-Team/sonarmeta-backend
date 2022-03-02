@@ -412,9 +412,8 @@ class ResourceReviewHeatViewSet(ModelViewSet):
         review = models.ResourceReview.objects \
             .prefetch_related('profile__user') \
             .filter(pk=resource.sticky_review_id)
-        print(resource.sticky_review_id)
-        serializer = serializers.ResourceReviewSerializer(review)
-        return Response(serializer.data)
+        # serializer = serializers.ResourceReviewSerializer(review)
+        return Response(resource.sticky_review_id)
 
 
 class ResourceReviewNewestViewSet(ModelViewSet):
