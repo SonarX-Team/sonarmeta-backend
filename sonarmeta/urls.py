@@ -26,7 +26,8 @@ router.register('resources-me', views.MeResourceViewSet, basename='resource')
 # endpoint: sonarmeta/follows-me/
 router.register('follows-me', views.UserFollowsViewset, basename='subscribe')
 # endpoint: sonarmeta/followers-me/
-router.register('followers-me', views.UserFollowersViewset, basename='subscribe')
+router.register('followers-me', views.UserFollowersViewset,
+                basename='subscribe')
 # endpoint: sonarmeta/histories-me/
 router.register('histories-me', views.UserHistoryViewSet,
                 basename='user-history')
@@ -61,6 +62,9 @@ branches_router.register(
 
 resources_router = routers.NestedDefaultRouter(
     router, 'resources', lookup='resource')
+# endpoint: sonarmeta/resources/{resource_pk}/basic-settings/
+resources_router.register(
+    'basic-settings', views.ResourceBasicSettingsViewSet, basename='resource-basic-settings')
 # endpoint: sonarmeta/resources/{resource_pk}/reviews/
 resources_router.register(
     'reviews', views.ResourceReviewHeatViewSet, basename='resource-review')

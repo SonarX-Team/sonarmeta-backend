@@ -1,4 +1,5 @@
 from dataclasses import field
+from operator import mod
 from django.db.models.fields import IntegerField
 from djoser.serializers import UserSerializer as BaseUserSerializer
 from rest_framework import serializers
@@ -130,6 +131,16 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Message
         fields = ['id', 'profile', 'content', 'type']
+
+
+class ResourceBasicSettingsSerailizer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        resource_id = self.context['resource_id']
+        return models.ResourceBasicSettings.objects.create(resource_id=resource_id, **validated_data)
+
+    class Meta:
+        model = models.ResourceBasicSettings
+        fields = '__all__'
 
 
 class UserReplyLikeSerializer(serializers.ModelSerializer):
@@ -517,6 +528,7 @@ class ResourceSerializer(serializers.ModelSerializer):
     downloads = UserResourceDownloadSerializer(many=True, read_only=True)
     shares = UserResourceShareSerializer(many=True, read_only=True)
     histories = DisplayUserResourceHistorySerializer(many=True, read_only=True)
+    basic_settings = ResourceBasicSettingsSerailizer(read_only=True)
 
     def create(self, validated_data):
         profile_id = self.context['profile_id']
@@ -528,8 +540,8 @@ class ResourceSerializer(serializers.ModelSerializer):
                   'title', 'description', 'category', 'download_type',
                   'price', 'no_carry', 'carry_from', 'no_commercial',
                   'entries', 'cover', 'sticky_review_id', 'status_change_timestamp',
-                  'time', 'profile', 'branch', 'tags', 'likes',
-                  'favorites', 'downloads', 'shares', 'histories']
+                  'time', 'profile', 'branch', 'tags', 'likes', 'favorites',
+                  'downloads', 'shares', 'histories', 'basic_settings']
 
 
 class ResourceBranchSerializer(serializers.ModelSerializer):

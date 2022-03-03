@@ -63,6 +63,14 @@ class ResourceAdmin(admin.ModelAdmin):
     search_fields = ['title']
 
 
+@admin.register(models.ResourceBasicSettings)
+class ResourceBasicSettingsAdmin(admin.ModelAdmin):
+    list_display = ['resource']
+    list_per_page = 20
+    autocomplete_fields = ['resource']
+    search_fields = ['resource']
+
+
 @admin.register(models.ResourceReview)
 class ResourceReviewAdmin(admin.ModelAdmin):
     list_display = ['content', 'resource', 'profile', 'time']

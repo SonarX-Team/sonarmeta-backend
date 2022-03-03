@@ -191,7 +191,7 @@ class Resource(models.Model):
     )
     price = models.DecimalField(max_digits=6, decimal_places=2)
     no_carry = models.BooleanField()
-    carry_from = models.CharField(max_length=255, blank=True, null=True)
+    carry_from = models.CharField(max_length=255, null=True, blank=True)
     no_commercial = models.BooleanField()
     cover = models.TextField(null=True, blank=True)
     sticky_review_id = models.PositiveIntegerField(null=True, blank=True)
@@ -212,6 +212,49 @@ class Resource(models.Model):
 
     class Meta:
         ordering = ['-time']
+
+
+class ResourceBasicSettings(models.Model):
+    BACKGROUND_COLOR = '颜色'
+    BACKGROUND_IMAGE = '图片'
+    BACKGROUND_ENV = '环境'
+
+    BACKGROUND_CHOICES = [
+        (BACKGROUND_COLOR, '颜色'),
+        (BACKGROUND_IMAGE, '图片'),
+        (BACKGROUND_ENV, '环境')
+    ]
+
+    model_position_x = models.CharField(max_length=255)
+    model_position_y = models.CharField(max_length=255)
+    model_position_z = models.CharField(max_length=255)
+    model_rotation_x = models.CharField(max_length=255)
+    model_rotation_y = models.CharField(max_length=255)
+    model_rotation_z = models.CharField(max_length=255)
+    camera_position_x = models.CharField(max_length=255)
+    camera_position_y = models.CharField(max_length=255)
+    camera_position_z = models.CharField(max_length=255)
+    camera_rotation_x = models.CharField(max_length=255)
+    camera_rotation_y = models.CharField(max_length=255)
+    camera_rotation_z = models.CharField(max_length=255)
+    fov = models.CharField(max_length=255)
+    background_choice = models.CharField(
+        max_length=10,
+        choices=BACKGROUND_CHOICES,
+        default=BACKGROUND_COLOR
+    )
+    background_color = models.CharField(max_length=10, null=True, blank=True)
+    background_image = models.TextField(null=True, blank=True)
+    background_env = models.TextField(null=True, blank=True)
+    background_env_brightness = models.CharField(max_length=255)
+    resource = models.OneToOneField(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name='basic_settngs'
+    )
+
+    def __str__(self):
+        return f'Basic settings of {self.resource.title}'
 
 
 class ResourceReview(models.Model):
