@@ -154,23 +154,20 @@ class ResourceLightSettingsSerailizer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ResourceNodeMaterialSettingsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.ResourceNodeMaterialSettings
-        field = '__all__'
+# class ResourceNodeMaterialSettingsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = models.ResourceNodeMaterialSettings
+#         field = '__all__'
 
 
 class ResourceMaterialSettingsSerailizer(serializers.ModelSerializer):
-    nodes = ResourceNodeMaterialSettingsSerializer(many=True)
-    resource_id = serializers.IntegerField(read_only=True)
-
     def create(self, validated_data):
         resource_id = self.context['resource_id']
         return models.ResourceMaterialSettings.objects.create(resource_id=resource_id, **validated_data)
 
     class Meta:
         model = models.ResourceMaterialSettings
-        fields = ['id', 'nodes', 'resource_id']
+        fields = '__all__'
 
 
 class UserReplyLikeSerializer(serializers.ModelSerializer):

@@ -317,7 +317,7 @@ class ResourceViewSet(CreateModelMixin,
 
 
 class ResourceBasicSettingsViewSet(ModelViewSet):
-    http_method_names = ['post', 'patch', 'head', 'options']
+    http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.ResourceBasicSettingsSerailizer
 
     def get_queryset(self):
@@ -338,7 +338,7 @@ class ResourceBasicSettingsViewSet(ModelViewSet):
 
 
 class ResourceLightSettingsViewSet(ModelViewSet):
-    http_method_names = ['post', 'patch', 'head', 'options']
+    http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.ResourceLightSettingsSerailizer
 
     def get_queryset(self):
@@ -359,7 +359,7 @@ class ResourceLightSettingsViewSet(ModelViewSet):
 
 
 class ResourceMaterialSettingsViewSet(ModelViewSet):
-    http_method_names = ['post', 'patch', 'head', 'options']
+    http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.ResourceMaterialSettingsSerailizer
 
     def get_queryset(self):
