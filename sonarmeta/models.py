@@ -416,7 +416,7 @@ class ResourceLightSettings(models.Model):
         null=True,
         blank=True
     )
-    env_light_switch = models.BooleanField(default=True)
+    env_switch = models.BooleanField(default=True)
     env_texture = models.TextField(null=True, blank=True)
     env_orientaion = models.CharField(
         max_length=255,
@@ -424,6 +424,17 @@ class ResourceLightSettings(models.Model):
         blank=True
     )
     env_brightness = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    ambient_directional_light_switch = models.BooleanField(default=True)
+    ambient_directional_light_intensity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    ambient_directional_light_bias = models.CharField(
         max_length=255,
         null=True,
         blank=True
