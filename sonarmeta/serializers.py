@@ -549,9 +549,9 @@ class ResourceSerializer(serializers.ModelSerializer):
     downloads = UserResourceDownloadSerializer(many=True, read_only=True)
     shares = UserResourceShareSerializer(many=True, read_only=True)
     histories = DisplayUserResourceHistorySerializer(many=True, read_only=True)
-    basic_settings = ResourceBasicSettingsSerailizer(many=True, read_only=True)
-    light_settings = ResourceLightSettingsSerailizer(many=True, read_only=True)
-    material_settings = ResourceMaterialSettingsSerailizer(many=True, read_only=True)
+    basic_settings = ResourceBasicSettingsSerailizer(read_only=True)
+    light_settings = ResourceLightSettingsSerailizer(read_only=True)
+    material_settings = ResourceMaterialSettingsSerailizer(read_only=True)
 
     def create(self, validated_data):
         profile_id = self.context['profile_id']
