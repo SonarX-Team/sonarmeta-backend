@@ -154,12 +154,6 @@ class ResourceLightSettingsSerailizer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class ResourceNodeMaterialSettingsSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = models.ResourceNodeMaterialSettings
-#         field = '__all__'
-
-
 class ResourceMaterialSettingsSerailizer(serializers.ModelSerializer):
     def create(self, validated_data):
         resource_id = self.context['resource_id']
