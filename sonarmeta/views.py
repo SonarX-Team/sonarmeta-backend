@@ -322,7 +322,7 @@ class ResourceBasicSettingsViewSet(ModelViewSet):
 
     def get_queryset(self):
         return models.ResourceBasicSettings.objects \
-            .get(resource_id=self.kwargs['resource_pk'])
+            .filter(resource_id=self.kwargs['resource_pk'])
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
@@ -343,7 +343,7 @@ class ResourceLightSettingsViewSet(ModelViewSet):
 
     def get_queryset(self):
         return models.ResourceLightSettings.objects \
-            .get(resource_id=self.kwargs['resource_pk'])
+            .filter(resource_id=self.kwargs['resource_pk'])
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
@@ -364,7 +364,7 @@ class ResourceMaterialSettingsViewSet(ModelViewSet):
 
     def get_queryset(self):
         return models.ResourceMaterialSettings.objects \
-            .get(resource_id=self.kwargs['resource_pk'])
+            .filter(resource_id=self.kwargs['resource_pk'])
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
