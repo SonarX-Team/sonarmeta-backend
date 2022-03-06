@@ -252,7 +252,7 @@ class ResourceBasicSettings(models.Model):
     resource = models.OneToOneField(
         Resource,
         on_delete=models.CASCADE,
-        related_name='basic_settngs'
+        related_name='basic_settings'
     )
 
     def __str__(self):
@@ -434,7 +434,7 @@ class ResourceLightSettings(models.Model):
     resource = models.OneToOneField(
         Resource,
         on_delete=models.CASCADE,
-        related_name='light_settngs'
+        related_name='light_settings'
     )
 
     def __str__(self):
@@ -446,7 +446,7 @@ class ResourceMaterialSettings(models.Model):
     resource = models.OneToOneField(
         Resource,
         on_delete=models.CASCADE,
-        related_name='material_settngs'
+        related_name='material_settings'
     )
 
     def __str__(self):
