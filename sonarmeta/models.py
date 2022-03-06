@@ -235,9 +235,6 @@ class ResourceBasicSettings(models.Model):
     camera_position_x = models.CharField(max_length=255)
     camera_position_y = models.CharField(max_length=255)
     camera_position_z = models.CharField(max_length=255)
-    camera_rotation_x = models.CharField(max_length=255)
-    camera_rotation_y = models.CharField(max_length=255)
-    camera_rotation_z = models.CharField(max_length=255)
     fov = models.CharField(max_length=255)
     background_switch = models.BooleanField(default=True)
     background_choice = models.CharField(
