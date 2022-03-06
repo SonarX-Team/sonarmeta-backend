@@ -1,4 +1,5 @@
 from pyexpat import model
+from random import choices
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -238,10 +239,11 @@ class ResourceBasicSettings(models.Model):
     camera_rotation_y = models.CharField(max_length=255)
     camera_rotation_z = models.CharField(max_length=255)
     fov = models.CharField(max_length=255)
+    background_switch = models.BooleanField(default=True)
     background_choice = models.CharField(
         max_length=10,
         choices=BACKGROUND_CHOICES,
-        default=BACKGROUND_COLOR
+        default=BACKGROUND_COLOR,
     )
     background_color = models.CharField(max_length=10, null=True, blank=True)
     background_image = models.TextField(null=True, blank=True)
@@ -255,6 +257,386 @@ class ResourceBasicSettings(models.Model):
 
     def __str__(self):
         return f'Basic settings of {self.resource.title}'
+
+
+class ResourceLightSettings(models.Model):
+    LIGHT_TYPE_NONE = '无'
+    LIGHT_TYPE_DIRECTIONALLIGHT = '平行光'
+    LIGHT_TYPE_POINTLIGHT = '点光源'
+    LIGHT_TYPE_SPOTLIGHT = '聚光灯'
+    LIGHT_TYPE_HEMISPHERELIGHT = '半球光'
+
+    LIGHT_TYPE_CHOICES = [
+        (LIGHT_TYPE_NONE, '无'),
+        (LIGHT_TYPE_DIRECTIONALLIGHT, '平行光'),
+        (LIGHT_TYPE_POINTLIGHT, '点光源'),
+        (LIGHT_TYPE_SPOTLIGHT, '聚光灯'),
+        (LIGHT_TYPE_HEMISPHERELIGHT, '半球光')
+    ]
+
+    light_switch = models.BooleanField(default=False)
+    light_one_type = models.CharField(
+        max_length=10,
+        choices=LIGHT_TYPE_CHOICES,
+        default=LIGHT_TYPE_NONE
+    )
+    light_one_color = models.CharField(max_length=10, null=True, blank=True)
+    light_one_position_x = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_one_position_y = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_one_position_z = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_one_intensity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_one_cast_shadow = models.BooleanField(default=False)
+    light_one_shadow_bias = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_one_attach_to_camera = models.BooleanField(default=False)
+    light_one_decay = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_one_angle = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_one_penumbra = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_two_type = models.CharField(
+        max_length=10,
+        choices=LIGHT_TYPE_CHOICES,
+        default=LIGHT_TYPE_NONE
+    )
+    light_two_color = models.CharField(max_length=10, null=True, blank=True)
+    light_two_position_x = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_two_position_y = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_two_position_z = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_two_intensity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_two_cast_shadow = models.BooleanField(default=False)
+    light_two_shadow_bias = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_two_attach_to_camera = models.BooleanField(default=False)
+    light_two_decay = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_two_angle = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_two_penumbra = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_three_type = models.CharField(
+        max_length=10,
+        choices=LIGHT_TYPE_CHOICES,
+        default=LIGHT_TYPE_NONE
+    )
+    light_three_color = models.CharField(max_length=10, null=True, blank=True)
+    light_three_position_x = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_three_position_y = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_three_position_z = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_three_intensity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_three_cast_shadow = models.BooleanField(default=False)
+    light_three_shadow_bias = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_three_attach_to_camera = models.BooleanField(default=False)
+    light_three_decay = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_three_angle = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    light_three_penumbra = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    env_light_switch = models.BooleanField(default=True)
+    env_texture = models.TextField(null=True, blank=True)
+    env_orientaion = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    env_brightness = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    resource = models.OneToOneField(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name='light_settngs'
+    )
+
+    def __str__(self):
+        return f'Light settings of {self.resource.title}'
+
+
+class ResourceMaterialSettings(models.Model):
+    resource = models.OneToOneField(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name='material_settngs'
+    )
+
+    def __str__(self):
+        return f'Material settings of {self.resource.title}'
+
+
+class ResourceNodeMaterialSettings(models.Model):
+    PBR_WORKFLOW_METALNESS = '金属度'
+    PBR_WORKFLOW_SPECULAR = '反射率'
+
+    NORMAL_BUMP_FLAG_NORMAL = '法线贴图'
+    NORMAL_BUMP_FLAG_BUMP = '凹凸贴图'
+
+    SIDE_FRONT = '前面'
+    SIDE_BACK = '后面'
+    SIDE_DOUBLE = '双面'
+
+    PBR_WORKFLOW_CHOICES = [
+        (PBR_WORKFLOW_METALNESS, '金属度'),
+        (PBR_WORKFLOW_SPECULAR, '反射率')
+    ]
+
+    NORMAL_BUMP_CHOICES = [
+        (NORMAL_BUMP_FLAG_NORMAL, '法线贴图'),
+        (NORMAL_BUMP_FLAG_BUMP, '凹凸贴图')
+    ]
+
+    SIDE_CHOICES = [
+        (SIDE_FRONT, '前面'),
+        (SIDE_BACK, '后面'),
+        (SIDE_DOUBLE, '双面')
+    ]
+
+    name = models.CharField(max_length=255)
+    pbr_workflow = models.CharField(
+        max_length=10,
+        choices=PBR_WORKFLOW_CHOICES,
+        default=PBR_WORKFLOW_METALNESS
+    )
+    base_color_color = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True
+    )
+    base_color_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    base_color_texture = models.TextField(null=True, blank=True)
+    metalness_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    metalness_texture = models.TextField(null=True, blank=True)
+    albedo_color = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True
+    )
+    albedo_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    albedo_texture = models.TextField(null=True, blank=True)
+    specular_color = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True
+    )
+    specular_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    specular_texture = models.TextField(null=True, blank=True)
+    metalness_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    metalness_texture = models.TextField(null=True, blank=True)
+    sheen_switch = models.BooleanField(default=False)
+    sheen_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    sheen_color = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True
+    )
+    sheen_color_texture = models.TextField(null=True, blank=True)
+    sheen_roughness_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    sheen_roughness_texture = models.TextField(null=True, blank=True)
+    clearcoat_switch = models.BooleanField(default=False)
+    clearcoat_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    clearcoat_texture = models.TextField(null=True, blank=True)
+    clearcoat_normal_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    clearcoat_normal_texture = models.TextField(null=True, blank=True)
+    clearcoat_normal_invert_y = models.BooleanField(default=False)
+    clearcoat_roughness_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    clearcoat_roughness_texture = models.TextField(null=True, blank=True)
+    reflectivity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    ambient_occlusion_switch = models.BooleanField(default=False)
+    ambient_occlusion_intensity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    ambient_occlusion_texture = models.TextField(null=True, blank=True)
+    emissive_switch = models.BooleanField(default=False)
+    emissive_intensity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    emissive_color = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True
+    )
+    emissive_texture = models.TextField(null=True, blank=True)
+    matcap = models.TextField(null=True, blank=True)
+    matcap_color = models.CharField(
+        max_length=10,
+        null=True,
+        blank=True
+    )
+    displacement_switch = models.BooleanField(default=False)
+    displacement_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    displacement_texture = models.TextField(null=True, blank=True)
+    normal_bump_switch = models.BooleanField(default=False)
+    normal_bump_flag = models.CharField(
+        max_length=10,
+        choices=NORMAL_BUMP_CHOICES,
+        default=None
+    )
+    material = models.ForeignKey(
+        ResourceMaterialSettings,
+        on_delete=models.CASCADE,
+        related_name='node_settings'
+    )
+    normal_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    normal_texture = models.TextField(null=True, blank=True)
+    normal_invert_y = models.BooleanField(default=False)
+    bump_scale = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    bump_texture = models.TextField(null=True, blank=True)
+    side = models.CharField(
+        max_length=10,
+        choices=SIDE_CHOICES,
+        default=SIDE_FRONT
+    )
+
+    def __str__(self):
+        return f'Material node settings of material {self.material.id}'
 
 
 class ResourceReview(models.Model):

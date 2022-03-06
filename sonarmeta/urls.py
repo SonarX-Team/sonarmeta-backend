@@ -65,6 +65,12 @@ resources_router = routers.NestedDefaultRouter(
 # endpoint: sonarmeta/resources/{resource_pk}/basic-settings/
 resources_router.register(
     'basic-settings', views.ResourceBasicSettingsViewSet, basename='resource-basic-settings')
+# endpoint: sonarmeta/resources/{resource_pk}/light-settings/
+resources_router.register(
+    'light-settings', views.ResourceLightSettingsViewSet, basename='resource-light-settings')
+# endpoint: sonarmeta/resources/{resource_pk}/material-settings/
+resources_router.register(
+    'material-settings', views.ResourceMaterialSettingsViewSet, basename='resource-material-settings')
 # endpoint: sonarmeta/resources/{resource_pk}/reviews/
 resources_router.register(
     'reviews', views.ResourceReviewHeatViewSet, basename='resource-review')

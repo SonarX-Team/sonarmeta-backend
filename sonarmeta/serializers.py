@@ -2,6 +2,7 @@ from dataclasses import field
 from operator import mod
 from django.db.models.fields import IntegerField
 from djoser.serializers import UserSerializer as BaseUserSerializer
+from pkg_resources import ResourceManager
 from rest_framework import serializers
 from . import models
 
@@ -141,6 +142,35 @@ class ResourceBasicSettingsSerailizer(serializers.ModelSerializer):
     class Meta:
         model = models.ResourceBasicSettings
         fields = '__all__'
+
+
+class ResourceLightSettingsSerailizer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        resource_id = self.context['resource_id']
+        return models.ResourceLightSettings.objects.create(resource_id=resource_id, **validated_data)
+
+    class Meta:
+        model = models.ResourceLightSettings
+        fields = '__all__'
+
+
+class ResourceNodeMaterialSettingsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ResourceNodeMaterialSettings
+        field = '__all__'
+
+
+class ResourceMaterialSettingsSerailizer(serializers.ModelSerializer):
+    nodes = ResourceNodeMaterialSettingsSerializer(many=True)
+    resource_id = serializers.IntegerField(read_only=True)
+
+    def create(self, validated_data):
+        resource_id = self.context['resource_id']
+        return models.ResourceMaterialSettings.objects.create(resource_id=resource_id, **validated_data)
+
+    class Meta:
+        model = models.ResourceMaterialSettings
+        fields = ['id', 'nodes', 'resource_id']
 
 
 class UserReplyLikeSerializer(serializers.ModelSerializer):
@@ -529,6 +559,8 @@ class ResourceSerializer(serializers.ModelSerializer):
     shares = UserResourceShareSerializer(many=True, read_only=True)
     histories = DisplayUserResourceHistorySerializer(many=True, read_only=True)
     basic_settings = ResourceBasicSettingsSerailizer(read_only=True)
+    light_settings = ResourceLightSettingsSerailizer(read_only=True)
+    material_settings = ResourceMaterialSettingsSerailizer(read_only=True)
 
     def create(self, validated_data):
         profile_id = self.context['profile_id']
@@ -540,8 +572,9 @@ class ResourceSerializer(serializers.ModelSerializer):
                   'title', 'description', 'category', 'download_type',
                   'price', 'no_carry', 'carry_from', 'no_commercial',
                   'entries', 'cover', 'sticky_review_id', 'status_change_timestamp',
-                  'time', 'profile', 'branch', 'tags', 'likes', 'favorites',
-                  'downloads', 'shares', 'histories', 'basic_settings']
+                  'time', 'profile', 'branch', 'tags', 'likes',
+                  'favorites', 'downloads', 'shares', 'histories',
+                  'basic_settings', 'light_settings', 'material_settings']
 
 
 class ResourceBranchSerializer(serializers.ModelSerializer):

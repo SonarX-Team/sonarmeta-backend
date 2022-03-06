@@ -337,6 +337,48 @@ class ResourceBasicSettingsViewSet(ModelViewSet):
         }
 
 
+class ResourceLightSettingsViewSet(ModelViewSet):
+    http_method_names = ['post', 'patch', 'head', 'options']
+    serializer_class = serializers.ResourceLightSettingsSerailizer
+
+    def get_queryset(self):
+        return models.ResourceLightSettings.objects \
+            .get(self.kwargs['resource_pk'])
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_serializer_context(self):
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_context()
+        return {
+            'resource_id': self.kwargs['resource_pk']
+        }
+
+
+class ResourceMaterialSettingsViewSet(ModelViewSet):
+    http_method_names = ['post', 'patch', 'head', 'options']
+    serializer_class = serializers.ResourceMaterialSettingsSerailizer
+
+    def get_queryset(self):
+        return models.ResourceMaterialSettings.objects \
+            .get(self.kwargs['resource_pk'])
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_serializer_context(self):
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_context()
+        return {
+            'resource_id': self.kwargs['resource_pk']
+        }
+
+
 class RecommendationResourceViewSet(ModelViewSet):
     '''
     This viewset is used to recommend resources
