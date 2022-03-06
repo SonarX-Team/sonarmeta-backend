@@ -164,6 +164,16 @@ class ResourceMaterialSettingsSerailizer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ResourcePostProcessingSettingsSerailizer(serializers.ModelSerializer):
+    def create(self, validated_data):
+        resource_id = self.context['resource_id']
+        return models.ResourcePostProcessingSettings.objects.create(resource_id=resource_id, **validated_data)
+
+    class Meta:
+        model = models.ResourcePostProcessingSettings
+        fields = '__all__'
+
+
 class UserReplyLikeSerializer(serializers.ModelSerializer):
     '''
     This serializer will be used in reply serializer
@@ -552,6 +562,9 @@ class ResourceSerializer(serializers.ModelSerializer):
     basic_settings = ResourceBasicSettingsSerailizer(read_only=True)
     light_settings = ResourceLightSettingsSerailizer(read_only=True)
     material_settings = ResourceMaterialSettingsSerailizer(read_only=True)
+    post_processing_settings = ResourcePostProcessingSettingsSerailizer(
+        read_only=True
+    )
 
     def create(self, validated_data):
         profile_id = self.context['profile_id']
@@ -565,7 +578,7 @@ class ResourceSerializer(serializers.ModelSerializer):
                   'entries', 'cover', 'sticky_review_id', 'status_change_timestamp',
                   'time', 'profile', 'branch', 'tags', 'likes',
                   'favorites', 'downloads', 'shares', 'histories',
-                  'basic_settings', 'light_settings', 'material_settings']
+                  'basic_settings', 'light_settings', 'material_settings', 'post_processing_settings']
 
 
 class ResourceBranchSerializer(serializers.ModelSerializer):

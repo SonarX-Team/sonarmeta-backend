@@ -71,6 +71,9 @@ resources_router.register(
 # endpoint: sonarmeta/resources/{resource_pk}/material-settings/
 resources_router.register(
     'material-settings', views.ResourceMaterialSettingsViewSet, basename='resource-material-settings')
+# endpoint: sonarmeta/resources/{resource_pk}/post-processing-settings/
+resources_router.register(
+    'post-processing-settings', views.ResourcePostProcessingSettingsViewSet, basename='resource-post-processing-settings')
 # endpoint: sonarmeta/resources/{resource_pk}/reviews/
 resources_router.register(
     'reviews', views.ResourceReviewHeatViewSet, basename='resource-review')

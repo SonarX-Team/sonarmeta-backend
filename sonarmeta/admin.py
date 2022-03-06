@@ -87,6 +87,14 @@ class ResourceMaterialSettingsAdmin(admin.ModelAdmin):
     search_fields = ['resource']
 
 
+@admin.register(models.ResourcePostProcessingSettings)
+class ResourcePostProcessingSettingsAdmin(admin.ModelAdmin):
+    list_display = ['resource']
+    list_per_page = 20
+    autocomplete_fields = ['resource']
+    search_fields = ['resource']
+
+
 @admin.register(models.ResourceReview)
 class ResourceReviewAdmin(admin.ModelAdmin):
     list_display = ['content', 'resource', 'profile', 'time']

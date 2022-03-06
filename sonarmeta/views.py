@@ -379,6 +379,27 @@ class ResourceMaterialSettingsViewSet(ModelViewSet):
         }
 
 
+class ResourcePostProcessingSettingsViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'head', 'options']
+    serializer_class = serializers.ResourcePostProcessingSettingsSerailizer
+
+    def get_queryset(self):
+        return models.ResourcePostProcessingSettings.objects \
+            .filter(resource_id=self.kwargs['resource_pk'])
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAuthenticated()]
+
+    def get_serializer_context(self):
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_context()
+        return {
+            'resource_id': self.kwargs['resource_pk']
+        }
+
+
 class RecommendationResourceViewSet(ModelViewSet):
     '''
     This viewset is used to recommend resources

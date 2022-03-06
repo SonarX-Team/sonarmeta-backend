@@ -256,7 +256,7 @@ class ResourceBasicSettings(models.Model):
     )
 
     def __str__(self):
-        return f'Basic settings of {self.resource.title}'
+        return f'Basic settings of {self.resource}'
 
 
 class ResourceLightSettings(models.Model):
@@ -438,7 +438,7 @@ class ResourceLightSettings(models.Model):
     )
 
     def __str__(self):
-        return f'Light settings of {self.resource.title}'
+        return f'Light settings of {self.resource}'
 
 
 class ResourceMaterialSettings(models.Model):
@@ -450,7 +450,68 @@ class ResourceMaterialSettings(models.Model):
     )
 
     def __str__(self):
-        return f'Material settings of {self.resource.title}'
+        return f'Material settings of {self.resource}'
+
+
+class ResourcePostProcessingSettings(models.Model):
+    switch = models.BooleanField(default=True)
+    ssao_switch = models.BooleanField(default=False)
+    ssao_radius = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    ssao_intensity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    ssao_bias = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    chromatic_aberration_switch = models.BooleanField(default=False)
+    chromatic_aberration_offset = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    vignette_switch = models.BooleanField(default=False)
+    vignette_offset = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    vignette_darkness = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    bloom_switch = models.BooleanField(default=False)
+    bloom_intensity = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    bloom_luminance_threshold = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    bloom_radius = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True
+    )
+    resource = models.OneToOneField(
+        Resource,
+        on_delete=models.CASCADE,
+        related_name='post_processing_settings'
+    )
+
+    def __str__(self):
+        return f'Post processing settings of {self.resource}'
 
 
 class ResourceReview(models.Model):
