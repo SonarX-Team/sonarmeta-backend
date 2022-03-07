@@ -143,7 +143,7 @@ class ResourceBasicSettingsSerailizer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceBasicSettings
-        fields = '__all__'
+        exclude = ['resource']
 
 
 class ResourceLightSettingsSerailizer(serializers.ModelSerializer):
@@ -155,7 +155,7 @@ class ResourceLightSettingsSerailizer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceLightSettings
-        fields = '__all__'
+        exclude = ['resource']
 
 
 class ResourceMaterialSettingsSerailizer(serializers.ModelSerializer):
@@ -167,7 +167,7 @@ class ResourceMaterialSettingsSerailizer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceMaterialSettings
-        fields = '__all__'
+        exclude = ['resource']
 
 
 class ResourcePostProcessingSettingsSerailizer(serializers.ModelSerializer):
@@ -179,7 +179,7 @@ class ResourcePostProcessingSettingsSerailizer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourcePostProcessingSettings
-        fields = '__all__'
+        exclude = ['resource']
 
 
 class UserReplyLikeSerializer(serializers.ModelSerializer):
