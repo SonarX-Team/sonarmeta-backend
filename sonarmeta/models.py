@@ -418,7 +418,7 @@ class ResourceLightSettings(models.Model):
     )
     env_switch = models.BooleanField(default=True)
     env_texture = models.TextField(null=True, blank=True)
-    env_orientaion = models.CharField(
+    env_orientation = models.CharField(
         max_length=255,
         null=True,
         blank=True
