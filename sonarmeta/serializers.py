@@ -135,6 +135,8 @@ class MessageSerializer(serializers.ModelSerializer):
 
 
 class ResourceBasicSettingsSerailizer(serializers.ModelSerializer):
+    resource_id = serializers.IntegerField(read_only=True)
+    
     def create(self, validated_data):
         resource_id = self.context['resource_id']
         return models.ResourceBasicSettings.objects.create(resource_id=resource_id, **validated_data)
@@ -145,6 +147,8 @@ class ResourceBasicSettingsSerailizer(serializers.ModelSerializer):
 
 
 class ResourceLightSettingsSerailizer(serializers.ModelSerializer):
+    resource_id = serializers.IntegerField(read_only=True)
+
     def create(self, validated_data):
         resource_id = self.context['resource_id']
         return models.ResourceLightSettings.objects.create(resource_id=resource_id, **validated_data)
@@ -155,6 +159,8 @@ class ResourceLightSettingsSerailizer(serializers.ModelSerializer):
 
 
 class ResourceMaterialSettingsSerailizer(serializers.ModelSerializer):
+    resource_id = serializers.IntegerField(read_only=True)
+
     def create(self, validated_data):
         resource_id = self.context['resource_id']
         return models.ResourceMaterialSettings.objects.create(resource_id=resource_id, **validated_data)
@@ -165,6 +171,8 @@ class ResourceMaterialSettingsSerailizer(serializers.ModelSerializer):
 
 
 class ResourcePostProcessingSettingsSerailizer(serializers.ModelSerializer):
+    resource_id = serializers.IntegerField(read_only=True)
+
     def create(self, validated_data):
         resource_id = self.context['resource_id']
         return models.ResourcePostProcessingSettings.objects.create(resource_id=resource_id, **validated_data)
