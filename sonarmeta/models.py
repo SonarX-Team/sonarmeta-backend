@@ -450,6 +450,19 @@ class ResourceLightSettings(models.Model):
 
 
 class ResourceMaterialSettings(models.Model):
+    CURRENT_PBR_WORKFLOW_METALNESS = '金属度'
+    CURRENT_PBR_WORKFLOW_SPECULAR = '反射率'
+
+    CURRENT_PBR_WORKFLOW_CHOICES = [
+        (CURRENT_PBR_WORKFLOW_METALNESS, '金属度'),
+        (CURRENT_PBR_WORKFLOW_SPECULAR, '反射率')
+    ]
+
+    current_pbr_workflow = models.CharField(
+        max_length=10,
+        choices=CURRENT_PBR_WORKFLOW_CHOICES,
+        default=CURRENT_PBR_WORKFLOW_METALNESS
+    )
     nodes = models.TextField()
     resource = models.OneToOneField(
         Resource,
