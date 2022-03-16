@@ -590,7 +590,6 @@ class ResourceSerializer(serializers.ModelSerializer):
 
 
 class ResourceBranchSerializer(serializers.ModelSerializer):
-    resources = SimpleResourceSerializer(many=True, read_only=True)
     profile = MicroProfileSerializer(read_only=True)
     total_entries = serializers \
         .SerializerMethodField(method_name='calculate_entry')

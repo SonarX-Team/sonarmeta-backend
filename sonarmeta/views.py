@@ -446,13 +446,8 @@ class MeResourceViewSet(ModelViewSet):
 
 
 class BranchResourceViewSet(ModelViewSet):
-    '''
-    This viewset is used to get resources of a certain branch
-    Only be used at the series management page, and do searching
-    '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.SimpleResourceSerializer
-    permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter]
     search_fields = ['title', 'tags']
