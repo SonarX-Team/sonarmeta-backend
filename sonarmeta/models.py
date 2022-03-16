@@ -202,8 +202,9 @@ class Resource(models.Model):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     branch = models.ForeignKey(
         ResourceBranch,
-        on_delete=models.SET_DEFAULT,
-        default=0,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='resources'
     )
 
