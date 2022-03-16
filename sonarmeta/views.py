@@ -239,7 +239,8 @@ class ResourceBranchViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceBranchSerializer
     pagination_class = pagination.TwelvePagination
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filterset_fields = ["profile__id"]
     search_fields = ['title']
 
     def get_queryset(self):
