@@ -136,7 +136,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
 class ResourceBasicSettingsSerailizer(serializers.ModelSerializer):
     resource_id = serializers.IntegerField(read_only=True)
-    
+
     def create(self, validated_data):
         resource_id = self.context['resource_id']
         return models.ResourceBasicSettings.objects.create(resource_id=resource_id, **validated_data)
@@ -646,7 +646,6 @@ class ResourceBranchSerializer(serializers.ModelSerializer):
 
 
 class ResourceSeriesSerializer(serializers.ModelSerializer):
-    branches = ResourceBranchSerializer(many=True, read_only=True)
     profile = MicroProfileSerializer(read_only=True)
     total_entries = serializers \
         .SerializerMethodField(method_name='calculate_entry')
@@ -700,5 +699,5 @@ class ResourceSeriesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceSeries
-        fields = ['id', 'title', 'description', 'branches', 'profile', 'total_entries',
+        fields = ['id', 'title', 'description', 'profile', 'total_entries',
                   'total_likes', 'total_favorites', 'total_downloads', 'total_shares', 'time']
