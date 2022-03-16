@@ -430,13 +430,14 @@ class SearchResourceViewSet(ModelViewSet):
 class MeResourceViewSet(ModelViewSet):
     '''
     This viewset is used to get resources of the current profile
+    And get resource choices for a certain series branch
     '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.SimpleResourceSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter, DjangoFilterBackend]
-    filterset_fields = ["status"]
+    filterset_fields = ["status", "branch__id"]
     search_fields = ['title', 'tags']
 
     def get_queryset(self):
