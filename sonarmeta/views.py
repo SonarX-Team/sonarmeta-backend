@@ -429,21 +429,39 @@ class SearchResourceViewSet(ModelViewSet):
 
 class MeResourceViewSet(ModelViewSet):
     '''
-    This viewset is used to get resources of the current profile
-    And get resource choices for a certain series branch
+    This viewset is used to provide resources of the current profile
     '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.SimpleResourceSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter, DjangoFilterBackend]
-    filterset_fields = ["status", "branch__id"]
+    filterset_fields = ["status"]
     search_fields = ['title', 'tags']
 
     def get_queryset(self):
         profile_id = models.Profile.objects \
             .get(user_id=self.request.user.id).id
         return models.Resource.objects.prefetch_related('profile').filter(profile_id=profile_id)
+
+
+class ChoiceResourceViewSet(ModelViewSet):
+    '''
+    This viewset is used to provide resource choices of the current profile
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.SimpleResourceSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwelvePagination
+    filter_backends = [SearchFilter]
+    search_fields = ['title', 'tags']
+
+    def get_queryset(self):
+        profile_id = models.Profile.objects \
+            .get(user_id=self.request.user.id).id
+        return models.Resource.objects \
+            .prefetch_related('profile') \
+            .filter(profile_id=profile_id, branch_id=None)
 
 
 class BranchResourceViewSet(ModelViewSet):
