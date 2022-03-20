@@ -1,4 +1,4 @@
-from django.db.models import Sum, Q
+from django.db.models import Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -262,15 +262,15 @@ class ResourceBranchViewSet(ModelViewSet):
     # endpoint: sonarmeta/series/{series_pk}/branches/covers/
     @action(detail=False, methods=['GET'])
     def covers(self, request, *args, **kwargs):
+        count = 0
         covers = []
         branches = models.ResourceBranch.objects \
             .prefetch_related('profile__user') \
-            .filter(series_id=kwargs['series_pk']) \
-            .annotate(heat=Sum('resources__entries')) \
-            .order_by('heat')
-        print(branches)
+            .filter(series_id=kwargs['series_pk'])
         for item in branches:
-            covers.append(item.resources.first().cover)
+            if item.resources.first().cover and count < 4:
+                covers.append(item.resources.first().cover)
+                count += 1
         return Response(covers, status=status.HTTP_200_OK)
 
 
