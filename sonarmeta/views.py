@@ -1,4 +1,4 @@
-from django.db.models import Count, Q
+from django.db.models import Sum, Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -266,7 +266,9 @@ class ResourceBranchViewSet(ModelViewSet):
         covers = []
         branches = models.ResourceBranch.objects \
             .prefetch_related('profile__user') \
-            .filter(series_id=kwargs['series_pk'])
+            .filter(series_id=kwargs['series_pk']) \
+            .annotate(heat=Sum('resources__entries')) \
+            .order_by('-heat')
         for item in branches:
             if item.resources.first().cover and count < 4:
                 covers.append(item.resources.first().cover)
