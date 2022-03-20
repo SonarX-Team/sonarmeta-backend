@@ -1,5 +1,4 @@
-from crypt import methods
-from django.db.models import Count, Q
+from django.db.models import Sum, Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
@@ -266,9 +265,12 @@ class ResourceBranchViewSet(ModelViewSet):
         covers = []
         branches = models.ResourceBranch.objects \
             .prefetch_related('profile__user') \
-            .filter(series_id=kwargs['series_pk'])[:4]
+            .filter(series_id=kwargs['series_pk']) \
+            .annotate(heat=Sum('resources__entries')) \
+            .order_by('heat')
+        print(branches)
         for item in branches:
-            covers.append(item.resources[0].cover)
+            covers.append(item.resources.first().cover)
         return Response(covers, status=status.HTTP_200_OK)
 
 
