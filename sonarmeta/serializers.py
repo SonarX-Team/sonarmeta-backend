@@ -639,7 +639,7 @@ class ResourceBranchSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ResourceBranch
-        fields = ['id', 'title', 'resources', 'profile',
+        fields = ['id', 'title', 'profile',
                   'total_entries', 'total_likes', 'total_favorites',
                   'total_downloads', 'total_shares', 'time']
 

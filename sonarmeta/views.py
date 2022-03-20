@@ -171,7 +171,6 @@ class ResourceSeriesViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     queryset = models.ResourceSeries.objects.all()
     serializer_class = serializers.ResourceSeriesSerializer
-    pagination_class = pagination.TwelvePagination
 
     def get_permissions(self):
         if self.request.method == 'POST' or self.request.method == 'DELETE':
@@ -208,7 +207,7 @@ class ResourceSeriesViewSet(ModelViewSet):
     def recommendations(self, request):
         series = models.ResourceSeries.objects \
             .prefetch_related('profile') \
-            .all()
+            .all()[:12]
         serializer = serializers \
             .DisplayResourceSeriesSerializer(series, many=True)
         return Response(serializer.data)
@@ -230,7 +229,7 @@ class MeResourceSeriesViewSet(ModelViewSet):
         profile_id = models.Profile.objects \
             .get(user_id=self.request.user.id).id
         return models.ResourceSeries.objects \
-            .prefetch_related("branches") \
+            .prefetch_related('branches') \
             .filter(Q(branches__profile__id=profile_id) | Q(profile_id=profile_id)) \
             .distinct()
 
@@ -240,7 +239,7 @@ class ResourceBranchViewSet(ModelViewSet):
     serializer_class = serializers.ResourceBranchSerializer
     pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter, DjangoFilterBackend]
-    filterset_fields = ["profile__id"]
+    filterset_fields = ['profile__id']
     search_fields = ['title']
 
     def get_queryset(self):
@@ -260,6 +259,17 @@ class ResourceBranchViewSet(ModelViewSet):
             'series_id': self.kwargs['series_pk'],
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
+
+    # endpoint: sonarmeta/series/{series_pk}/branches/covers/
+    @action(detail=False, methods=['GET'])
+    def covers(self, request, *args, **kwargs):
+        covers = []
+        branches = models.ResourceBranch.objects \
+            .prefetch_related('profile__user') \
+            .filter(series_id=kwargs['series_pk'])[:4]
+        for item in branches:
+            covers.append(item.resources[0].cover)
+        return Response(covers, status=status.HTTP_200_OK)
 
 
 class ResourceViewSet(CreateModelMixin,
@@ -293,10 +303,10 @@ class ResourceViewSet(CreateModelMixin,
     @action(detail=False, methods=['POST'])
     def attach(self, request):
         profile_id = models.Profile.objects.get(user_id=request.user.id).id
-        for item in request.data.get("resource_id_list"):
+        for item in request.data.get('resource_id_list'):
             resource = models.Resource.objects.get(pk=item)
             if resource.profile_id == profile_id:
-                resource.branch_id = request.data.get("branch_id")
+                resource.branch_id = request.data.get('branch_id')
                 resource.save()
             else:
                 return Response(status.HTTP_401_UNAUTHORIZED)
@@ -308,7 +318,7 @@ class ResourceViewSet(CreateModelMixin,
     def detach(self, request):
         profile_id = models.Profile.objects.get(user_id=request.user.id).id
         resource = models.Resource.objects \
-            .get(pk=request.data.get("resource_id"))
+            .get(pk=request.data.get('resource_id'))
         if resource.profile_id == profile_id:
             resource.branch_id = None
             resource.save()
@@ -436,7 +446,7 @@ class MeResourceViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter, DjangoFilterBackend]
-    filterset_fields = ["status"]
+    filterset_fields = ['status']
     search_fields = ['title', 'tags']
 
     def get_queryset(self):
