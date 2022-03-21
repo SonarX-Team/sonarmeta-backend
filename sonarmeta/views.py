@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
 from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
-from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated
+from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
@@ -116,15 +116,11 @@ class UserFollowersViewset(ModelViewSet):
 class UserSubscribeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.UserSubscribeSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         return models.UserSubscribe.objects \
             .filter(creator_id=self.kwargs['profile_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         return {
@@ -136,17 +132,13 @@ class UserSubscribeViewSet(ModelViewSet):
 class UserBlacklistViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.UserBlacklistSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = pagination.TwelvePagination
 
     def get_queryset(self):
         profile_id = models.Profile.objects \
             .get(user_id=self.request.user.id).id
         return models.UserBlacklist.objects.filter(preventer_id=profile_id)
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         return {
@@ -170,11 +162,7 @@ class ResourceSeriesViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     queryset = models.ResourceSeries.objects.all()
     serializer_class = serializers.ResourceSeriesSerializer
-
-    def get_permissions(self):
-        if self.request.method == 'POST' or self.request.method == 'DELETE':
-            return [IsAuthenticated()]
-        return [AllowAny()]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -236,6 +224,7 @@ class MeResourceSeriesViewSet(ModelViewSet):
 class ResourceBranchViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceBranchSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = pagination.TwelvePagination
     filter_backends = [SearchFilter, DjangoFilterBackend]
     filterset_fields = ['profile__id']
@@ -245,11 +234,6 @@ class ResourceBranchViewSet(ModelViewSet):
         return models.ResourceBranch.objects \
             .prefetch_related('profile__user') \
             .filter(series_id=self.kwargs['series_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -276,11 +260,7 @@ class ResourceBranchViewSet(ModelViewSet):
         return Response(covers, status=status.HTTP_200_OK)
 
 
-class ResourceViewSet(CreateModelMixin,
-                      RetrieveModelMixin,
-                      UpdateModelMixin,
-                      DestroyModelMixin,
-                      GenericViewSet):
+class ResourceViewSet(ModelViewSet):
     '''
     This ViewSet's GET method is only used to retrieve,
     since ResourceSerializer is very complex and it will cause
@@ -289,11 +269,7 @@ class ResourceViewSet(CreateModelMixin,
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     queryset = models.Resource.objects.all().prefetch_related('profile', 'branch')
     serializer_class = serializers.ResourceSerializer
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -334,15 +310,11 @@ class ResourceViewSet(CreateModelMixin,
 class ResourceBasicSettingsViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.ResourceBasicSettingsSerailizer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         return models.ResourceBasicSettings.objects \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -355,15 +327,11 @@ class ResourceBasicSettingsViewSet(ModelViewSet):
 class ResourceLightSettingsViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.ResourceLightSettingsSerailizer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         return models.ResourceLightSettings.objects \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -376,15 +344,11 @@ class ResourceLightSettingsViewSet(ModelViewSet):
 class ResourceMaterialSettingsViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.ResourceMaterialSettingsSerailizer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         return models.ResourceMaterialSettings.objects \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -397,15 +361,11 @@ class ResourceMaterialSettingsViewSet(ModelViewSet):
 class ResourcePostProcessingSettingsViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.ResourcePostProcessingSettingsSerailizer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         return models.ResourcePostProcessingSettings.objects \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -493,6 +453,7 @@ class BranchResourceViewSet(ModelViewSet):
 class ResourceReviewHeatViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = pagination.TwelvePagination
 
     # user resource review is designed to list at the review's side
@@ -503,11 +464,6 @@ class ResourceReviewHeatViewSet(ModelViewSet):
             .filter(resource_id=self.kwargs['resource_pk']) \
             .annotate(num_likes=Count('likes__like_flag', filter=Q(likes__like_flag=True))-Count('likes__like_flag', filter=Q(likes__like_flag=False))) \
             .order_by('-num_likes', '-time')
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -531,6 +487,7 @@ class ResourceReviewHeatViewSet(ModelViewSet):
 class ResourceReviewNewestViewSet(ModelViewSet):
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.ResourceReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = pagination.TwelvePagination
 
     # user resource review is designed to list at the review's side
@@ -541,15 +498,11 @@ class ResourceReviewNewestViewSet(ModelViewSet):
             .filter(resource_id=self.kwargs['resource_pk']) \
             .order_by('-time')
 
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
-
 
 class ResourceReplyViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceReplySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     pagination_class = pagination.TwelvePagination
 
     # user resource reply is designed to list at the reply's side
@@ -558,11 +511,6 @@ class ResourceReplyViewSet(ModelViewSet):
         return models.ResourceReply.objects \
             .prefetch_related('profile__user') \
             .filter(review_id=self.kwargs['review_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -600,6 +548,7 @@ class UserResourceHistoryViewSet(ModelViewSet):
 class UserResourceEntryViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'options']
     serializer_class = serializers.UserResourceEntrySerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     # user resource entry is designed to list at the resource's side
     # so get its queryset by resource id
@@ -607,11 +556,6 @@ class UserResourceEntryViewSet(ModelViewSet):
         return models.UserResourceEntry.objects \
             .prefetch_related('profile__user') \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -625,6 +569,7 @@ class UserResourceEntryViewSet(ModelViewSet):
 class UserResourceLikeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.UserResourceLikeSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     # user resource like is designed to list at the resource's side
     # so get its queryset by resource id
@@ -632,11 +577,6 @@ class UserResourceLikeViewSet(ModelViewSet):
         return models.UserResourceLike.objects \
             .prefetch_related('profile__user') \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -650,6 +590,7 @@ class UserResourceLikeViewSet(ModelViewSet):
 class UserResourceFavoriteViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     serializer_class = serializers.DisplayUserResourceFavoriteSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     # user resource favorite is designed to list at the resource's side
     # so get its queryset by resource id
@@ -657,11 +598,6 @@ class UserResourceFavoriteViewSet(ModelViewSet):
         return models.UserResourceFavorite.objects \
             .prefetch_related('profile__user') \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -675,6 +611,7 @@ class UserResourceFavoriteViewSet(ModelViewSet):
 class UserResourceDownloadViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'options']
     serializer_class = serializers.UserResourceDownloadSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     # user resource download is designed to list at the resource's side
     # so get its queryset by resource id
@@ -682,11 +619,6 @@ class UserResourceDownloadViewSet(ModelViewSet):
         return models.UserResourceDownload.objects \
             .prefetch_related('profile__user') \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -700,6 +632,7 @@ class UserResourceDownloadViewSet(ModelViewSet):
 class UserResourceShareViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'options']
     serializer_class = serializers.UserResourceShareSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     # user resource share is designed to list at the resource's side
     # so get its queryset by resource id
@@ -707,11 +640,6 @@ class UserResourceShareViewSet(ModelViewSet):
         return models.UserResourceShare.objects \
             .prefetch_related('profile__user') \
             .filter(resource_id=self.kwargs['resource_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -725,6 +653,7 @@ class UserResourceShareViewSet(ModelViewSet):
 class UserReviewLikeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     serializer_class = serializers.UserReviewLikeSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     # user review like is designed to list at the review's side
     # so get its queryset by review id
@@ -732,11 +661,6 @@ class UserReviewLikeViewSet(ModelViewSet):
         return models.UserReviewLike.objects \
             .prefetch_related('profile__user') \
             .filter(review_id=self.kwargs['review_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
@@ -750,6 +674,7 @@ class UserReviewLikeViewSet(ModelViewSet):
 class UserReplyLikeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     serializer_class = serializers.UserReplyLikeSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     # user reply like is designed to list at the reply's side
     # so get its queryset by reply id
@@ -758,11 +683,6 @@ class UserReplyLikeViewSet(ModelViewSet):
         return models.UserReplyLike.objects \
             .prefetch_related('profile__user') \
             .filter(reply_id=self.kwargs['reply_pk'])
-
-    def get_permissions(self):
-        if self.request.method in SAFE_METHODS:
-            return [AllowAny()]
-        return [IsAuthenticated()]
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
