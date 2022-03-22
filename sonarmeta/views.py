@@ -2,7 +2,7 @@ from django.db.models import Sum, Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
+from rest_framework.mixins import RetrieveModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
@@ -127,6 +127,17 @@ class UserSubscribeViewSet(ModelViewSet):
             'creator_id': self.kwargs['profile_pk'],
             'subscriber_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects \
+            .get(user_id=request.user.id).id
+        subscriber_id = models.UserSubscribe.objects \
+            .get(pk=kwargs['pk']).subscriber_id
+        if profile_id == subscriber_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UserBlacklistViewSet(ModelViewSet):
