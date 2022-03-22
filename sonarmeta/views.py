@@ -304,7 +304,7 @@ class ResourceBranchViewSet(ModelViewSet):
             .annotate(heat=Sum('resources__entries')) \
             .order_by('-heat')
         for item in branches:
-            if item.resources.first().cover and count < 4:
+            if item.resources.first() and count < 4:
                 covers.append(item.resources.first().cover)
                 count += 1
         return Response(covers, status=status.HTTP_200_OK)
@@ -355,7 +355,7 @@ class ResourceViewSet(ModelViewSet):
         profile_id = models.Profile.objects.get(user_id=request.user.id).id
         for item in request.data.get('resource_id_list'):
             resource = models.Resource.objects.get(pk=item)
-            if resource.profile_id == profile_id:
+            if resource.profile_id == profile_id and resource.status == 'P':
                 resource.branch_id = request.data.get('branch_id')
                 resource.save()
             else:
@@ -553,7 +553,7 @@ class ChoiceResourceViewSet(ModelViewSet):
             .get(user_id=self.request.user.id).id
         return models.Resource.objects \
             .prefetch_related('profile') \
-            .filter(profile_id=profile_id, branch_id=None)
+            .filter(profile_id=profile_id, status='P', branch_id=None)
 
 
 class BranchResourceViewSet(ModelViewSet):
