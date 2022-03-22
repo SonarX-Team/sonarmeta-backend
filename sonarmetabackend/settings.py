@@ -34,8 +34,12 @@ SECRET_KEY = 'django-insecure-7v6i0i(cu=t5boadu02q=d*smtds9mxctyvdz4auiw6f9md%$s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
+ALLOWED_HOSTS = ['api.sonarmeta.com']
 
 # Application definition
 
@@ -74,11 +78,11 @@ INTERNAL_IPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://sonarmeta.com",
     "https://www.sonarmeta.com",
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
+    "http://localhost:8080"
 ]
+
+#CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'sonarmetabackend.urls'
 
@@ -110,7 +114,7 @@ DATABASES = {
         'NAME': 'sonarmeta',
         'HOST': 'localhost',
         'USER': 'root',
-        'PASSWORD': 'Xrs80750176'
+        'PASSWORD': 'archimesons20211111'
     }
 }
 
@@ -167,6 +171,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    #'DEFAULT_RENDERER_CLASSES': (
+    #    'rest_framework.renderers.JSONRenderer',
+    #),
+    #'DEFAULT_PARSER_CLASSES': (
+    #    'rest_framework.parsers.JSONParser',
+    #)
 }
 
 AUTH_USER_MODEL = 'core.User'
