@@ -130,8 +130,7 @@ class UserSubscribeViewSet(ModelViewSet):
 
     # Override the destroy method in order to verify owner authentication
     def destroy(self, request, *args, **kwargs):
-        profile_id = models.Profile.objects \
-            .get(user_id=request.user.id).id
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
         subscriber_id = models.UserSubscribe.objects \
             .get(pk=kwargs['pk']).subscriber_id
         if profile_id == subscriber_id:
@@ -157,6 +156,16 @@ class UserBlacklistViewSet(ModelViewSet):
             'preventer_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        preventer_id = models.UserBlacklist.objects \
+            .get(pk=kwargs['pk']).preventer_id
+        if profile_id == preventer_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class MessageViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
@@ -167,6 +176,16 @@ class MessageViewSet(ModelViewSet):
         profile_id = models.Profile.objects \
             .get(user_id=self.request.user.id).id
         return models.Message.objects.filter(profile_id=profile_id)
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.Message.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ResourceSeriesViewSet(ModelViewSet):
@@ -254,6 +273,26 @@ class ResourceBranchViewSet(ModelViewSet):
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.ResourceBranch.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.ResourceBranch.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
     # endpoint: sonarmeta/series/{series_pk}/branches/covers/
     @action(detail=False, methods=['GET'])
     def covers(self, request, *args, **kwargs):
@@ -288,6 +327,26 @@ class ResourceViewSet(ModelViewSet):
         return {
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
+
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.Resource.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.Resource.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     # endpoint: sonarmeta/resources/attach/
     # This method is used to attach a resource to a branch
@@ -334,6 +393,18 @@ class ResourceBasicSettingsViewSet(ModelViewSet):
             'resource_id': self.kwargs['resource_pk']
         }
 
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        resource_id = models.ResourceBasicSettings.objects \
+            .get(pk=kwargs['pk']).resource_id
+        owner_profile_id = models.Resource.objects \
+            .get(pk=resource_id).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class ResourceLightSettingsViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options']
@@ -350,6 +421,18 @@ class ResourceLightSettingsViewSet(ModelViewSet):
         return {
             'resource_id': self.kwargs['resource_pk']
         }
+
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        resource_id = models.ResourceLightSettings.objects \
+            .get(pk=kwargs['pk']).resource_id
+        owner_profile_id = models.Resource.objects \
+            .get(pk=resource_id).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ResourceMaterialSettingsViewSet(ModelViewSet):
@@ -368,6 +451,18 @@ class ResourceMaterialSettingsViewSet(ModelViewSet):
             'resource_id': self.kwargs['resource_pk']
         }
 
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        resource_id = models.ResourceMaterialSettings.objects \
+            .get(pk=kwargs['pk']).resource_id
+        owner_profile_id = models.Resource.objects \
+            .get(pk=resource_id).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class ResourcePostProcessingSettingsViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options']
@@ -384,6 +479,18 @@ class ResourcePostProcessingSettingsViewSet(ModelViewSet):
         return {
             'resource_id': self.kwargs['resource_pk']
         }
+
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        resource_id = models.ResourcePostProcessingSettings.objects \
+            .get(pk=kwargs['pk']).resource_id
+        owner_profile_id = models.Resource.objects \
+            .get(pk=resource_id).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class RecommendationResourceViewSet(ModelViewSet):
@@ -484,6 +591,16 @@ class ResourceReviewHeatViewSet(ModelViewSet):
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.ResourceReview.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
     # endpoint: sonarmeta/resources/{resource_pk}/reviews/sticky/
     # This method is used to get the sticky review of its resource
     @action(detail=False, methods=['GET'])
@@ -531,6 +648,16 @@ class ResourceReplyViewSet(ModelViewSet):
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.ResourceReply.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class UserResourceHistoryViewSet(ModelViewSet):
     '''
@@ -554,6 +681,26 @@ class UserResourceHistoryViewSet(ModelViewSet):
             'resource_id': self.kwargs['resource_pk'],
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
+
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserResourceHistory.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserResourceHistory.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UserResourceEntryViewSet(ModelViewSet):
@@ -597,6 +744,16 @@ class UserResourceLikeViewSet(ModelViewSet):
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserResourceLike.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class UserResourceFavoriteViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
@@ -617,6 +774,16 @@ class UserResourceFavoriteViewSet(ModelViewSet):
             'resource_id': self.kwargs['resource_pk'],
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserResourceFavorite.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UserResourceDownloadViewSet(ModelViewSet):
@@ -639,6 +806,16 @@ class UserResourceDownloadViewSet(ModelViewSet):
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserResourceDownload.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class UserResourceShareViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'head', 'options']
@@ -659,6 +836,16 @@ class UserResourceShareViewSet(ModelViewSet):
             'resource_id': self.kwargs['resource_pk'],
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserResourceShare.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class UserReviewLikeViewSet(ModelViewSet):
@@ -681,6 +868,26 @@ class UserReviewLikeViewSet(ModelViewSet):
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
 
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserReviewLike.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserReviewLike.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 
 class UserReplyLikeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
@@ -702,3 +909,23 @@ class UserReplyLikeViewSet(ModelViewSet):
             'reply_id': self.kwargs['reply_pk'],
             'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
         }
+
+    # Override the update method in order to verift owner authentication
+    def update(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserReplyLike.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().update(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+    # Override the destroy method in order to verify owner authentication
+    def destroy(self, request, *args, **kwargs):
+        profile_id = models.Profile.objects.get(user_id=request.user.id).id
+        owner_profile_id = models.UserReplyLike.objects \
+            .get(pk=kwargs['pk']).profile_id
+        if profile_id == owner_profile_id:
+            return super().destroy(request, *args, **kwargs)
+        else:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
