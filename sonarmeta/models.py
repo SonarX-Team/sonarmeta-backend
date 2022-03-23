@@ -216,6 +216,14 @@ class Resource(models.Model):
 
 
 class ResourceBasicSettings(models.Model):
+    SHADING_LIT = '照明'
+    SHADING_SHADELESS = '无阴影'
+
+    SHADING_CHOICES = [
+        (SHADING_LIT, '照明'),
+        (SHADING_SHADELESS, '无阴影')
+    ]
+
     BACKGROUND_COLOR = '颜色'
     BACKGROUND_IMAGE = '图片'
     BACKGROUND_ENV = '环境'
@@ -235,12 +243,17 @@ class ResourceBasicSettings(models.Model):
     camera_position_x = models.CharField(max_length=255)
     camera_position_y = models.CharField(max_length=255)
     camera_position_z = models.CharField(max_length=255)
+    shading = models.CharField(
+        max_length=10,
+        choices=SHADING_CHOICES,
+        default=SHADING_LIT
+    )
     fov = models.CharField(max_length=255)
     background_switch = models.BooleanField(default=True)
     background_choice = models.CharField(
         max_length=10,
         choices=BACKGROUND_CHOICES,
-        default=BACKGROUND_COLOR,
+        default=BACKGROUND_COLOR
     )
     background_color = models.CharField(max_length=10, null=True, blank=True)
     background_image = models.TextField(null=True, blank=True)
