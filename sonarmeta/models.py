@@ -171,7 +171,7 @@ class Resource(models.Model):
         default=RESOURCE_STATUS_UNRELEASED
     )
     path = models.TextField()
-    attached = models.TextField()
+    attached = models.TextField(null=True, blank=True)
     type = models.CharField(
         max_length=1,
         choices=RESOURCE_TYPE_CHOICES,
