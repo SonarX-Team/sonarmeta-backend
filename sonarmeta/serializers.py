@@ -392,7 +392,7 @@ class SimpleResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'status', 'path', 'path_folder_list', 'title', 'description', 'cover',
+        fields = ['id', 'status', 'path', 'attached', 'title', 'description', 'cover',
                   'entries', 'likes', 'favorites', 'downloads', 'shares', 'branch_id', 'time']
 
 
@@ -580,7 +580,7 @@ class ResourceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Resource
-        fields = ['id', 'status', 'path', 'path_folder_list', 'type',
+        fields = ['id', 'status', 'path', 'attached', 'type',
                   'title', 'description', 'category', 'download_type',
                   'price', 'no_carry', 'carry_from', 'no_commercial',
                   'entries', 'cover', 'sticky_review_id', 'status_change_timestamp',
