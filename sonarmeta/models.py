@@ -1,5 +1,3 @@
-from pyexpat import model
-from random import choices
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -13,7 +11,7 @@ class Profile(models.Model):
     PROFILE_GENDER_CHOICES = [
         (PROFILE_GENDER_MALE, 'male'),
         (PROFILE_GENDER_FEMALE, 'female'),
-        (PROFILE_GENDER_SECRET, 'secret'),
+        (PROFILE_GENDER_SECRET, 'secret')
     ]
 
     username = models.CharField(max_length=255, unique=True)
@@ -80,7 +78,7 @@ class Message(models.Model):
     MESSAGE_TYPE_CHOICES = [
         (MESSAGE_TYPE_LIKE, 'like'),
         (MESSAGE_TYPE_REPLY, 'reply'),
-        (MESSAGE_TYPE_SYSTEM, 'system'),
+        (MESSAGE_TYPE_SYSTEM, 'system')
     ]
 
     content = models.TextField()
@@ -134,7 +132,7 @@ class Resource(models.Model):
         (RESOURCE_STATUS_UNRELEASED, 'unreleased'),
         (RESOURCE_STATUS_CHECKING, 'checking'),
         (RESOURCE_STATUS_PASSED, 'passed'),
-        (RESOURCE_STATUS_FAILED, 'failed'),
+        (RESOURCE_STATUS_FAILED, 'failed')
     ]
 
     RESOURCE_TYPE_ORIGINAL = 'O'
@@ -142,7 +140,7 @@ class Resource(models.Model):
 
     RESOURCE_TYPE_CHOICES = [
         (RESOURCE_TYPE_ORIGINAL, 'original'),
-        (RESOURCE_TYPE_CARRY, 'carry'),
+        (RESOURCE_TYPE_CARRY, 'carry')
     ]
 
     RESOURCE_CATEGORY_ANIMALS = 'A'
@@ -152,7 +150,7 @@ class Resource(models.Model):
     RESOURCE_CATEGORY_CHOICES = [
         (RESOURCE_CATEGORY_ANIMALS, 'animals'),
         (RESOURCE_CATEGORY_PLANTS, 'plants'),
-        (RESOURCE_CATEGORY_CARS, 'cars'),
+        (RESOURCE_CATEGORY_CARS, 'cars')
     ]
 
     RESOURCE_DOWNLOAD_TYPE_FREE = 'F'
@@ -172,6 +170,7 @@ class Resource(models.Model):
     )
     path = models.TextField()
     attached = models.TextField(null=True, blank=True)
+    path_folder_list = models.TextField()
     type = models.CharField(
         max_length=1,
         choices=RESOURCE_TYPE_CHOICES,
