@@ -2,7 +2,7 @@ from django.db.models import Sum, Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter
-from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.permissions import SAFE_METHODS, AllowAny, IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
@@ -188,7 +188,7 @@ class MessageViewSet(ModelViewSet):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class ResourceSeriesViewSet(ModelViewSet):
+class ResourceSeriesViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, GenericViewSet):
     http_method_names = ['get', 'post', 'delete', 'head', 'options']
     queryset = models.ResourceSeries.objects.all()
     serializer_class = serializers.ResourceSeriesSerializer
@@ -251,6 +251,24 @@ class MeResourceSeriesViewSet(ModelViewSet):
             .distinct()
 
 
+class ProfileResourceSeriesViewSet(ModelViewSet):
+    '''
+    This ViewSet is used to get space profile's series in space page
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.ResourceSeriesSerializer
+    permission_classes = [AllowAny]
+    pagination_class = pagination.TwelvePagination
+    filter_backends = [SearchFilter]
+    search_fields = ['title']
+
+    def get_queryset(self):
+        return models.ResourceSeries.objects \
+            .prefetch_related('branches') \
+            .filter(Q(branches__profile__id=self.kwargs['profile_pk']) | Q(profile_id=self.kwargs['profile_pk'])) \
+            .distinct()
+
+
 class ResourceBranchViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     serializer_class = serializers.ResourceBranchSerializer
@@ -310,7 +328,7 @@ class ResourceBranchViewSet(ModelViewSet):
         return Response(covers, status=status.HTTP_200_OK)
 
 
-class ResourceViewSet(ModelViewSet):
+class ResourceViewSet(RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
     '''
     This ViewSet's GET method is only used to retrieve,
     since ResourceSerializer is very complex and it will cause
@@ -535,6 +553,21 @@ class MeResourceViewSet(ModelViewSet):
         profile_id = models.Profile.objects \
             .get(user_id=self.request.user.id).id
         return models.Resource.objects.prefetch_related('profile').filter(profile_id=profile_id)
+
+
+class ProfileResourceViewSet(ModelViewSet):
+    '''
+    This viewset is used to provide resources of the space profile
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.MicroResourceSerializer
+    permission_classes = [AllowAny]
+    pagination_class = pagination.TwelvePagination
+    filter_backends = [SearchFilter]
+    search_fields = ['title', 'tags']
+
+    def get_queryset(self):
+        return models.Resource.objects.prefetch_related('profile').filter(profile_id=self.kwargs['profile_pk'])
 
 
 class ChoiceResourceViewSet(ModelViewSet):

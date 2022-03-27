@@ -22,9 +22,11 @@ router.register('resources-recommendation', views.RecommendationResourceViewSet,
 # endpoint: sonarmeta/resources-search/
 router.register('resources-search', views.SearchResourceViewSet)
 # endpoint: sonarmeta/resources-me/
-router.register('resources-me', views.MeResourceViewSet, basename='resource-me')
+router.register('resources-me', views.MeResourceViewSet,
+                basename='resource-me')
 # endpoint: sonarmeta/resources-choice/
-router.register('resources-choice', views.ChoiceResourceViewSet, basename='resource-choice')
+router.register('resources-choice', views.ChoiceResourceViewSet,
+                basename='resource-choice')
 # endpoint: sonarmeta/follows-me/
 router.register('follows-me', views.UserFollowsViewset, basename='follow-me')
 # endpoint: sonarmeta/followers-me/
@@ -40,6 +42,12 @@ router.register('favorites-me', views.UserFavoriteViewSet,
 
 profiles_router = routers.NestedDefaultRouter(
     router, 'profiles', lookup='profile')
+# endpoint: sonarmeta/profiles/{profile_pk}/series/
+profiles_router.register(
+    'series', views.ProfileResourceSeriesViewSet, basename='profile-series')
+# endpoint: sonarmeta/profiles/{profile_pk}/resources/
+profiles_router.register(
+    'resources', views.ProfileResourceViewSet, basename='profile-resource')
 # endpoint: sonarmeta/profiles/{profile_pk}/subscribe/
 profiles_router.register(
     'subscribe', views.UserSubscribeViewSet, basename='profile-subscribe')
