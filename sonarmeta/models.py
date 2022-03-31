@@ -475,7 +475,8 @@ class ResourceMaterialSettings(models.Model):
         choices=CURRENT_PBR_WORKFLOW_CHOICES,
         default=CURRENT_PBR_WORKFLOW_METALNESS
     )
-    textures = models.TextField()
+    textures = models.TextField(null=True, blank=True)
+    paramters = models.TextField()
     resource = models.OneToOneField(
         Resource,
         on_delete=models.CASCADE,
