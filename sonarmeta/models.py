@@ -268,6 +268,9 @@ class ResourceBasicSettings(models.Model):
     camera_position_x = models.CharField(max_length=255)
     camera_position_y = models.CharField(max_length=255)
     camera_position_z = models.CharField(max_length=255)
+    camera_look_at_x = models.CharField(max_length=255)
+    camera_look_at_y = models.CharField(max_length=255)
+    camera_look_at_z = models.CharField(max_length=255)
     shading = models.CharField(
         max_length=10,
         choices=SHADING_CHOICES,
