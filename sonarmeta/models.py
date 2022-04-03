@@ -274,6 +274,7 @@ class ResourceBasicSettings(models.Model):
         default=SHADING_LIT
     )
     fov = models.CharField(max_length=255)
+    near = models.CharField(max_length=255)
     background_switch = models.BooleanField(default=True)
     background_choice = models.CharField(
         max_length=10,
@@ -342,7 +343,7 @@ class ResourceLightSettings(models.Model):
         null=True,
         blank=True
     )
-    light_one_attach_to_camera = models.BooleanField(default=False)
+    light_one_attached_to_camera = models.BooleanField(default=False)
     light_one_decay = models.CharField(
         max_length=255,
         null=True,
@@ -390,7 +391,7 @@ class ResourceLightSettings(models.Model):
         null=True,
         blank=True
     )
-    light_two_attach_to_camera = models.BooleanField(default=False)
+    light_two_attached_to_camera = models.BooleanField(default=False)
     light_two_decay = models.CharField(
         max_length=255,
         null=True,
@@ -438,7 +439,7 @@ class ResourceLightSettings(models.Model):
         null=True,
         blank=True
     )
-    light_three_attach_to_camera = models.BooleanField(default=False)
+    light_three_attached_to_camera = models.BooleanField(default=False)
     light_three_decay = models.CharField(
         max_length=255,
         null=True,
