@@ -10,24 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='resourcelightsettings',
-            name='light_one_ground_color',
-            field=models.CharField(default='#ffffff', max_length=10),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='resourcelightsettings',
-            name='light_three_ground_color',
-            field=models.CharField(default='#ffffff', max_length=10),
-            preserve_default=False,
-        ),
-        migrations.AddField(
-            model_name='resourcelightsettings',
-            name='light_two_ground_color',
-            field=models.CharField(default='#ffffff', max_length=10),
-            preserve_default=False,
-        ),
         migrations.AlterField(
             model_name='resourcelightsettings',
             name='ambient_directional_light_bias',
