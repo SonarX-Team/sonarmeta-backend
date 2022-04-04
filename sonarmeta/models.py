@@ -316,168 +316,59 @@ class ResourceLightSettings(models.Model):
         choices=LIGHT_TYPE_CHOICES,
         default=LIGHT_TYPE_NONE
     )
-    light_one_color = models.CharField(max_length=10, null=True, blank=True)
-    light_one_position_x = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_one_position_y = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_one_position_z = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_one_intensity = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_one_position_x = models.CharField(max_length=255)
+    light_one_position_y = models.CharField(max_length=255)
+    light_one_position_z = models.CharField(max_length=255)
+    light_one_color = models.CharField(max_length=10)
+    light_one_ground_color = models.CharField(max_length=10)
+    light_one_intensity = models.CharField(max_length=255)
     light_one_cast_shadow = models.BooleanField(default=False)
-    light_one_shadow_bias = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_one_shadow_bias = models.CharField(max_length=255)
     light_one_attached_to_camera = models.BooleanField(default=False)
-    light_one_decay = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_one_angle = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_one_penumbra = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_one_decay = models.CharField(max_length=255)
+    light_one_angle = models.CharField(max_length=255)
+    light_one_penumbra = models.CharField(max_length=255)
     light_two_type = models.CharField(
         max_length=10,
         choices=LIGHT_TYPE_CHOICES,
         default=LIGHT_TYPE_NONE
     )
-    light_two_color = models.CharField(max_length=10, null=True, blank=True)
-    light_two_position_x = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_two_position_y = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_two_position_z = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_two_intensity = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_two_position_x = models.CharField(max_length=255)
+    light_two_position_y = models.CharField(max_length=255)
+    light_two_position_z = models.CharField(max_length=255)
+    light_two_color = models.CharField(max_length=10)
+    light_two_ground_color = models.CharField(max_length=10)
+    light_two_intensity = models.CharField(max_length=255)
     light_two_cast_shadow = models.BooleanField(default=False)
-    light_two_shadow_bias = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_two_shadow_bias = models.CharField(max_length=255)
     light_two_attached_to_camera = models.BooleanField(default=False)
-    light_two_decay = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_two_angle = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_two_penumbra = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_two_decay = models.CharField(max_length=255)
+    light_two_angle = models.CharField(max_length=255)
+    light_two_penumbra = models.CharField(max_length=255)
     light_three_type = models.CharField(
         max_length=10,
         choices=LIGHT_TYPE_CHOICES,
         default=LIGHT_TYPE_NONE
     )
-    light_three_color = models.CharField(max_length=10, null=True, blank=True)
-    light_three_position_x = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_three_position_y = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_three_position_z = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_three_intensity = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_three_position_x = models.CharField(max_length=255)
+    light_three_position_y = models.CharField(max_length=255)
+    light_three_position_z = models.CharField(max_length=255)
+    light_three_color = models.CharField(max_length=10)
+    light_three_ground_color = models.CharField(max_length=10)
+    light_three_intensity = models.CharField(max_length=255)
     light_three_cast_shadow = models.BooleanField(default=False)
-    light_three_shadow_bias = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_three_shadow_bias = models.CharField(max_length=255)
     light_three_attached_to_camera = models.BooleanField(default=False)
-    light_three_decay = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_three_angle = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    light_three_penumbra = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    light_three_decay = models.CharField(max_length=255)
+    light_three_angle = models.CharField(max_length=255)
+    light_three_penumbra = models.CharField(max_length=255)
     env_switch = models.BooleanField(default=True)
     env_texture = models.TextField(null=True, blank=True)
-    env_orientation = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    env_brightness = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    env_orientation = models.CharField(max_length=255)
+    env_brightness = models.CharField(max_length=255)
     ambient_directional_light_switch = models.BooleanField(default=True)
-    ambient_directional_light_intensity = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    ambient_directional_light_bias = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    ambient_directional_light_intensity = models.CharField(max_length=255)
+    ambient_directional_light_bias = models.CharField(max_length=255)
     resource = models.OneToOneField(
         Resource,
         on_delete=models.CASCADE,
@@ -517,54 +408,18 @@ class ResourceMaterialSettings(models.Model):
 class ResourcePostProcessingSettings(models.Model):
     switch = models.BooleanField(default=True)
     ssao_switch = models.BooleanField(default=False)
-    ssao_radius = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    ssao_intensity = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    ssao_bias = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    ssao_radius = models.CharField(max_length=255)
+    ssao_intensity = models.CharField(max_length=255)
+    ssao_bias = models.CharField(max_length=255)
     chromatic_aberration_switch = models.BooleanField(default=False)
-    chromatic_aberration_offset = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    chromatic_aberration_offset = models.CharField(max_length=255)
     vignette_switch = models.BooleanField(default=False)
-    vignette_offset = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    vignette_darkness = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    vignette_offset = models.CharField(max_length=255)
+    vignette_darkness = models.CharField(max_length=255)
     bloom_switch = models.BooleanField(default=False)
-    bloom_intensity = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    bloom_luminance_threshold = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
-    bloom_radius = models.CharField(
-        max_length=255,
-        null=True,
-        blank=True
-    )
+    bloom_intensity = models.CharField(max_length=255)
+    bloom_luminance_threshold = models.CharField(max_length=255)
+    bloom_radius = models.CharField(max_length=255)
     resource = models.OneToOneField(
         Resource,
         on_delete=models.CASCADE,
