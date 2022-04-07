@@ -325,16 +325,12 @@ class ResourceBranchViewSet(ModelViewSet):
         for branch in branches:
             if len(branch.resources.all()) > length:
                 length = len(branch.resources.all())
-            if count < 4 and branch.resources.first():
-                covers.append(branch.resources.first().cover)
-                count += 1
-        i = 1
-        if count < 4 and i < length:
-            for branch in branches:
-                if count < 4 and len(branch.resources.all()) > i and branch.resources.all()[i]:
-                    covers.append(branch.resources.all()[i].cover)
-                    count += 1
-            i += 1
+        for i in length:
+            if count < 4 and i < length:
+                for branch in branches:
+                    if count < 4 and len(branch.resources.all()) > i and branch.resources.all()[i]:
+                        covers.append(branch.resources.all()[i].cover)
+                        count += 1
         return Response(covers, status=status.HTTP_200_OK)
 
 
