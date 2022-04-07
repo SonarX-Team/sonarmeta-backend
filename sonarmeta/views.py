@@ -323,16 +323,16 @@ class ResourceBranchViewSet(ModelViewSet):
             .order_by('-heat')
         length = 0
         for branch in branches:
-            if len(branch.resources) > length:
-                length = len(branch.resources)
+            if len(branch.resources.all()) > length:
+                length = len(branch.resources.all())
             if count < 4 and branch.resources.first():
                 covers.append(branch.resources.first().cover)
                 count += 1
         i = 1
         if count < 4 and i < length:
             for branch in branches:
-                if count < 4 and branch.resources[i]:
-                    covers.append(branch.resources[i].cover)
+                if count < 4 and branch.resources.all()[i]:
+                    covers.append(branch.resources.all()[i].cover)
                     count += 1
             i += 1
         return Response(covers, status=status.HTTP_200_OK)
