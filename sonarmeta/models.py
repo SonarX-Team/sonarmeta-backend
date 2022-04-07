@@ -258,10 +258,7 @@ class ResourceBasicSettings(models.Model):
         (BACKGROUND_IMAGE, '图片'),
         (BACKGROUND_ENV, '环境')
     ]
-
-    model_position_x = models.CharField(max_length=255)
-    model_position_y = models.CharField(max_length=255)
-    model_position_z = models.CharField(max_length=255)
+    
     model_rotation_x = models.CharField(max_length=255)
     model_rotation_y = models.CharField(max_length=255)
     model_rotation_z = models.CharField(max_length=255)
