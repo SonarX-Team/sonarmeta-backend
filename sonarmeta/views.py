@@ -325,7 +325,7 @@ class ResourceBranchViewSet(ModelViewSet):
         for branch in branches:
             if len(branch.resources.all()) > length:
                 length = len(branch.resources.all())
-        for i in length:
+        for i in range(0, length):
             if count < 4 and i < length:
                 for branch in branches:
                     if count < 4 and len(branch.resources.all()) > i and branch.resources.all()[i]:
