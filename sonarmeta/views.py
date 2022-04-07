@@ -321,10 +321,20 @@ class ResourceBranchViewSet(ModelViewSet):
             .filter(series_id=kwargs['series_pk']) \
             .annotate(heat=Sum('resources__entries')) \
             .order_by('-heat')
-        for item in branches:
-            if item.resources.first() and count < 4:
-                covers.append(item.resources.first().cover)
+        length = 0
+        for branch in branches:
+            if i == 0 and len(branch.resources) > length:
+                length = len(branch.resources)
+            if count < 4 and branch.resources.first():
+                covers.append(branch.resources.first().cover)
                 count += 1
+        i = 1
+        if count < 4 and i < length:
+            for branch in branches:
+                if count < 4 and branch.resources[i]:
+                    covers.append(branch.resources[i].cover)
+                    count += 1
+            i += 1
         return Response(covers, status=status.HTTP_200_OK)
 
 
