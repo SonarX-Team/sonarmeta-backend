@@ -331,7 +331,7 @@ class ResourceBranchViewSet(ModelViewSet):
         i = 1
         if count < 4 and i < length:
             for branch in branches:
-                if count < 4 and branch.resources.all()[i]:
+                if count < 4 and len(branch.resources.all()) > i and branch.resources.all()[i]:
                     covers.append(branch.resources.all()[i].cover)
                     count += 1
             i += 1
