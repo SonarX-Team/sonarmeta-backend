@@ -258,7 +258,7 @@ class ResourceBasicSettings(models.Model):
         (BACKGROUND_IMAGE, '图片'),
         (BACKGROUND_ENV, '环境')
     ]
-    
+
     model_rotation_x = models.CharField(max_length=255)
     model_rotation_y = models.CharField(max_length=255)
     model_rotation_z = models.CharField(max_length=255)
@@ -378,11 +378,11 @@ class ResourceLightSettings(models.Model):
 
 class ResourceMaterialSettings(models.Model):
     CURRENT_PBR_WORKFLOW_METALNESS = '金属度'
-    CURRENT_PBR_WORKFLOW_SPECULAR = '反射率'
+    CURRENT_PBR_WORKFLOW_SPECULAR = '镜面'
 
     CURRENT_PBR_WORKFLOW_CHOICES = [
         (CURRENT_PBR_WORKFLOW_METALNESS, '金属度'),
-        (CURRENT_PBR_WORKFLOW_SPECULAR, '反射率')
+        (CURRENT_PBR_WORKFLOW_SPECULAR, '镜面')
     ]
 
     current_pbr_workflow = models.CharField(
