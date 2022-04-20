@@ -573,7 +573,7 @@ class ProfileResourceViewSet(ModelViewSet):
     search_fields = ['title', 'tags']
 
     def get_queryset(self):
-        return models.Resource.objects.prefetch_related('profile').filter(profile_id=self.kwargs['profile_pk'])
+        return models.Resource.objects.prefetch_related('profile').filter(profile_id=self.kwargs['profile_pk'], status='P')
 
 
 class ChoiceResourceViewSet(ModelViewSet):
