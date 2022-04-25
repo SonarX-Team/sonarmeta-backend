@@ -535,7 +535,9 @@ class SearchResourceViewSet(ModelViewSet):
     This viewset is used to search resources
     '''
     http_method_names = ['get', 'head', 'options']
-    queryset = models.Resource.objects.all().prefetch_related('profile')
+    queryset = models.Resource.objects \
+        .prefetch_related('profile') \
+        .filter(status='P')
     serializer_class = serializers.SearchResourceSerializer
     permission_classes = [AllowAny]
     pagination_class = pagination.TwelvePagination
