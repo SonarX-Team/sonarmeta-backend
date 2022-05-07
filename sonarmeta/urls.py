@@ -38,6 +38,16 @@ router.register('histories-me', views.UserHistoryViewSet,
 # endpoint: sonarmeta/favorites-me/
 router.register('favorites-me', views.UserFavoriteViewSet,
                 basename='favorite-me')
+# endpoint: sonarmeta/custommade-requirements/
+router.register('custommade-requirements', views.CustommadeRequirementViewSet)
+# endpoint: sonarmeta/custommade-orders/
+router.register('custommade-orders', views.CustommadeOrderViewSet)
+# endpoint: sonarmeta/custommade-order-orders/
+router.register('custommade-order-orders', views.CustommadeOrderOrderViewSet,
+                basename='custommade-order-orders')
+# endpoint: sonarmeta/custommade-take-orders/
+router.register('custommade-take-orders', views.CustommadeTakeOrderViewSet,
+                basename='custommade-take-orders')
 
 
 profiles_router = routers.NestedDefaultRouter(
@@ -54,6 +64,9 @@ profiles_router.register(
 # endpoint: sonarmeta/profiles/{profile_pk}/blacklist/
 profiles_router.register(
     'blacklist', views.UserBlacklistViewSet, basename='profile-blacklist')
+# endpoint: sonarmeta/profiles/{profile_pk}/custommade-designer/
+profiles_router.register(
+    'custommade-designer', views.CustommadeDesignerViewSet, basename='profile-custommade-designer')
 
 
 series_router = routers.NestedDefaultRouter(

@@ -23,15 +23,28 @@ class Profile(models.Model):
         choices=PROFILE_GENDER_CHOICES,
         default=PROFILE_GENDER_SECRET
     )
+    wechat = models.CharField(max_length=255, null=True, blank=True)
     history_flag = models.BooleanField(default=True)
     user = models.OneToOneField(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
 
     def __str__(self):
         return self.username
 
     class Meta:
         ordering = ['user']
+
+
+class CustommadeDesigner(models.Model):
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.profile.username
+
+    class Meta:
+        ordering = ['profile']
 
 
 class UserSubscribe(models.Model):
@@ -122,17 +135,134 @@ class ResourceBranch(models.Model):
         ordering = ['-time']
 
 
+class CustommadeRequirement(models.Model):
+    LEVEL_LOW = 'L'
+    LEVEL_MIDDLE = 'M'
+    LEVEL_HIGH = 'H'
+
+    LEVEL_CHOICES = [
+        (LEVEL_LOW, '低'),
+        (LEVEL_MIDDLE, '中'),
+        (LEVEL_HIGH, '高'),
+    ]
+
+    STATUS_PENDING = 'P'
+    STATUS_UNDERWAWY = 'P'
+    STATUS_FINISHED = 'F'
+
+    STATUS_CHOICES = [
+        (STATUS_PENDING, '待抢单'),
+        (STATUS_UNDERWAWY, '进行中'),
+        (STATUS_FINISHED, '已完成')
+    ]
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    images = models.TextField()
+    budget = models.DecimalField(max_digits=12, decimal_places=2)
+    deposit = models.DecimalField(max_digits=12, decimal_places=2)
+    amount = models.PositiveIntegerField(default=1)
+    level = models.CharField(
+        max_length=10,
+        choices=LEVEL_CHOICES,
+        default=LEVEL_MIDDLE
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDING
+    )
+    attached_files = models.TextField(null=True, blank=True)
+    time = models.DateTimeField(auto_now_add=True)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    intended_designers = models.TextField()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-time']
+
+
+class CustommadeOrder(models.Model):
+    LEVEL_LOW = 'L'
+    LEVEL_MIDDLE = 'M'
+    LEVEL_HIGH = 'H'
+
+    LEVEL_CHOICES = [
+        (LEVEL_LOW, '低'),
+        (LEVEL_MIDDLE, '中'),
+        (LEVEL_HIGH, '高'),
+    ]
+
+    STATUS_CONTRACT_PENDING = 'CP'
+    STATUS_DEPOSIT_PENDING = 'DP'
+    STATUS_DEPOSIT_CHECKING = 'DC'
+    STATUS_REMAIN_PENDING = 'RP'
+    STATUS_REMAIN_CHECKING = 'RC'
+    STATUS_FINISHED = 'F'
+
+    STATUS_CHOICES = [
+        (STATUS_CONTRACT_PENDING, '待签合同'),
+        (STATUS_DEPOSIT_PENDING, '待付定金'),
+        (STATUS_DEPOSIT_CHECKING, '待验收定金'),
+        (STATUS_REMAIN_PENDING, '待付尾款'),
+        (STATUS_REMAIN_CHECKING, '待验收尾款'),
+        (STATUS_FINISHED, '已完成'),
+    ]
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    images = models.TextField()
+    budget = models.DecimalField(max_digits=12, decimal_places=2)
+    deposit = models.DecimalField(max_digits=12, decimal_places=2)
+    paid = models.DecimalField(max_digits=12, decimal_places=2)
+    paid_checked = models.DecimalField(max_digits=12, decimal_places=2)
+    refund = models.DecimalField(max_digits=12, decimal_places=2)
+    amount = models.PositiveIntegerField(default=1)
+    level = models.CharField(
+        max_length=10,
+        choices=LEVEL_CHOICES,
+        default=LEVEL_MIDDLE
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default=STATUS_CONTRACT_PENDING
+    )
+    contract = models.TextField()
+    receipt = models.TextField()
+    dynamic = models.TextField()
+    attached_files = models.TextField(null=True, blank=True)
+    customer = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    designer = models.ForeignKey(CustommadeDesigner, on_delete=models.CASCADE)
+    create_time = models.DateTimeField(auto_now_add=True)
+    ddl_time = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        ordering = ['-create_time']
+
+
 class Resource(models.Model):
     RESOURCE_STATUS_UNRELEASED = 'U'
     RESOURCE_STATUS_CHECKING = 'C'
     RESOURCE_STATUS_PASSED = 'P'
+    RESOURCE_STATUS_CUSTOMMADE_ORDER_UNRELEASED = 'COU'
+    RESOURCE_STATUS_CUSTOMMADE_ORDER_CHECKING = 'COC'
+    RESOURCE_STATUS_CUSTOMMADE_ORDER_PASSED = 'COP'
     RESOURCE_STATUS_FAILED = 'F'
 
     RESOURCE_STATUS_CHOICES = [
-        (RESOURCE_STATUS_UNRELEASED, 'unreleased'),
-        (RESOURCE_STATUS_CHECKING, 'checking'),
-        (RESOURCE_STATUS_PASSED, 'passed'),
-        (RESOURCE_STATUS_FAILED, 'failed')
+        (RESOURCE_STATUS_UNRELEASED, '未发布'),
+        (RESOURCE_STATUS_CHECKING, '审核中'),
+        (RESOURCE_STATUS_PASSED, '已通过'),
+        (RESOURCE_STATUS_CUSTOMMADE_ORDER_UNRELEASED, '订制订单未发布'),
+        (RESOURCE_STATUS_CUSTOMMADE_ORDER_CHECKING, '订制订单审核中'),
+        (RESOURCE_STATUS_CUSTOMMADE_ORDER_PASSED, '订制订单已通过'),
+        (RESOURCE_STATUS_FAILED, '未通过')
     ]
 
     RESOURCE_TYPE_ORIGINAL = 'O'
@@ -190,7 +320,7 @@ class Resource(models.Model):
     ]
 
     status = models.CharField(
-        max_length=1,
+        max_length=10,
         choices=RESOURCE_STATUS_CHOICES,
         default=RESOURCE_STATUS_UNRELEASED
     )
@@ -215,7 +345,7 @@ class Resource(models.Model):
         choices=RESOURCE_TYPE_DOWNLOAD_CHOICES,
         default=RESOURCE_DOWNLOAD_TYPE_FREE
     )
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(max_digits=12, decimal_places=2)
     no_carry = models.BooleanField()
     carry_from = models.CharField(max_length=255, null=True, blank=True)
     no_commercial = models.BooleanField()
@@ -228,6 +358,13 @@ class Resource(models.Model):
     branch = models.ForeignKey(
         ResourceBranch,
         on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='resources'
+    )
+    custommade_order = models.ForeignKey(
+        CustommadeOrder,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name='resources'

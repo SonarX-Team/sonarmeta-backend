@@ -1,3 +1,4 @@
+from distutils.sysconfig import customize_compiler
 from django.db.models import Sum, Count, Q
 from rest_framework import status
 from rest_framework.decorators import action
@@ -970,3 +971,81 @@ class UserReplyLikeViewSet(ModelViewSet):
             return super().destroy(request, *args, **kwargs)
         else:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+class CustommadeDesignerViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'head', 'options']
+    serializer_class = serializers.CustommadeDesignerSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        return models.CustommadeDesigner.objects \
+            .prefetch_related('profile') \
+            .get(profile_id=self.kwargs['profile_pk'])
+
+    def get_serializer_context(self):
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_context()
+        return {
+            'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
+        }
+
+
+class CustommadeRequirementViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+    queryset = models.CustommadeRequirement.objects.prefetch_related().all()
+    serializer_class = serializers.CustommadeRequirementSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    pagination_class = pagination.TwentyPagination
+    filter_backends = [SearchFilter]
+    search_fields = ['title']
+
+    def get_serializer_context(self):
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_context()
+        return {
+            'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
+        }
+
+
+class CustommadeOrderViewSet(RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
+    http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+    queryset = models.CustommadeOrder.objects.prefetch_related().all()
+    serializer_class = serializers.CustommadeOrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_context(self):
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_context()
+        return {
+            'customer_id': models.Profile.objects.get(user_id=self.request.user.id).id,
+            'designer_id': self.request.data.get('designer_id')
+        }
+
+
+class CustommadeOrderOrderViewSet(ModelViewSet):
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.CustommadeOrderSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwentyPagination
+    filter_backends = [SearchFilter]
+    search_fields = ['title']
+
+    def get_queryset(self):
+        return models.CustommadeOrder.objects \
+            .prefetch_related('profile') \
+            .filter(customer_id=self.kwargs['profile_pk'])
+
+
+class CustommadeTakeOrderViewSet(ModelViewSet):
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.CustommadeOrderSerializer
+    permission_classes = [IsAuthenticated]
+    pagination_class = pagination.TwentyPagination
+    filter_backends = [SearchFilter]
+    search_fields = ['title']
+
+    def get_queryset(self):
+        return models.CustommadeOrder.objects \
+            .prefetch_related('profile') \
+            .filter(designer_id=self.kwargs['profile_pk'])

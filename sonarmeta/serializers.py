@@ -700,3 +700,74 @@ class ResourceSeriesSerializer(serializers.ModelSerializer):
         model = models.ResourceSeries
         fields = ['id', 'title', 'description', 'profile', 'total_entries',
                   'total_likes', 'total_favorites', 'total_downloads', 'total_shares', 'time']
+
+
+class CustommadeResourceSerializer(serializers.ModelSerializer):
+    basic_settings = ResourceBasicSettingsSerailizer(read_only=True)
+    light_settings = ResourceLightSettingsSerailizer(read_only=True)
+    material_settings = ResourceMaterialSettingsSerailizer(read_only=True)
+    post_processing_settings = ResourcePostProcessingSettingsSerailizer(
+        read_only=True
+    )
+
+    class Meta:
+        model = models.Resource
+        fields = ['id', 'status', 'path', 'attached', 'path_folder_list', 'title',
+                  'basic_settings', 'light_settings', 'material_settings', 'post_processing_settings']
+
+
+class CustommadeProfileSerializer(serializers.ModelSerializer):
+    '''
+    This serializer is used to provide phone, email, username, wechat
+    which will be nested into Custommade Area
+    '''
+
+    class Meta:
+        model = models.Profile
+        fields = ['id', 'user', 'username', 'wechat']
+
+
+class CustommadeDesignerSerializer(serializers.ModelSerializer):
+    profile = CustommadeProfileSerializer(read_only=True)
+
+    def create(self, validated_data):
+        profile_id = self.context['profile_id']
+        return models.UserBlacklist.objects \
+            .create(profile_id=profile_id, **validated_data)
+
+    class Meta:
+        model = models.CustommadeDesigner
+        fields = ['id', 'profile']
+
+
+class CustommadeRequirementSerializer(serializers.ModelSerializer):
+    profile = CustommadeProfileSerializer(read_only=True)
+
+    def create(self, validated_data):
+        profile_id = self.context['profile_id']
+        return models.UserBlacklist.objects \
+            .create(profile_id=profile_id, **validated_data)
+
+    class Meta:
+        model = models.CustommadeRequirement
+        fields = ['id', 'title', 'description', 'images', 'budget', 'deposit', 'amount',
+                  'level', 'status', 'attached_files', 'time', 'profile', 'intended_designers']
+
+
+class CustommadeOrderSerializer(serializers.ModelSerializer):
+    resources = CustommadeResourceSerializer(many=True, read_only=True)
+    customer = CustommadeProfileSerializer(read_only=True)
+    designer = CustommadeDesignerSerializer(read_only=True)
+
+    def create(self, validated_data):
+        customer_id = self.context['customer_id']
+        designer_id = self.context['designer_id']
+        return models.UserBlacklist.objects \
+            .create(customer_id=customer_id, designer_id=designer_id, **validated_data)
+
+    class Meta:
+        model = models.CustommadeOrder
+        fields = ['id', 'title', 'description', 'images', 'budget', 'deposit',
+                  'paid', 'paid_checked', 'refund', 'amount', 'level', 'status',
+                  'contract', 'receipt', 'dynamic', 'attached_files', 'resources',
+                  'customer', 'designer', 'create_time', 'ddl_time']

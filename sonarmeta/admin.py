@@ -8,7 +8,7 @@ class ProfileAdmin(admin.ModelAdmin):
     list_select_related = ['user']
     list_per_page = 20
     autocomplete_fields = ['user']
-    search_fields = ['username__i', 'username']
+    search_fields = ['username', 'phone']
 
     @admin.display(ordering='user__username')
     def phone(self, profile):
@@ -158,3 +158,39 @@ class UserReviewLikeAdmin(admin.ModelAdmin):
 class UserReplyLikeAdmin(admin.ModelAdmin):
     list_per_page = 20
     autocomplete_fields = ['reply', 'profile']
+
+
+@admin.register(models.CustommadeDesigner)
+class CustommadeDesignerAdmin(admin.ModelAdmin):
+    list_display = ['username', 'phone', 'email', 'wechat']
+    list_per_page = 20
+    autocomplete_fields = ['profile']
+    search_fields = ['username', 'phone']
+
+    @admin.display(ordering='profile__username')
+    def username(self, designer):
+        return designer.profile.username
+
+    @admin.display(ordering='profile__user__username')
+    def phone(self, designer):
+        return designer.profile.user.username
+
+    @admin.display(ordering='profile__user__email')
+    def email(self, designer):
+        return designer.profile.user.email
+
+    @admin.display(ordering='profile__wechat')
+    def wechat(self, designer):
+        return designer.profile.wechat
+
+
+@admin.register(models.CustommadeRequirement)
+class CustommadeRequirementAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    autocomplete_fields = ['profile']
+
+
+@admin.register(models.CustommadeOrder)
+class CustommadeOrderAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    autocomplete_fields = ['customer', 'designer']
