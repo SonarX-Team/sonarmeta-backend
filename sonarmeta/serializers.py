@@ -751,7 +751,7 @@ class CustommadeRequirementSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CustommadeRequirement
         fields = ['id', 'title', 'description', 'images', 'budget', 'deposit', 'amount',
-                  'level', 'status', 'attached_files', 'time', 'profile', 'intended_designers']
+                  'level', 'status', 'time', 'profile', 'intended_designers']
 
 
 class CustommadeOrderSerializer(serializers.ModelSerializer):
@@ -769,5 +769,5 @@ class CustommadeOrderSerializer(serializers.ModelSerializer):
         model = models.CustommadeOrder
         fields = ['id', 'title', 'description', 'images', 'budget', 'deposit',
                   'paid', 'paid_checked', 'refund', 'amount', 'level', 'status',
-                  'contract', 'receipt', 'dynamic', 'attached_files', 'resources',
+                  'contract', 'receipt', 'dynamic', 'resources',
                   'customer', 'designer', 'create_time', 'ddl_time']

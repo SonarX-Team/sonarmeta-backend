@@ -141,9 +141,9 @@ class CustommadeRequirement(models.Model):
     LEVEL_HIGH = 'H'
 
     LEVEL_CHOICES = [
-        (LEVEL_LOW, '低'),
-        (LEVEL_MIDDLE, '中'),
-        (LEVEL_HIGH, '高'),
+        (LEVEL_LOW, '低模'),
+        (LEVEL_MIDDLE, '中模'),
+        (LEVEL_HIGH, '高模'),
     ]
 
     STATUS_PENDING = 'P'
@@ -172,7 +172,6 @@ class CustommadeRequirement(models.Model):
         choices=STATUS_CHOICES,
         default=STATUS_PENDING
     )
-    attached_files = models.TextField(null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
     intended_designers = models.TextField()
@@ -190,9 +189,9 @@ class CustommadeOrder(models.Model):
     LEVEL_HIGH = 'H'
 
     LEVEL_CHOICES = [
-        (LEVEL_LOW, '低'),
-        (LEVEL_MIDDLE, '中'),
-        (LEVEL_HIGH, '高'),
+        (LEVEL_LOW, '低模'),
+        (LEVEL_MIDDLE, '中模'),
+        (LEVEL_HIGH, '高模'),
     ]
 
     STATUS_CONTRACT_PENDING = 'CP'
@@ -233,7 +232,6 @@ class CustommadeOrder(models.Model):
     contract = models.TextField()
     receipt = models.TextField()
     dynamic = models.TextField()
-    attached_files = models.TextField(null=True, blank=True)
     customer = models.ForeignKey(Profile, on_delete=models.CASCADE)
     designer = models.ForeignKey(CustommadeDesigner, on_delete=models.CASCADE)
     create_time = models.DateTimeField(auto_now_add=True)
