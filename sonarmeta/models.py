@@ -1,3 +1,4 @@
+from turtle import Turtle
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -38,7 +39,6 @@ class Profile(models.Model):
 
 
 class ThreeDViewerOwner(models.Model):
-    secret_key = models.CharField(max_length=255)
     allow_origin = models.TextField()
     retired_time = models.DateTimeField()
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
@@ -338,6 +338,7 @@ class Resource(models.Model):
     path = models.TextField()
     attached = models.TextField(null=True, blank=True)
     path_folder_list = models.TextField()
+    key = models.CharField(max_length=255, null=True, blank=True)
     type = models.CharField(
         max_length=1,
         choices=RESOURCE_TYPE_CHOICES,
