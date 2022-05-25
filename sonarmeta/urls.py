@@ -58,6 +58,9 @@ profiles_router.register(
 # endpoint: sonarmeta/profiles/{profile_pk}/blacklist/
 profiles_router.register(
     'blacklist', views.UserBlacklistViewSet, basename='profile-blacklist')
+# endpoint: sonarmeta/profiles/{profile_pk}/3d-viewer-owner/
+profiles_router.register(
+    '3d-viewer-owner', views.ThreeDViewerOwnerViewSet, basename='profile-3d-viewer-owner')
 # endpoint: sonarmeta/profiles/{profile_pk}/custommade-designer/
 profiles_router.register(
     'custommade-designer', views.CustommadeDesignerViewSet, basename='profile-custommade-designer')

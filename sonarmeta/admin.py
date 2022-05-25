@@ -160,6 +160,23 @@ class UserReplyLikeAdmin(admin.ModelAdmin):
     autocomplete_fields = ['reply', 'profile']
 
 
+@admin.register(models.ThreeDViewerOwner)
+class ThreeDViewerOwnerAdmin(admin.ModelAdmin):
+    list_display = ['username', 'phone']
+    list_per_page = 20
+    autocomplete_fields = ['profile']
+    search_fields = ['username', 'phone']
+
+    @admin.display(ordering='profile__username')
+    def username(self, owner):
+        return owner.profile.username
+
+    @admin.display(ordering='profile__user__username')
+    def phone(self, owner):
+        return owner.profile.user.username
+
+
+
 @admin.register(models.CustommadeDesigner)
 class CustommadeDesignerAdmin(admin.ModelAdmin):
     list_display = ['username', 'phone', 'email', 'wechat']

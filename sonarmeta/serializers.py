@@ -702,6 +702,19 @@ class ResourceSeriesSerializer(serializers.ModelSerializer):
                   'total_likes', 'total_favorites', 'total_downloads', 'total_shares', 'time']
 
 
+class ThreeDViewerOwnerSerializer(serializers.ModelSerializer):
+    profile = TinyProfileSerializer(read_only=True)
+
+    def create(self, validated_data):
+        profile_id = self.context['profile_id']
+        return models.ThreeDViewerOwner.objects \
+            .create(profile_id=profile_id, **validated_data)
+
+    class Meta:
+        model = models.ThreeDViewerOwner
+        fields = ['id', 'secret_key', 'allow_origin', 'retired_time', 'profile']
+
+
 class CustommadeResourceSerializer(serializers.ModelSerializer):
     basic_settings = ResourceBasicSettingsSerailizer(read_only=True)
     light_settings = ResourceLightSettingsSerailizer(read_only=True)
@@ -732,7 +745,7 @@ class CustommadeDesignerSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         profile_id = self.context['profile_id']
-        return models.UserBlacklist.objects \
+        return models.CustommadeDesigner.objects \
             .create(profile_id=profile_id, **validated_data)
 
     class Meta:
@@ -745,7 +758,7 @@ class CustommadeRequirementSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         profile_id = self.context['profile_id']
-        return models.UserBlacklist.objects \
+        return models.CustommadeRequirement.objects \
             .create(profile_id=profile_id, **validated_data)
 
     class Meta:
@@ -762,7 +775,7 @@ class CustommadeOrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         customer_id = self.context['customer_id']
         designer_id = self.context['designer_id']
-        return models.UserBlacklist.objects \
+        return models.CustommadeOrder.objects \
             .create(customer_id=customer_id, designer_id=designer_id, **validated_data)
 
     class Meta:

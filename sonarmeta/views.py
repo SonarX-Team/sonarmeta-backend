@@ -973,6 +973,24 @@ class UserReplyLikeViewSet(ModelViewSet):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
+class ThreeDViewerOwnerViewSet(ModelViewSet):
+    http_method_names = ['get', 'post', 'patch', 'head', 'options']
+    serializer_class = serializers.ThreeDViewerOwnerSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return models.ThreeDViewerOwner.objects \
+            .prefetch_related('profile') \
+            .get(profile_id=self.kwargs['profile_pk'])
+
+    def get_serializer_context(self):
+        if self.request.method in SAFE_METHODS:
+            return super().get_serializer_context()
+        return {
+            'profile_id': models.Profile.objects.get(user_id=self.request.user.id).id,
+        }
+
+
 class CustommadeDesignerViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.CustommadeDesignerSerializer

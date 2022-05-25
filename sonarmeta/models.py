@@ -37,6 +37,19 @@ class Profile(models.Model):
         ordering = ['user']
 
 
+class ThreeDViewerOwner(models.Model):
+    secret_key = models.CharField(max_length=255)
+    allow_origin = models.TextField()
+    retired_time = models.DateTimeField()
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.profile.username
+
+    class Meta:
+        ordering = ['profile']
+
+
 class CustommadeDesigner(models.Model):
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
 
