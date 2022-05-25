@@ -981,7 +981,7 @@ class ThreeDViewerOwnerViewSet(ModelViewSet):
     def get_queryset(self):
         return models.ThreeDViewerOwner.objects \
             .prefetch_related('profile') \
-            .get(profile_id=self.kwargs['profile_pk'])
+            .filter(profile_id=self.kwargs['profile_pk'])
 
     def get_serializer_context(self):
         if self.request.method in SAFE_METHODS:
