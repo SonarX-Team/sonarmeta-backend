@@ -976,7 +976,7 @@ class UserReplyLikeViewSet(ModelViewSet):
 class ThreeDViewerOwnerViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'head', 'options']
     serializer_class = serializers.ThreeDViewerOwnerSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         return models.ThreeDViewerOwner.objects \
