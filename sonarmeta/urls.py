@@ -52,6 +52,9 @@ profiles_router.register(
 # endpoint: sonarmeta/profiles/{profile_pk}/resources/
 profiles_router.register(
     'resources', views.ProfileResourceViewSet, basename='profile-resource')
+# endpoint: sonarmeta/profiles/{profile_pk}/resources-all/
+profiles_router.register(
+    'resources-all', views.ProfileResourceAllViewSet, basename='profile-resource-all')
 # endpoint: sonarmeta/profiles/{profile_pk}/subscribe/
 profiles_router.register(
     'subscribe', views.UserSubscribeViewSet, basename='profile-subscribe')

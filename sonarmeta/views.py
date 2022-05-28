@@ -566,7 +566,7 @@ class MeResourceViewSet(ModelViewSet):
 
 class ProfileResourceViewSet(ModelViewSet):
     '''
-    This viewset is used to provide resources of the space profile
+    This viewset is used to provide resources of a space profile
     '''
     http_method_names = ['get', 'head', 'options']
     serializer_class = serializers.MicroResourceSerializer
@@ -577,6 +577,18 @@ class ProfileResourceViewSet(ModelViewSet):
 
     def get_queryset(self):
         return models.Resource.objects.prefetch_related('profile').filter(profile_id=self.kwargs['profile_pk'], status='P')
+
+
+class ProfileResourceAllViewSet(ModelViewSet):
+    '''
+    This viewset is used to provide all the resources of a profile
+    '''
+    http_method_names = ['get', 'head', 'options']
+    serializer_class = serializers.MicroResourceSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return models.Resource.objects.prefetch_related('profile').filter(profile_id=self.kwargs['profile_pk'])
 
 
 class ChoiceResourceViewSet(ModelViewSet):
