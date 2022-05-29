@@ -712,7 +712,7 @@ class ThreeDViewerOwnerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ThreeDViewerOwner
-        fields = ['id', 'allow_origin', 'retired_time', 'profile']
+        fields = ['id', 'top_limit', 'allow_origins', 'retired_time', 'profile']
 
 
 class CustommadeResourceSerializer(serializers.ModelSerializer):

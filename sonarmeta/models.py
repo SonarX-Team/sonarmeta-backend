@@ -38,7 +38,8 @@ class Profile(models.Model):
 
 
 class ThreeDViewerOwner(models.Model):
-    allow_origin = models.TextField()
+    top_limit = models.PositiveIntegerField(default=0)
+    allow_origins = models.TextField()
     retired_time = models.DateTimeField()
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
 
