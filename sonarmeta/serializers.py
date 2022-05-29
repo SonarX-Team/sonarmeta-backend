@@ -60,7 +60,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Profile
         fields = ['id', 'user', 'username', 'avatar', 'birth_date', 'history_flag', 'description',
-                  'gender', 'be_followed', 'follow', 'be_prevented', 'prevent']
+                  'gender', 'available_balance', 'be_followed', 'follow', 'be_prevented', 'prevent']
 
 
 class SimpleProfileSerializer(serializers.ModelSerializer):
@@ -712,7 +712,8 @@ class ThreeDViewerOwnerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ThreeDViewerOwner
-        fields = ['id', 'top_limit', 'allow_origins', 'retired_time', 'profile']
+        fields = ['id', 'top_limit', 'allow_origins',
+                  'retired_time', 'profile']
 
 
 class CustommadeResourceSerializer(serializers.ModelSerializer):

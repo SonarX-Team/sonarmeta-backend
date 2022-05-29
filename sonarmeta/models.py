@@ -1,3 +1,4 @@
+from zoneinfo import available_timezones
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -25,6 +26,7 @@ class Profile(models.Model):
     )
     wechat = models.CharField(max_length=255, null=True, blank=True)
     history_flag = models.BooleanField(default=True)
+    available_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
