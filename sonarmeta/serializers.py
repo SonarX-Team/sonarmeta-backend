@@ -60,7 +60,7 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Profile
         fields = ['id', 'user', 'username', 'avatar', 'birth_date', 'history_flag', 'description',
-                  'gender', 'available_balance', 'be_followed', 'follow', 'be_prevented', 'prevent']
+                  'gender', 'wechat', 'available_balance', 'be_followed', 'follow', 'be_prevented', 'prevent']
 
 
 class SimpleProfileSerializer(serializers.ModelSerializer):
