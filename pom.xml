@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.3-SNAPSHOT</version>
+        <version>2.1.6.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.SonarX</groupId>
@@ -17,23 +17,22 @@
         <java.version>1.8</java.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-mongodb</artifactId>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-redis</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -41,19 +40,44 @@
             <optional>true</optional>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- MYSQL -->
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- LOMBOK -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- MYBATIS-PLUS -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.2</version>
+        </dependency>
+        <!-- SWAGGER2 -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <!-- WEB3J -->
+        <dependency>
+            <groupId>org.web3j</groupId>
+            <artifactId>core</artifactId>
+            <version>4.8.7</version>
         </dependency>
     </dependencies>
 
@@ -62,6 +86,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.3.4.RELEASE</version>
                 <configuration>
                     <excludes>
                         <exclude>
@@ -71,6 +96,42 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!--mvn web3j:generate-sources-->
+            <plugin>
+                <groupId>org.web3j</groupId>
+                <artifactId>web3j-maven-plugin</artifactId>
+                <version>4.8.7</version>
+                <configuration>
+                    <packageName>com.contract</packageName>
+                    <sourceDestination>src/main/java/generated</sourceDestination>
+                    <nativeJavaType>true</nativeJavaType>
+                    <outputFormat>java,bin</outputFormat>
+                    <soliditySourceFiles>
+                        <directory>src/main/resources</directory>
+                        <includes>
+                            <include>**/*.sol</include>
+                        </includes>
+                    </soliditySourceFiles>
+                    <outputDirectory>
+                        <java>src/java/generated</java>
+                        <bin>src/bin/generated</bin>
+                        <abi>src/abi/generated</abi>
+                    </outputDirectory>
+                    <contract>
+                        <!--<includes>-->
+                        <!--    <include>Chip</include>-->
+                        <!--</includes>-->
+                        <!--<excludes>-->
+                        <!--    <exclude>Hello</exclude>-->
+                        <!--    <exclude>Chip</exclude>-->
+                        <!--</excludes>-->
+                    </contract>
+                    <pathPrefixes>
+                        <pathPrefix>dep=../dependencies</pathPrefix>
+                    </pathPrefixes>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
     <repositories>

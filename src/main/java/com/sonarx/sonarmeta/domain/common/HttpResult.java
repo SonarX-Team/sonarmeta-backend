@@ -1,15 +1,15 @@
-package com.hinsliu.monki.domain.common;
+package com.sonarx.sonarmeta.domain.common;
 
-import com.hinsliu.monki.common.enums.ErrorCodeEnum;
+
+import com.sonarx.sonarmeta.common.enums.ErrorCodeEnum;
 
 import java.io.Serializable;
 
 /**
  * @Description: Format definition of RPC results.
  * @author: liuxuanming
- * @date: 2021/03/23 11:53 上午
  */
-public class RpcResult<T> implements Serializable {
+public class HttpResult<T> implements Serializable {
 
     private Boolean success;
 
@@ -19,23 +19,23 @@ public class RpcResult<T> implements Serializable {
 
     private T data;
 
-    public static <T> RpcResult<T> successResult() {
-        return new RpcResult<T>(true, ErrorCodeEnum.SUCCESS.getCode(), "success", null);
+    public static <T> HttpResult<T> successResult() {
+        return new HttpResult<T>(true, ErrorCodeEnum.SUCCESS.getCode(), "success", null);
     }
 
-    public static <T> RpcResult<T> successResult(T data) {
-        return new RpcResult<T>(true, ErrorCodeEnum.SUCCESS.getCode(), "success", data);
+    public static <T> HttpResult<T> successResult(T data) {
+        return new HttpResult<T>(true, ErrorCodeEnum.SUCCESS.getCode(), "success", data);
     }
 
-    public static <T> RpcResult<T> errorResult(String msg) {
-        return new RpcResult<T>(false, ErrorCodeEnum.FAIL.getCode(), msg, null);
+    public static <T> HttpResult<T> errorResult(String msg) {
+        return new HttpResult<T>(false, ErrorCodeEnum.FAIL.getCode(), msg, null);
     }
 
-    public static <T> RpcResult<T> errorResult(int code, String msg) {
-        return new RpcResult<T>(false, code, msg, null);
+    public static <T> HttpResult<T> errorResult(int code, String msg) {
+        return new HttpResult<T>(false, code, msg, null);
     }
 
-    public RpcResult(boolean success, int code, String message, T data) {
+    public HttpResult(boolean success, int code, String message, T data) {
         this.success = success;
         this.code = code;
         this.message = message;

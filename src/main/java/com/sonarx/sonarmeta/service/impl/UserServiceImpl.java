@@ -16,8 +16,8 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO>
     implements UserService{
 
-    public HttpResult getOrCreateUserProfile(String id) {
-    }
+//    public HttpResult getOrCreateUserProfile(String id) {
+//    }
 }
 
 

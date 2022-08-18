@@ -1,4 +1,4 @@
-package com.hinsliu.monki.common.utils.time;
+package com.sonarx.sonarmeta.common.utils.time;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,7 +11,6 @@ import java.util.Date;
 /**
  * @Description: 时间日期工具类
  * @author: liuxuanming
- * @date: 2021/04/28 6:07 下午
  */
 
 public class DateTimeUtil {

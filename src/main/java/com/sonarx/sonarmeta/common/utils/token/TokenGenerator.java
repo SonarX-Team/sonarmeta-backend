@@ -1,11 +1,10 @@
-package com.hinsliu.monki.common.utils.token;
+package com.sonarx.sonarmeta.common.utils.token;
 
 import org.springframework.util.DigestUtils;
 
 /**
- * @Description: Token generator for utils.
+ * @Description: Token generator.
  * @author: liuxuanming
- * @date: 2021/03/30 10:59 上午
  */
 public class TokenGenerator {
 

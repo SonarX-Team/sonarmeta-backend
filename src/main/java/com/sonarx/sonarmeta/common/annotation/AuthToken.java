@@ -1,4 +1,4 @@
-package com.hinsliu.monki.common.annotation;
+package com.sonarx.sonarmeta.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,4 +1,4 @@
-package com.hinsliu.monki.domain.common;
+package com.sonarx.sonarmeta.domain.common;
 
 import java.io.Serializable;
 import java.util.List;
@@ -6,7 +6,6 @@ import java.util.List;
 /**
  * @Description: Page to maintain several items.
  * @author: liuxuanming
- * @date: 2021/03/29 11:14 上午
  */
 public class Page<T> implements Serializable {
 

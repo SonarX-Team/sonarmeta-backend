@@ -1,4 +1,4 @@
-package com.hinsliu.monki.web.config.interceptor;
+package com.sonarx.sonarmeta.web;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -10,7 +10,6 @@ import javax.annotation.Resource;
 /**
  * @Description: Config for interceptor.
  * @author: liuxuanming
- * @date: 2021/07/10 6:27 下午
  */
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {

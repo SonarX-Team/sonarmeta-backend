@@ -1,4 +1,4 @@
-package com.hinsliu.monki.web.config.swagger;
+package com.sonarx.sonarmeta.web.swagger;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +15,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @EnableSwagger2
 public class SwaggerConfig {
 
-
     @Value("${swagger.enabled}")
     private boolean enabled;
 
@@ -28,7 +27,7 @@ public class SwaggerConfig {
     @Value("${swagger.description}")
     private String description;
 
-    @Value("${swaager.version")
+    @Value("${swagger.version}")
     private String VERSION;
 
     @Bean
@@ -49,4 +48,5 @@ public class SwaggerConfig {
                 .termsOfServiceUrl("http://www.baidu.com")
                 .build();
     }
+
 }

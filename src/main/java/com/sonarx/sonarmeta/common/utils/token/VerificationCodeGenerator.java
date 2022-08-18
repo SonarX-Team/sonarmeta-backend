@@ -1,12 +1,9 @@
-package com.hinsliu.monki.common.utils.token;
-
-import io.swagger.models.auth.In;
+package com.sonarx.sonarmeta.common.utils.token;
 
 import java.util.Random;
 
 /**
  * @author liuxuanming
- * @date 2021/7/12 21:00
  * @description: 验证码生成
  */
 public class VerificationCodeGenerator {

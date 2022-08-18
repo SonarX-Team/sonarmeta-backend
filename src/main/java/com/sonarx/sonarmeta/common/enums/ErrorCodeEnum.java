@@ -1,9 +1,8 @@
-package com.hinsliu.monki.common.enums;
+package com.sonarx.sonarmeta.common.enums;
 
 /**
  * @Description: Definition of error code in RPC.
  * @author: liuxuanming
- * @date: 2021/03/23 12:00 上午
  */
 public enum ErrorCodeEnum {
     /**

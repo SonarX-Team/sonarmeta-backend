@@ -1,16 +1,19 @@
-package com.hinsliu.monki.common;
+package com.sonarx.sonarmeta.common;
 
-import io.swagger.models.auth.In;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * @Description: 常量
  * @author: liuxuanming
- * @date: 2021/05/25 4:25 下午
  */
 @Component
-public class UtilConstant {
+public class Constants {
+
+    // API版本号
+    public static final String CURRENT_API_VERSION = "/v2";
+
+    // API前缀
+    public static final String API_PREFIX = "/api" + CURRENT_API_VERSION;
 
     // 默认连接符
     public static final String DEFAULT_DELIMITER = ";";
@@ -26,11 +29,4 @@ public class UtilConstant {
 
     // 请求头中带有Token的键
     public static final String TOKEN_HEADER = "Authorization";
-
-    // Redis server
-    public static String redisServer = "www.neohugh.art";
-
-    // Redis port
-    public static Integer redisPort = 6379;
-
 }

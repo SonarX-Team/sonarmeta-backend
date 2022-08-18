@@ -1,14 +1,10 @@
-package com.hinsliu.monki.web.controller;
+package com.sonarx.sonarmeta.web.controller;
 
-import com.hinsliu.monki.domain.common.RpcResult;
+import com.sonarx.sonarmeta.domain.common.HttpResult;
 import io.swagger.annotations.Api;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpRequest;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.HashMap;
@@ -17,21 +13,15 @@ import java.util.Map;
 /**
  * @Description: Default controller for test.
  * @author: liuxuanming
- * @date: 2021/03/23 3:10 下午
  */
-@Api(description = "测试接口")
+@Api("测试接口")
 @RestController
 @RequestMapping
 public class DefaultController {
 
-    @RequestMapping(value = "/error", method = {RequestMethod.POST,RequestMethod.GET})
-    public RpcResult error() {
-        return RpcResult.errorResult("服务器内部错误");
-    }
-
-    @RequestMapping(value = "/monki", method = {RequestMethod.GET})
-    public String hello() {
-        return "Hello MonKi!";
+    @RequestMapping(value = "/error", method = {RequestMethod.POST, RequestMethod.GET})
+    public HttpResult error() {
+        return HttpResult.errorResult("服务器内部错误");
     }
 
     @RequestMapping(value = "/index", method = {RequestMethod.GET})
@@ -42,15 +32,15 @@ public class DefaultController {
     // Test PathVariable
     @RequestMapping(value = "/index/pathvariable/{params}", method = {RequestMethod.GET})
     public Map<String, Object> pathVariableTest(@PathVariable("params") String param) {
-        return new HashMap<String, Object>(){{
-           put("PathVariable param", param);
+        return new HashMap<String, Object>() {{
+            put("PathVariable param", param);
         }};
     }
 
     // Test RequestParam
     @RequestMapping(value = "/index/requestparam", method = {RequestMethod.GET})
     public Map<String, Object> requestParamTest(@RequestParam("params") String param) {
-        return new HashMap<String, Object>(){{
+        return new HashMap<String, Object>() {{
             put("RequestParam param", param);
         }};
     }
@@ -89,15 +79,6 @@ public class DefaultController {
         }
         return null;
     }
-
-    /*
-    @RequestMapping(value = "/redis")
-    public String redis(HttpServletRequest request) {
-        String key = "Redis", value = "RedisValue";
-        RedisUtil.set(key, value, 3);
-        return RedisUtil.get(key);
-    }
-    */
 
 }
 

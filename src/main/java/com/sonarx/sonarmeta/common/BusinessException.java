@@ -1,11 +1,10 @@
-package com.hinsliu.monki.common.exception;
+package com.sonarx.sonarmeta.common;
 
-import com.hinsliu.monki.common.enums.ErrorCodeEnum;
+import com.sonarx.sonarmeta.common.enums.ErrorCodeEnum;
 
 /**
  * @Description: 业务异常
  * @author: liuxuanming
- * @date: 2021/05/08 12:06 下午
  */
 public class BusinessException extends RuntimeException {
 

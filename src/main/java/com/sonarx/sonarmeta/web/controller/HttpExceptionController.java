@@ -1,9 +1,9 @@
-package com.hinsliu.monki.web.controller;
+package com.sonarx.sonarmeta.web.controller;
 
-import com.hinsliu.monki.common.UtilConstant;
-import com.hinsliu.monki.common.enums.ErrorCodeEnum;
-import com.hinsliu.monki.common.exception.BusinessException;
-import com.hinsliu.monki.domain.common.RpcResult;
+import com.sonarx.sonarmeta.common.BusinessException;
+import com.sonarx.sonarmeta.common.Constants;
+import com.sonarx.sonarmeta.common.enums.ErrorCodeEnum;
+import com.sonarx.sonarmeta.domain.common.HttpResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -21,8 +21,8 @@ import java.util.stream.Collectors;
  * RPC统一异常控制器
  */
 @Slf4j
-@RestControllerAdvice(basePackages = "com.hinsliu.monki.web.controller")
-public class RpcExceptionController {
+@RestControllerAdvice(basePackages = "com.sonarx.sonarmeta.web.controller")
+public class HttpExceptionController {
 
     /**
      * 捕捉参数校验异常
@@ -33,12 +33,12 @@ public class RpcExceptionController {
      */
     @ExceptionHandler(BindException.class)
     @ResponseStatus(HttpStatus.OK)
-    public RpcResult<Object> handleMethodArgumentNotValidException(BindException e) {
+    public HttpResult<Object> handleMethodArgumentNotValidException(BindException e) {
         String bindErrMsg = e.getBindingResult().getFieldErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.joining(UtilConstant.DEFAULT_DELIMITER));
+                .collect(Collectors.joining(Constants.DEFAULT_DELIMITER));
         log.error(bindErrMsg);
-        return RpcResult.errorResult(ErrorCodeEnum.FAIL.getCode(), String.format("输入参数不合法-->%s", bindErrMsg));
+        return HttpResult.errorResult(ErrorCodeEnum.FAIL.getCode(), String.format("输入参数不合法-->%s", bindErrMsg));
     }
 
     /**
@@ -50,12 +50,12 @@ public class RpcExceptionController {
      */
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.OK)
-    public RpcResult<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    public HttpResult<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         String bindErrMsg = e.getBindingResult().getFieldErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .collect(Collectors.joining(UtilConstant.DEFAULT_DELIMITER));
+                .collect(Collectors.joining(Constants.DEFAULT_DELIMITER));
         log.error(bindErrMsg);
-        return RpcResult.errorResult(ErrorCodeEnum.FAIL.getCode(), String.format("输入参数不合法-->%s", bindErrMsg));
+        return HttpResult.errorResult(ErrorCodeEnum.FAIL.getCode(), String.format("输入参数不合法-->%s", bindErrMsg));
     }
 
     /**
@@ -66,22 +66,22 @@ public class RpcExceptionController {
      */
     @ExceptionHandler({MissingServletRequestParameterException.class, MethodArgumentTypeMismatchException.class})
     @ResponseStatus(HttpStatus.OK)
-    public RpcResult<Object> handleMethodArgumentNotValidException(Exception e) {
+    public HttpResult<Object> handleMethodArgumentNotValidException(Exception e) {
         log.error(e.getMessage(), e);
-        return RpcResult.errorResult(ErrorCodeEnum.FAIL.getCode(), String.format("输入参数不合法-->%s", e.getMessage()));
+        return HttpResult.errorResult(ErrorCodeEnum.FAIL.getCode(), String.format("输入参数不合法-->%s", e.getMessage()));
     }
 
     /**
      * 捕获业务异常
      *
      * @param e 业务异常类
-     * @return rpcResult
+     * @return HttpResult
      */
     @ExceptionHandler(BusinessException.class)
     @ResponseStatus(HttpStatus.OK)
-    public RpcResult<Object> handleBusinessException(BusinessException e) {
+    public HttpResult<Object> handleBusinessException(BusinessException e) {
         log.error(e.getMessage(), e);
-        return RpcResult.errorResult(e.getCode(), e.getMessage());
+        return HttpResult.errorResult(e.getCode(), e.getMessage());
     }
 
     /**
@@ -93,8 +93,8 @@ public class RpcExceptionController {
     @SuppressWarnings("unused")
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
-    public RpcResult<Object> globalException(Exception e) {
+    public HttpResult<Object> globalException(Exception e) {
         log.error("服务器内部错误", e);
-        return RpcResult.errorResult("服务器内部错误");
+        return HttpResult.errorResult("服务器内部错误");
     }
 }
