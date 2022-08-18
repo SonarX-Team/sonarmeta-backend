@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonarx.sonarmeta.mapper.ModelLightSettingsMapper">
+
+    <resultMap id="BaseResultMap" type="com.sonarx.sonarmeta.domain.model.ModelLightSettingsDO">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="modelId" column="model_id" jdbcType="BIGINT"/>
+            <result property="lightSwitch" column="light_switch" jdbcType="TINYINT"/>
+            <result property="lightOneType" column="light_one_type" jdbcType="INTEGER"/>
+            <result property="lightOneColor" column="light_one_color" jdbcType="VARCHAR"/>
+            <result property="lightOnePositionX" column="light_one_position_x" jdbcType="VARCHAR"/>
+            <result property="lightOnePositionY" column="light_one_position_y" jdbcType="VARCHAR"/>
+            <result property="lightOnePositionZ" column="light_one_position_z" jdbcType="VARCHAR"/>
+            <result property="lightOneIntensity" column="light_one_intensity" jdbcType="VARCHAR"/>
+            <result property="lightOneCastShadow" column="light_one_cast_shadow" jdbcType="TINYINT"/>
+            <result property="lightOneShadowBias" column="light_one_shadow_bias" jdbcType="VARCHAR"/>
+            <result property="lightOneAttachedToCamera" column="light_one_attached_to_camera" jdbcType="TINYINT"/>
+            <result property="lightOneDecay" column="light_one_decay" jdbcType="VARCHAR"/>
+            <result property="lightOneAngle" column="light_one_angle" jdbcType="VARCHAR"/>
+            <result property="lightOnePenumbra" column="light_one_penumbra" jdbcType="VARCHAR"/>
+            <result property="lightTwoType" column="light_two_type" jdbcType="INTEGER"/>
+            <result property="lightTwoColor" column="light_two_color" jdbcType="VARCHAR"/>
+            <result property="lightTwoPositionX" column="light_two_position_x" jdbcType="VARCHAR"/>
+            <result property="lightTwoPositionY" column="light_two_position_y" jdbcType="VARCHAR"/>
+            <result property="lightTwoPositionZ" column="light_two_position_z" jdbcType="VARCHAR"/>
+            <result property="lightTwoIntensity" column="light_two_intensity" jdbcType="VARCHAR"/>
+            <result property="lightTwoCastShadow" column="light_two_cast_shadow" jdbcType="TINYINT"/>
+            <result property="lightTwoShadowBias" column="light_two_shadow_bias" jdbcType="VARCHAR"/>
+            <result property="lightTwoAttachedToCamera" column="light_two_attached_to_camera" jdbcType="TINYINT"/>
+            <result property="lightTwoDecay" column="light_two_decay" jdbcType="VARCHAR"/>
+            <result property="lightTwoAngle" column="light_two_angle" jdbcType="VARCHAR"/>
+            <result property="lightTwoPenumbra" column="light_two_penumbra" jdbcType="VARCHAR"/>
+            <result property="lightThreeType" column="light_three_type" jdbcType="INTEGER"/>
+            <result property="lightThreeColor" column="light_three_color" jdbcType="VARCHAR"/>
+            <result property="lightThreePositionX" column="light_three_position_x" jdbcType="VARCHAR"/>
+            <result property="lightThreePositionY" column="light_three_position_y" jdbcType="VARCHAR"/>
+            <result property="lightThreePositionZ" column="light_three_position_z" jdbcType="VARCHAR"/>
+            <result property="lightThreeIntensity" column="light_three_intensity" jdbcType="VARCHAR"/>
+            <result property="lightThreeCastShadow" column="light_three_cast_shadow" jdbcType="TINYINT"/>
+            <result property="lightThreeShadowBias" column="light_three_shadow_bias" jdbcType="VARCHAR"/>
+            <result property="lightThreeAttachedToCamera" column="light_three_attached_to_camera" jdbcType="TINYINT"/>
+            <result property="lightThreeDecay" column="light_three_decay" jdbcType="VARCHAR"/>
+            <result property="lightThreeAngle" column="light_three_angle" jdbcType="VARCHAR"/>
+            <result property="lightThreePenumbra" column="light_three_penumbra" jdbcType="VARCHAR"/>
+            <result property="envSwitch" column="env_switch" jdbcType="TINYINT"/>
+            <result property="envTexture" column="env_texture" jdbcType="VARCHAR"/>
+            <result property="envOrientation" column="env_orientation" jdbcType="VARCHAR"/>
+            <result property="envBrightness" column="env_brightness" jdbcType="VARCHAR"/>
+            <result property="ambientDirectionalLightBias" column="ambient_directional_light_bias" jdbcType="VARCHAR"/>
+            <result property="ambientDirectionalLightIntensity" column="ambient_directional_light_intensity" jdbcType="VARCHAR"/>
+            <result property="ambientDirectionalLightSwitch" column="ambient_directional_light_switch" jdbcType="TINYINT"/>
+            <result property="lightOneGroundColor" column="light_one_ground_color" jdbcType="VARCHAR"/>
+            <result property="lightThreeGroundColor" column="light_three_ground_color" jdbcType="VARCHAR"/>
+            <result property="lightTwoGroundColor" column="light_two_ground_color" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,model_id,light_switch,
+        light_one_type,light_one_color,light_one_position_x,
+        light_one_position_y,light_one_position_z,light_one_intensity,
+        light_one_cast_shadow,light_one_shadow_bias,light_one_attached_to_camera,
+        light_one_decay,light_one_angle,light_one_penumbra,
+        light_two_type,light_two_color,light_two_position_x,
+        light_two_position_y,light_two_position_z,light_two_intensity,
+        light_two_cast_shadow,light_two_shadow_bias,light_two_attached_to_camera,
+        light_two_decay,light_two_angle,light_two_penumbra,
+        light_three_type,light_three_color,light_three_position_x,
+        light_three_position_y,light_three_position_z,light_three_intensity,
+        light_three_cast_shadow,light_three_shadow_bias,light_three_attached_to_camera,
+        light_three_decay,light_three_angle,light_three_penumbra,
+        env_switch,env_texture,env_orientation,
+        env_brightness,ambient_directional_light_bias,ambient_directional_light_intensity,
+        ambient_directional_light_switch,light_one_ground_color,light_three_ground_color,
+        light_two_ground_color
+    </sql>
+</mapper>

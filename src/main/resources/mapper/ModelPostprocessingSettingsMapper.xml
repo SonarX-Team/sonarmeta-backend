@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonarx.sonarmeta.mapper.ModelPostprocessingSettingsMapper">
+
+    <resultMap id="BaseResultMap" type="com.sonarx.sonarmeta.domain.model.ModelPostprocessingSettingsDO">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="modelId" column="model_id" jdbcType="BIGINT"/>
+            <result property="_switch" column="switch" jdbcType="TINYINT"/>
+            <result property="ssaoSwitch" column="ssao_switch" jdbcType="TINYINT"/>
+            <result property="ssaoRadius" column="ssao_radius" jdbcType="VARCHAR"/>
+            <result property="ssaoIntensity" column="ssao_intensity" jdbcType="VARCHAR"/>
+            <result property="ssaoBias" column="ssao_bias" jdbcType="VARCHAR"/>
+            <result property="chromaticAberrationSwitch" column="chromatic_aberration_switch" jdbcType="TINYINT"/>
+            <result property="chromaticAberrationOffset" column="chromatic_aberration_offset" jdbcType="VARCHAR"/>
+            <result property="vignetteSwitch" column="vignette_switch" jdbcType="TINYINT"/>
+            <result property="vignetteOffset" column="vignette_offset" jdbcType="VARCHAR"/>
+            <result property="vignetteDarkness" column="vignette_darkness" jdbcType="VARCHAR"/>
+            <result property="bloomSwitch" column="bloom_switch" jdbcType="TINYINT"/>
+            <result property="bloomIntensity" column="bloom_intensity" jdbcType="VARCHAR"/>
+            <result property="bloomLuminanceThreshold" column="bloom_luminance_threshold" jdbcType="VARCHAR"/>
+            <result property="bloomRadius" column="bloom_radius" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,model_id,switch,
+        ssao_switch,ssao_radius,ssao_intensity,
+        ssao_bias,chromatic_aberration_switch,chromatic_aberration_offset,
+        vignette_switch,vignette_offset,vignette_darkness,
+        bloom_switch,bloom_intensity,bloom_luminance_threshold,
+        bloom_radius
+    </sql>
+</mapper>

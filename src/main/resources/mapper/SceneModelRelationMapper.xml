@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonarx.sonarmeta.mapper.SceneModelRelationMapper">
+
+    <resultMap id="BaseResultMap" type="com.sonarx.sonarmeta.domain.model.SceneModelRelationDO">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="sceneId" column="scene_id" jdbcType="BIGINT"/>
+            <result property="modelId" column="model_id" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,scene_id,model_id
+    </sql>
+</mapper>

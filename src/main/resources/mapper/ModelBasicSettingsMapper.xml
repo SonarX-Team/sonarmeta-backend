@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sonarx.sonarmeta.mapper.ModelBasicSettingsMapper">
+
+    <resultMap id="BaseResultMap" type="com.sonarx.sonarmeta.domain.model.ModelBasicSettingsDO">
+            <id property="id" column="id" jdbcType="BIGINT"/>
+            <result property="modelId" column="model_id" jdbcType="BIGINT"/>
+            <result property="modelRotationX" column="model_rotation_x" jdbcType="VARCHAR"/>
+            <result property="modelRotationY" column="model_rotation_y" jdbcType="VARCHAR"/>
+            <result property="modelRotationZ" column="model_rotation_z" jdbcType="VARCHAR"/>
+            <result property="cameraPositionX" column="camera_position_x" jdbcType="VARCHAR"/>
+            <result property="cameraPositionY" column="camera_position_y" jdbcType="VARCHAR"/>
+            <result property="cameraPositionZ" column="camera_position_z" jdbcType="VARCHAR"/>
+            <result property="fov" column="fov" jdbcType="VARCHAR"/>
+            <result property="backgroundSwitch" column="background_switch" jdbcType="TINYINT"/>
+            <result property="backgroundChoice" column="background_choice" jdbcType="INTEGER"/>
+            <result property="backgroundColor" column="background_color" jdbcType="VARCHAR"/>
+            <result property="backgroundImage" column="background_image" jdbcType="VARCHAR"/>
+            <result property="backgroundEnv" column="background_env" jdbcType="VARCHAR"/>
+            <result property="backgroundEnvBrightness" column="background_env_brightness" jdbcType="VARCHAR"/>
+            <result property="shading" column="shading" jdbcType="INTEGER"/>
+            <result property="near" column="near" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,model_id,model_rotation_x,
+        model_rotation_y,model_rotation_z,camera_position_x,
+        camera_position_y,camera_position_z,fov,
+        background_switch,background_choice,background_color,
+        background_image,background_env,background_env_brightness,
+        shading,near
+    </sql>
+</mapper>
