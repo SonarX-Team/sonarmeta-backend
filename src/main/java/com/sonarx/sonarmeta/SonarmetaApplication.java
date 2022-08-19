@@ -5,7 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-@SpringBootApplication(scanBasePackages="com.sonarx.sonarmeta.web.controller")
+@SpringBootApplication(scanBasePackages = {"com.sonarx.sonarmeta.web", "com.sonarx.sonarmeta.web.controller", "com.sonarx.sonarmeta.service.impl"})
 @MapperScan("com.sonarx.sonarmeta.mapper")
 @EnableSwagger2
 public class SonarmetaApplication {

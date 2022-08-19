@@ -7,7 +7,7 @@ create table `sonarmeta`.`t_user`
 (
     `id`          BIGINT       NOT NULL AUTO_INCREMENT,
     `username`    VARCHAR(255) NOT NULL COMMENT '用户姓名',
-    `email`       VARCHAR(255) NOT NULL COMMENT '用户邮箱',
+    `email`       VARCHAR(255) COMMENT '用户邮箱',
     `avatar`      VARCHAR(255)          DEFAULT 'https://ik.imagekit.io/bayc/assets/ape1.png' COMMENT '用户头像',
     `gender`      INT                   DEFAULT 0 COMMENT '用户性别',
     `description` TEXT COMMENT '用户描述',
@@ -46,38 +46,36 @@ create table `sonarmeta`.`t_model`
     `path`             TEXT          NOT NULL COMMENT '素材源',
     `attached`         TEXT          NULL COMMENT '',
     `path_folder_list` TEXT          NOT NULL COMMENT '',
-    `status`           INT                    DEFAULT 0 COMMENT '模型状态',
+    `status`           INT                    DEFAULT 1 COMMENT '模型状态',
     `title`            VARCHAR(255)  NOT NULL DEFAULT '' COMMENT '模型名称',
     `description`      TEXT COMMENT '模型描述',
-    `cover`            TEXT          null comment '模型封面',
+    `cover`            TEXT          NULL COMMENT '模型封面',
     `tags`             VARCHAR(1024) NOT NULL COMMENT '模型标签',
     `category`         VARCHAR(2)    NOT NULL COMMENT '模型分类',
-    `type`             INT                    DEFAULT 0 COMMENT '模型类型',
     `create_time`      TIMESTAMP              DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 
-    `purchase_price`   BIGINT        NOT NULL COMMENT '购买费用',
-    `grant_price`      BIGINT        NOT NULL COMMENT '借用费用',
-    `watch_price`      BIGINT        NOT NULL COMMENT '观看费用',
+    `purchase_price`   BIGINT        NOT NULL DEFAULT 0 COMMENT '购买费用',
+    `grant_price`      BIGINT        NOT NULL DEFAULT 0 COMMENT '借用费用',
+    `experience_price` BIGINT        NOT NULL DEFAULT 0 COMMENT '体验费用',
     `nft_token_id`     BIGINT        NOT NULL COMMENT '对应NFT TokenId',
     PRIMARY KEY (`id`)
 ) COMMENT ='模型信息';
 
 create table `sonarmeta`.`t_scene`
 (
-    `id`             BIGINT        NOT NULL AUTO_INCREMENT,
-    `status`         INT                    DEFAULT 0 COMMENT '场景状态',
-    `title`          VARCHAR(255)  NOT NULL DEFAULT '' COMMENT '场景名称',
-    `description`    TEXT COMMENT '场景描述',
-    `cover`          TEXT          null comment '场景封面',
-    `tags`           VARCHAR(1024) NOT NULL COMMENT '场景标签',
-    `category`       VARCHAR(2)    NOT NULL COMMENT '场景分类',
-    `type`           INT                    DEFAULT 0 COMMENT '场景类型',
-    `create_time`    TIMESTAMP              DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `id`               BIGINT        NOT NULL AUTO_INCREMENT,
+    `status`           INT                    DEFAULT 1 COMMENT '场景状态',
+    `title`            VARCHAR(255)  NOT NULL DEFAULT '' COMMENT '场景名称',
+    `description`      TEXT COMMENT '场景描述',
+    `cover`            TEXT          NULL COMMENT '场景封面',
+    `tags`             VARCHAR(1024) NOT NULL COMMENT '场景标签',
+    `category`         VARCHAR(2)    NOT NULL COMMENT '场景分类',
+    `create_time`      TIMESTAMP              DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
 
-    `purchase_price` BIGINT        NOT NULL COMMENT '购买费用',
-    `grant_price`    BIGINT        NOT NULL COMMENT '借用费用',
-    `watch_price`    BIGINT        NOT NULL COMMENT '观看费用',
-    `nft_token_id`   BIGINT        NOT NULL COMMENT '对应NFT TokenId',
+    `purchase_price`   BIGINT        NOT NULL DEFAULT 0 COMMENT '购买费用',
+    `grant_price`      BIGINT        NOT NULL DEFAULT 0 COMMENT '借用费用',
+    `experience_price` BIGINT        NOT NULL DEFAULT 0 COMMENT '体验费用',
+    `nft_token_id`     BIGINT        NOT NULL COMMENT '对应NFT TokenId',
     PRIMARY KEY (`id`)
 ) COMMENT ='场景信息';
 

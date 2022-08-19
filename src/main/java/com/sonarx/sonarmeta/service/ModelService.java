@@ -1,5 +1,7 @@
 package com.sonarx.sonarmeta.service;
 
+import com.sonarx.sonarmeta.domain.form.CreateModelForm;
+import com.sonarx.sonarmeta.domain.form.EditModelForm;
 import com.sonarx.sonarmeta.domain.model.ModelDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -10,4 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface ModelService extends IService<ModelDO> {
 
+    void createModelWithForm(CreateModelForm form);
+
+    void editModelWithForm(EditModelForm form);
 }

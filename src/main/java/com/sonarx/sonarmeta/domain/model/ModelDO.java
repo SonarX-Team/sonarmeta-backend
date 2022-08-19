@@ -67,11 +67,6 @@ public class ModelDO implements Serializable {
     private String category;
 
     /**
-     * 模型类型
-     */
-    private Integer type;
-
-    /**
      * 创建时间
      */
     private Date createTime;
@@ -87,9 +82,9 @@ public class ModelDO implements Serializable {
     private Long grantPrice;
 
     /**
-     * 观看费用
+     * 体验费用
      */
-    private Long watchPrice;
+    private Long experiencePrice;
 
     /**
      * 对应NFT TokenId

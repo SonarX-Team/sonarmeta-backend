@@ -1,4 +1,4 @@
-package com.sonarx.sonarmeta.web3;
+package com.sonarx.sonarmeta.web;
 
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;

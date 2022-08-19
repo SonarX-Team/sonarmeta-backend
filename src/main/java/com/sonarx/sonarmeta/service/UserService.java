@@ -1,7 +1,9 @@
 package com.sonarx.sonarmeta.service;
 
+import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.stereotype.Service;
 
 /**
 * @author hinsliu
@@ -10,4 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface UserService extends IService<UserDO> {
 
+    UserDO getOrCreateUserProfileByAddress(String id);
+
+    UserDO getUserProfileById(String id);
 }

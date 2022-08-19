@@ -20,12 +20,14 @@ import static com.sonarx.sonarmeta.common.Constants.API_PREFIX;
 @RequestMapping(API_PREFIX + "/scene")
 public class SceneController {
 
+    // TODO
     @ApiOperation(value = "创建场景作品")
     @RequestMapping(value = "/create", method = {RequestMethod.POST})
     public HttpResult createScene() {
         return  HttpResult.successResult();
     }
 
+    // TODO
     @ApiOperation(value = "编辑场景作品")
     @RequestMapping(value = "/edit", method = {RequestMethod.POST})
     public HttpResult editScene() {

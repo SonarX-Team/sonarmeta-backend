@@ -78,6 +78,17 @@
             <groupId>org.web3j</groupId>
             <artifactId>core</artifactId>
             <version>4.8.7</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.squareup.okhttp3</groupId>
+                    <artifactId>okhttp</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.8</version>
         </dependency>
     </dependencies>
 

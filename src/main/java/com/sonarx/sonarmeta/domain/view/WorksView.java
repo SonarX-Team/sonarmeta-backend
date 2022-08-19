@@ -1,55 +1,74 @@
-package com.sonarx.sonarmeta.domain.model;
+package com.sonarx.sonarmeta.domain.view;
 
 import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.util.Date;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
- * 场景信息
- * @TableName t_scene
+ * @description: 作品视图
+ * @author: liuxuanming
  */
-@TableName(value ="t_scene")
 @Data
-public class SceneDO implements Serializable {
-    /**
-     * 
-     */
-    @TableId(type = IdType.AUTO)
+public class WorksView {
+
     private Long id;
 
     /**
-     * 场景状态
+     * 作品类型
+     */
+    private Integer worksType;
+
+    /**
+     * 素材源
+     */
+    private String path;
+
+    /**
+     *
+     */
+    private String attached;
+
+    /**
+     *
+     */
+    private String pathFolderList;
+
+    /**
+     * 状态
      */
     private Integer status;
 
     /**
-     * 场景名称
+     * 名称
      */
     private String title;
 
     /**
-     * 场景描述
+     * 描述
      */
     private String description;
 
     /**
-     * 场景封面
+     * 封面
      */
     private String cover;
 
     /**
-     * 场景标签
+     * 标签
      */
     private String tags;
 
     /**
-     * 场景分类
+     * 分类
      */
     private String category;
+
+    /**
+     * 类型
+     */
+    private Integer type;
 
     /**
      * 创建时间
@@ -67,15 +86,12 @@ public class SceneDO implements Serializable {
     private Long grantPrice;
 
     /**
-     * 体验费用
+     * 观看费用
      */
-    private Long experiencePrice;
+    private Long watchPrice;
 
     /**
      * 对应NFT TokenId
      */
     private Long nftTokenId;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 }

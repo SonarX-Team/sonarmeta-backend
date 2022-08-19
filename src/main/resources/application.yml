@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://www.neohugh.art:3306/sonarmeta?characterEncoding=utf8&useSSL=false
+    url: jdbc:mysql://localhost:3306/sonarmeta?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
     username: ${mysql.username:root}
-    password: ${mysql.password:}
+    password: ${mysql.password:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis-plus:

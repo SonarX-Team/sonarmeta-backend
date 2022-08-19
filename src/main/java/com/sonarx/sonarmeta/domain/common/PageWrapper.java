@@ -7,7 +7,7 @@ import java.util.List;
  * @Description: Page to maintain several items.
  * @author: liuxuanming
  */
-public class Page<T> implements Serializable {
+public class PageWrapper<T> implements Serializable {
 
     private Integer page;
 
@@ -17,7 +17,7 @@ public class Page<T> implements Serializable {
 
     private List<T> results;
 
-    public Page(Integer page, Integer pageSize, Integer count, List<T> results){
+    public PageWrapper(Integer page, Integer pageSize, Integer count, List<T> results){
         this.page = page;
         this.pageSize = pageSize;
         this.count = count;

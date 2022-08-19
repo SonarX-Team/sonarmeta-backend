@@ -1,6 +1,7 @@
 package com.sonarx.sonarmeta.web.controller;
 
 import com.sonarx.sonarmeta.domain.common.HttpResult;
+import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.sonarx.sonarmeta.service.UserService;
 import com.sonarx.sonarmeta.service.impl.UserServiceImpl;
 import io.swagger.annotations.Api;
@@ -25,25 +26,38 @@ import static com.sonarx.sonarmeta.common.Constants.API_PREFIX;
 @RequestMapping(API_PREFIX + "/user")
 public class UserController {
 
-//    @Resource
-//    private UserServiceImpl userService;
-//
-//    @ApiOperation(value = "获取用户个人信息")
-//    @RequestMapping(value = "/profile", method = {RequestMethod.GET})
-//    public HttpResult getUserProfile(@RequestParam(value = "id") String id) {
-//        return  userService.getOrCreateUserProfile(id);
-//    }
+    @Resource
+    UserService userService;
 
+    @ApiOperation(value = "通过钱包地址获取用户个人信息")
+    @RequestMapping(value = "/profile/byAddress", method = {RequestMethod.GET})
+    public HttpResult getUserProfileByAddress(@RequestParam(value = "address") String address) {
+        return HttpResult.successResult(userService.getOrCreateUserProfileByAddress(address));
+    }
+
+    @ApiOperation(value = "通过ID获取用户个人信息")
+    @RequestMapping(value = "/profile/byId", method = {RequestMethod.GET})
+    public HttpResult getUserProfileById(@RequestParam(value = "id") String id) {
+        UserDO user = userService.getUserProfileById(id);
+        if (user == null) {
+            return HttpResult.errorResult("用户不存在");
+        } else {
+            return HttpResult.successResult(user);
+        }
+    }
+
+    // TODO
     @ApiOperation(value = "获取用户个人空间作品列表")
     @RequestMapping(value = "/workslist", method = {RequestMethod.GET})
     public HttpResult getUserWorksList() {
-            return  HttpResult.successResult();
+        return HttpResult.successResult();
     }
 
+    // TODO
     @ApiOperation(value = "用户行为")
     @RequestMapping(value = "/action", method = {RequestMethod.POST})
     public HttpResult userActions() {
-        return  HttpResult.successResult();
+        return HttpResult.successResult();
     }
 
 }

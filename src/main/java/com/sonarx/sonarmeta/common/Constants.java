@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class Constants {
 
+    public static final String APP_NAME = "sonarmeta";
+
     // API版本号
     public static final String CURRENT_API_VERSION = "/v2";
 
@@ -17,6 +19,8 @@ public class Constants {
 
     // 默认连接符
     public static final String DEFAULT_DELIMITER = ";";
+
+    public static final String DEFAULT_CONNECTOR = "-";
 
     // 分页查询系统最大页大小
     public static final Integer MAX_PAGE_SIZE = 50;
