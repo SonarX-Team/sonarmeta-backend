@@ -1,7 +1,7 @@
 package com.sonarx.sonarmeta.domain.common;
 
 
-import com.sonarx.sonarmeta.common.enums.ErrorCodeEnum;
+import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 
 import java.io.Serializable;
 

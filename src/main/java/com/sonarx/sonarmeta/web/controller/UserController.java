@@ -1,16 +1,13 @@
 package com.sonarx.sonarmeta.web.controller;
 
 import com.sonarx.sonarmeta.domain.common.HttpResult;
+import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
 import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.sonarx.sonarmeta.service.UserService;
-import com.sonarx.sonarmeta.service.impl.UserServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -53,10 +50,10 @@ public class UserController {
         return HttpResult.successResult();
     }
 
-    // TODO
-    @ApiOperation(value = "用户行为")
-    @RequestMapping(value = "/action", method = {RequestMethod.POST})
-    public HttpResult userActions() {
+    @ApiOperation(value = "用户消费行为")
+    @RequestMapping(value = "/consume", method = {RequestMethod.POST})
+    public HttpResult userActions(@RequestBody ConsumeActionForm form) {
+        userService.consume(form);
         return HttpResult.successResult();
     }
 

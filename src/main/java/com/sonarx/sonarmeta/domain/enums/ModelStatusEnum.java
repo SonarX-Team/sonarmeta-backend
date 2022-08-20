@@ -1,9 +1,12 @@
-package com.sonarx.sonarmeta.common.enums;
+package com.sonarx.sonarmeta.domain.enums;
+
+import io.swagger.annotations.ApiModel;
 
 /**
  * @description: 模型状态枚举
  * @author: liuxuanming
  */
+@ApiModel(description = "模型状态类别")
 public enum ModelStatusEnum {
 
     MODEL_STATUS_UNRELEASED(1, "未发布"),
@@ -12,7 +15,7 @@ public enum ModelStatusEnum {
 
     MODEL_STATUS_PASSED(3, "已发布"),
 
-    MODEL_STATUS_CHECK_FAILED(3, "审核不通过");
+    MODEL_STATUS_CHECK_FAILED(4, "审核不通过");
 
     private final Integer statusCode;
 

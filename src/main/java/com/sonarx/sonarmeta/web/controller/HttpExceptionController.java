@@ -2,7 +2,7 @@ package com.sonarx.sonarmeta.web.controller;
 
 import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.common.Constants;
-import com.sonarx.sonarmeta.common.enums.ErrorCodeEnum;
+import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;

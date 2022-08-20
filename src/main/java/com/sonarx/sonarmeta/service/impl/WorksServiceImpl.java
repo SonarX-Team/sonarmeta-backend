@@ -2,9 +2,9 @@ package com.sonarx.sonarmeta.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sonarx.sonarmeta.common.enums.ModelStatusEnum;
-import com.sonarx.sonarmeta.common.enums.SceneStatusEnum;
-import com.sonarx.sonarmeta.common.enums.WorksTypeEnum;
+import com.sonarx.sonarmeta.domain.enums.ModelStatusEnum;
+import com.sonarx.sonarmeta.domain.enums.SceneStatusEnum;
+import com.sonarx.sonarmeta.domain.enums.WorksTypeEnum;
 import com.sonarx.sonarmeta.domain.common.PageWrapper;
 import com.sonarx.sonarmeta.domain.common.PageParam;
 import com.sonarx.sonarmeta.domain.model.ModelDO;

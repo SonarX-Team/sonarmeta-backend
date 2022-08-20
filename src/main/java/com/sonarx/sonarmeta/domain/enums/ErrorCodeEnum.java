@@ -1,4 +1,4 @@
-package com.sonarx.sonarmeta.common.enums;
+package com.sonarx.sonarmeta.domain.enums;
 
 /**
  * @Description: Definition of error code in RPC.

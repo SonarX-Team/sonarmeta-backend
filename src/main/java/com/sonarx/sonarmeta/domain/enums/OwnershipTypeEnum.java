@@ -1,5 +1,8 @@
-package com.sonarx.sonarmeta.common.enums;
+package com.sonarx.sonarmeta.domain.enums;
 
+import io.swagger.annotations.ApiModel;
+
+@ApiModel(description = "所有权类别")
 public enum OwnershipTypeEnum {
 
     OWN(1, "拥有权"),

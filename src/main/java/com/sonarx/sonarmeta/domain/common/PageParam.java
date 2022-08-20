@@ -1,6 +1,8 @@
 package com.sonarx.sonarmeta.domain.common;
 
 import com.sonarx.sonarmeta.common.Constants;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,12 +14,16 @@ import java.io.Serializable;
  */
 @Data
 @NoArgsConstructor
+@ApiModel(description = "分页参数")
 public class PageParam implements Serializable {
 
+    @ApiModelProperty(value = "当前页")
     private Integer page;
 
+    @ApiModelProperty(value = "页容量")
     private Integer pageSize;
 
+    @ApiModelProperty(value = "偏移量，不一定需要传输", required = false)
     private Integer offset;
 
     public void setOffset() {

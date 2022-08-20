@@ -1,6 +1,6 @@
 package com.sonarx.sonarmeta.common;
 
-import com.sonarx.sonarmeta.common.enums.ErrorCodeEnum;
+import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 
 /**
  * @Description: 业务异常

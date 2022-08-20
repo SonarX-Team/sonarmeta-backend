@@ -1,9 +1,12 @@
-package com.sonarx.sonarmeta.common.enums;
+package com.sonarx.sonarmeta.domain.enums;
+
+import io.swagger.annotations.ApiModel;
 
 /**
  * @description: 场景状态枚举
  * @author: liuxuanming
  */
+@ApiModel(description = "场景状态类别")
 public enum SceneStatusEnum {
 
     SCENE_STATUS_UNRELEASED(1, "未发布"),

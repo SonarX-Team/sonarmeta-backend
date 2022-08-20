@@ -1,5 +1,8 @@
-package com.sonarx.sonarmeta.common.enums;
+package com.sonarx.sonarmeta.domain.enums;
 
+import io.swagger.annotations.ApiModel;
+
+@ApiModel(description = "作品类别")
 public enum WorksTypeEnum {
 
     WORKS_MODEL(1, "模型"),

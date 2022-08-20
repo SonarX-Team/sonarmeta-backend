@@ -15,4 +15,6 @@ public interface ModelService extends IService<ModelDO> {
     void createModelWithForm(CreateModelForm form);
 
     void editModelWithForm(EditModelForm form);
+
+    ModelDO getModelById(Long id);
 }
