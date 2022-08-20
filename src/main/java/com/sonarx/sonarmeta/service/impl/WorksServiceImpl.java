@@ -3,25 +3,32 @@ package com.sonarx.sonarmeta.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sonarx.sonarmeta.domain.enums.ModelStatusEnum;
+import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.enums.SceneStatusEnum;
 import com.sonarx.sonarmeta.domain.enums.WorksTypeEnum;
 import com.sonarx.sonarmeta.domain.common.PageWrapper;
 import com.sonarx.sonarmeta.domain.common.PageParam;
 import com.sonarx.sonarmeta.domain.model.ModelDO;
 import com.sonarx.sonarmeta.domain.model.SceneDO;
+import com.sonarx.sonarmeta.domain.model.UserModelOwnershipRelationDO;
+import com.sonarx.sonarmeta.domain.model.UserSceneOwnershipRelationDO;
 import com.sonarx.sonarmeta.domain.query.AllWorksListQuery;
 import com.sonarx.sonarmeta.domain.query.SearchWorksListQuery;
 import com.sonarx.sonarmeta.domain.view.WorksView;
 import com.sonarx.sonarmeta.mapper.ModelMapper;
 import com.sonarx.sonarmeta.mapper.SceneMapper;
+import com.sonarx.sonarmeta.mapper.UserModelOwnershipRelationMapper;
+import com.sonarx.sonarmeta.mapper.UserSceneOwnershipRelationMapper;
 import com.sonarx.sonarmeta.service.WorksService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @description: Implement WorksService
@@ -36,6 +43,12 @@ public class WorksServiceImpl implements WorksService {
 
     @Resource
     SceneMapper sceneMapper;
+
+    @Resource
+    UserModelOwnershipRelationMapper userModelOwnershipRelationMapper;
+
+    @Resource
+    UserSceneOwnershipRelationMapper userSceneOwnershipRelationMapper;
 
     @Override
     public PageWrapper<WorksView> getWorksList(AllWorksListQuery query) {
@@ -103,6 +116,53 @@ public class WorksServiceImpl implements WorksService {
         });
 
         return new PageWrapper<>(query.getPage(), query.getPageSize(), result.size(), result);
+    }
+
+    @Override
+    public Map<Integer, List<WorksView>> getWorksByUserId(String userId) {
+
+        Map<Integer, List<WorksView>> res = new HashMap<>();
+        List<WorksView> ownList = new LinkedList<>();
+        List<WorksView> grantList = new LinkedList<>();
+        List<WorksView> experienceList = new LinkedList<>();
+
+        // 根据user_id查询用户models
+        QueryWrapper<UserModelOwnershipRelationDO> userModelOwnershipRelationDOQueryWrapper = new QueryWrapper<>();
+        userModelOwnershipRelationDOQueryWrapper.select().eq("user_id", userId);
+        List<UserModelOwnershipRelationDO> userModelOwnershipRelationDOS = userModelOwnershipRelationMapper.selectList(userModelOwnershipRelationDOQueryWrapper);
+        for (UserModelOwnershipRelationDO userModelOwnershipRelationDO : userModelOwnershipRelationDOS) {
+            if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.OWN.getCode())) {
+                ownList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+            }
+            if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.GRANT.getCode())) {
+                grantList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+            }
+            if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.EXPERIENCE.getCode())) {
+                experienceList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+            }
+        }
+
+        // 根据user_id查询用户scenes
+        QueryWrapper<UserSceneOwnershipRelationDO> userSceneOwnershipRelationDOQueryWrapper = new QueryWrapper<>();
+        userSceneOwnershipRelationDOQueryWrapper.select().eq("user_id", userId);
+        List<UserSceneOwnershipRelationDO> userSceneOwnershipRelationDOS = userSceneOwnershipRelationMapper.selectList(userSceneOwnershipRelationDOQueryWrapper);
+        for (UserSceneOwnershipRelationDO userSceneOwnershipRelationDO : userSceneOwnershipRelationDOS) {
+            if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.OWN.getCode())) {
+                ownList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+            }
+            if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.GRANT.getCode())) {
+                grantList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+            }
+            if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.EXPERIENCE.getCode())) {
+                experienceList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+            }
+        }
+
+        res.put(OwnershipTypeEnum.OWN.getCode(), ownList);
+        res.put(OwnershipTypeEnum.GRANT.getCode(), grantList);
+        res.put(OwnershipTypeEnum.EXPERIENCE.getCode(), experienceList);
+        return res;
+
     }
 
     private WorksView getWorksFromScene(SceneDO sceneDO) {
