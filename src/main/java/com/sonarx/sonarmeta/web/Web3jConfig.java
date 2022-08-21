@@ -16,17 +16,27 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class Web3jConfig {
 
-    @Value("${web3j.client-address}")
-    private String rpcUrl;
+    @Value("${web3j.rpc.localhost}")
+    private String localhostUrl;
+
+    @Value("${web3j.rpc.mainnet}")
+    private String mainnetUrl;
+
+    @Value("${web3j.rpc.rinkeby}")
+    private String rinkebyUrl;
+
+    private static final Integer timeout = 10 * 1000;
 
     @Bean
     public Web3j web3j() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
-        builder.connectTimeout(30*1000, TimeUnit.MILLISECONDS);
-        builder.writeTimeout(30*1000, TimeUnit.MILLISECONDS);
-        builder.readTimeout(30*1000, TimeUnit.MILLISECONDS);
-        OkHttpClient httpClient = builder.build();
-        Web3j web3j = Web3j.build(new HttpService(rpcUrl,httpClient,false));
-        return web3j;
+        return Web3j.build(
+                new HttpService(localhostUrl,
+                        new OkHttpClient.Builder()
+                                .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                                .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                                .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                                .build(),
+                        false)
+        );
     }
 }

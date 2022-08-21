@@ -32,7 +32,12 @@ swagger:
   version: 2.0.0
 
 web3j:
-  client-address: http://localhost:8545
+  rpc:
+    localhost: http://localhost:8545
+    rinkeby: https://rinkeby.infura.io/v3/
+    mainnet: https://mainnet.infura.io/v3/
+
+
 
 
 
