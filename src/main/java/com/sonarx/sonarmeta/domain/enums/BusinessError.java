@@ -40,6 +40,8 @@ public enum BusinessError {
     TRANSACTION_ERROR("交易异常");
 
 
+
+
     private final String desc;
 
     BusinessError(String desc) {
