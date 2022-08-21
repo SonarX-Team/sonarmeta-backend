@@ -3,10 +3,12 @@ package com.sonarx.sonarmeta.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sonarx.sonarmeta.common.BusinessException;
+import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.domain.enums.ConsumeTypeEnum;
 import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
+import com.sonarx.sonarmeta.domain.form.UpdateUserForm;
 import com.sonarx.sonarmeta.domain.model.ModelDO;
 import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.sonarx.sonarmeta.domain.model.UserModelOwnershipRelationDO;
@@ -104,18 +106,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
             if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.OWN.getCode()) {
                 // 所属关系不存在或者已经获得了相同或更高的权限
-                throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "错误的消费类型");
+                throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
                 // 可以进行消费，修改金额，修改模型所属关系
                 // 获取模型的信息
                 ModelDO model = modelService.getModelById(form.getId());
                 if (model == null) {
-                    throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "消费对象不存在");
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 获取模型拥有者信息
                 UserModelOwnershipRelationDO beforeOwnRelation = userModelOwnershipRelationService.getModelOwnRelation(form.getId());
                 if (beforeOwnRelation == null) {
-                    throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "消费对象不存在");
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 转账
                 transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getPurchasePrice());
@@ -132,18 +134,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
             if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.GRANT.getCode()) {
                 // 所属关系不存在或者已经获得了相同或更高的权限
-                throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "错误的消费类型");
+                throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
                 // 可以进行消费，修改金额，修改模型所属关系
                 // 获取模型的信息
                 ModelDO model = modelService.getModelById(form.getId());
                 if (model == null) {
-                    throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "消费对象不存在");
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 获取模型拥有者信息
                 UserModelOwnershipRelationDO beforeOwnRelation = userModelOwnershipRelationService.getModelOwnRelation(form.getId());
                 if (beforeOwnRelation == null) {
-                    throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "消费对象不存在");
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 转账
                 transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getGrantPrice());
@@ -161,18 +163,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
             if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.EXPERIENCE.getCode()) {
                 // 所属关系不存在或者已经获得了相同或更高的权限
-                throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "错误的消费类型");
+                throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
                 // 可以进行消费，修改金额，修改模型所属关系
                 // 获取模型的信息
                 ModelDO model = modelService.getModelById(form.getId());
                 if (model == null) {
-                    throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "消费对象不存在");
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 获取模型拥有者信息
                 UserModelOwnershipRelationDO beforeOwnRelation = userModelOwnershipRelationService.getModelOwnRelation(form.getId());
                 if (beforeOwnRelation == null) {
-                    throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "消费对象不存在");
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 转账
                 transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getExperiencePrice());
@@ -190,32 +192,48 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         } else if (consumeType == ConsumeTypeEnum.CONSUME_EXPERIENCE_SCENE.getCode()) {
             // TODO
         } else {
-            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "非法消费类型");
+            throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
         }
+    }
+
+    @Override
+    public void updateUser(UpdateUserForm userForm) {
+        UserDO user = userMapper.selectById(userForm.getId());
+        if (user == null) {
+            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
+        }
+        user.setEmail(userForm.getEmail());
+        user.setAvatar(userForm.getAvatar());
+        user.setGender(userForm.getGender());
+        user.setDescription(userForm.getDescription());
+        user.setBirthDate(userForm.getBirthDate());
+        user.setWechat(userForm.getWechat());
+        user.setTwitter(userForm.getTwitter());
+        user.setBalance(userForm.getBalance());
     }
 
     private void transfer(Long from, Long to, Long amount) {
         UserDO fromUser = userMapper.selectById(from);
         if (fromUser == null) {
-            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "用户不存在");
+            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
         } else if (fromUser.getBalance() < amount) {
-            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "用户余额不足");
+            throw new BusinessException(BusinessError.OUT_OF_BALANCE_ERROR);
         } else {
             fromUser.setBalance(fromUser.getBalance() - amount);
             int affectCount = userMapper.updateById(fromUser);
             if (affectCount <= 0) {
-                throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "转账失败");
+                throw new BusinessException(BusinessError.TRANSACTION_ERROR);
             }
         }
 
         UserDO toUser = userMapper.selectById(to);
         if (toUser == null) {
-            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "用户不存在");
+            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
         } else {
             toUser.setBalance(toUser.getBalance() + amount);
             int affectCount = userMapper.updateById(toUser);
             if (affectCount <= 0) {
-                throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "转账失败");
+                throw new BusinessException(BusinessError.TRANSACTION_ERROR);
             }
         }
     }

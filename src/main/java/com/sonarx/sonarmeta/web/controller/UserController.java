@@ -2,12 +2,14 @@ package com.sonarx.sonarmeta.web.controller;
 
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
+import com.sonarx.sonarmeta.domain.form.UpdateUserForm;
 import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.sonarx.sonarmeta.service.UserService;
 import com.sonarx.sonarmeta.service.WorksService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -61,9 +63,15 @@ public class UserController {
 
     @ApiOperation(value = "用户消费行为")
     @RequestMapping(value = "/consume", method = {RequestMethod.POST})
-    public HttpResult userActions(@RequestBody ConsumeActionForm form) {
+    public HttpResult userActions(@RequestBody @Validated ConsumeActionForm form) {
         userService.consume(form);
         return HttpResult.successResult();
     }
 
+    @ApiOperation(value = "更新用户个人信息")
+    @RequestMapping(value = "/profile/update", method = {RequestMethod.POST})
+    public HttpResult updateUserProfile(@RequestBody @Validated UpdateUserForm userForm) {
+        userService.updateUser(userForm);
+        return HttpResult.successResult();
+    }
 }

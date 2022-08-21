@@ -2,6 +2,7 @@ package com.sonarx.sonarmeta.service;
 
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
+import com.sonarx.sonarmeta.domain.form.UpdateUserForm;
 import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
@@ -18,4 +19,6 @@ public interface UserService extends IService<UserDO> {
     UserDO getUserProfileById(String id);
 
     void consume(ConsumeActionForm form);
+
+    void updateUser(UpdateUserForm userForm);
 }

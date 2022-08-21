@@ -78,4 +78,21 @@ public class SceneDO implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public SceneDO(){}
+
+    public SceneDO(SceneDO sceneDO) {
+        this.id = sceneDO.id;
+        this.status = sceneDO.status;
+        this.title = sceneDO.title;
+        this.description = sceneDO.description;
+        this.cover = sceneDO.cover;
+        this.tags = sceneDO.tags;
+        this.category = sceneDO.category;
+        this.createTime = sceneDO.createTime;
+        this.purchasePrice = sceneDO.purchasePrice;
+        this.grantPrice = sceneDO.grantPrice;
+        this.experiencePrice = sceneDO.experiencePrice;
+        this.nftTokenId = sceneDO.nftTokenId;
+    }
 }

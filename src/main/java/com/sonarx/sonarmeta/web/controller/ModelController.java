@@ -45,6 +45,11 @@ public class ModelController {
         return HttpResult.successResult();
     }
 
+    @ApiOperation(value = "获取模型信息")
+    @RequestMapping(value = "/get", method = {RequestMethod.GET})
+    public HttpResult getModel(@RequestParam(value = "modelId") Long modelId) {
+        return HttpResult.successResult(modelService.getModelById(modelId));
+    }
 
     @ApiOperation(value = "获取模型基本设置")
     @RequestMapping(value = "/basic", method = {RequestMethod.GET})

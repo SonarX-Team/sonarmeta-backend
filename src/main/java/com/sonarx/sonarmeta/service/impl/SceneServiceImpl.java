@@ -7,9 +7,14 @@ import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
+import com.sonarx.sonarmeta.domain.model.ModelDO;
 import com.sonarx.sonarmeta.domain.model.SceneDO;
+import com.sonarx.sonarmeta.domain.model.SceneModelRelationDO;
 import com.sonarx.sonarmeta.domain.model.UserSceneOwnershipRelationDO;
+import com.sonarx.sonarmeta.domain.view.SceneView;
+import com.sonarx.sonarmeta.mapper.ModelMapper;
 import com.sonarx.sonarmeta.mapper.SceneMapper;
+import com.sonarx.sonarmeta.mapper.SceneModelRelationMapper;
 import com.sonarx.sonarmeta.mapper.UserSceneOwnershipRelationMapper;
 import com.sonarx.sonarmeta.service.SceneService;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
 * @author hinsliu
@@ -35,6 +42,12 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
 
     @Resource
     UserSceneOwnershipRelationMapper userSceneOwnershipRelationMapper;
+
+    @Resource
+    SceneModelRelationMapper sceneModelRelationMapper;
+
+    @Resource
+    ModelMapper modelMapper;
 
     @Override
     @Transactional
@@ -58,7 +71,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         relation.setOwnershipType(OwnershipTypeEnum.OWN.getCode());
         affectCount = userSceneOwnershipRelationMapper.insert(relation);
         if (affectCount <= 0) {
-            throw new BusinessException(BusinessError.CREATE_USER_AND_MODEL_ERROR);
+            throw new BusinessException(BusinessError.CREATE_USER_AND_SCENE_ERROR);
         }
 
         log.info("新建场景信息：用户{}，场景{}，NFT{}", relation.getUserId(), relation.getSceneId(), sceneDO.getNftTokenId());
@@ -82,6 +95,26 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         }
 
         log.info("编辑模型信息：用户{}，场景{}", relation.getUserId(), relation.getSceneId());
+    }
+
+    @Override
+    public SceneView getScene(Long sceneId) {
+        SceneDO sceneDO = sceneMapper.selectById(sceneId);
+        if (sceneDO == null) {
+            return null;
+        }
+        SceneView sceneView = new SceneView(sceneDO);
+        List<ModelDO> modelList = new LinkedList<>();
+        QueryWrapper<SceneModelRelationDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("scene_id", sceneId);
+        List<SceneModelRelationDO> sceneModelRelationDOS = sceneModelRelationMapper.selectList(queryWrapper);
+        if (sceneModelRelationDOS != null) {
+            for (SceneModelRelationDO sceneModelRelationDO : sceneModelRelationDOS) {
+                modelList.add(modelMapper.selectById(sceneModelRelationDO.getModelId()));
+            }
+        }
+        sceneView.setModelList(modelList);
+        return null;
     }
 }
 
