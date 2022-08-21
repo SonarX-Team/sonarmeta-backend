@@ -3,6 +3,10 @@ package com.sonarx.sonarmeta.web.controller;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.CreateModelForm;
 import com.sonarx.sonarmeta.domain.form.EditModelForm;
+import com.sonarx.sonarmeta.domain.model.ModelBasicSettingsDO;
+import com.sonarx.sonarmeta.domain.model.ModelLightSettingsDO;
+import com.sonarx.sonarmeta.domain.model.ModelMaterialSettingsDO;
+import com.sonarx.sonarmeta.domain.model.ModelPostprocessingSettingsDO;
 import com.sonarx.sonarmeta.service.ModelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,59 +45,63 @@ public class ModelController {
         return HttpResult.successResult();
     }
 
-    // TODO
+
     @ApiOperation(value = "获取模型基本设置")
     @RequestMapping(value = "/basic", method = {RequestMethod.GET})
-    public HttpResult getModelBasicSettings() {
-        return HttpResult.successResult();
+    public HttpResult getModelBasicSettings(@RequestParam(value = "modelId") Long modelId) {
+        return HttpResult.successResult(modelService.getModelBasicSettings(modelId));
     }
 
-    // TODO
+
     @ApiOperation(value = "编辑模型基本设置")
     @RequestMapping(value = "/basic/edit", method = {RequestMethod.POST})
-    public HttpResult editModelBasicSettings() {
+    public HttpResult editModelBasicSettings(@RequestBody ModelBasicSettingsDO modelBasicSettingsDO) {
+        modelService.editModelBasicSettings(modelBasicSettingsDO);
         return HttpResult.successResult();
     }
 
-    // TODO
+
     @ApiOperation(value = "获取模型基本设置")
     @RequestMapping(value = "/light", method = {RequestMethod.GET})
-    public HttpResult getModelLightSettings() {
-        return HttpResult.successResult();
+    public HttpResult getModelLightSettings(@RequestParam(value = "modelId") Long modelId) {
+        return HttpResult.successResult(modelService.getModelLightSettings(modelId));
     }
 
-    // TODO
+
     @ApiOperation(value = "编辑模型光线设置")
     @RequestMapping(value = "/light/edit", method = {RequestMethod.POST})
-    public HttpResult editModelLightSettings() {
+    public HttpResult editModelLightSettings(@RequestBody ModelLightSettingsDO modelLightSettingsDO) {
+        modelService.editModelLightSettings(modelLightSettingsDO);
         return HttpResult.successResult();
     }
 
-    // TODO
+
     @ApiOperation(value = "获取模型材料设置")
     @RequestMapping(value = "/material", method = {RequestMethod.GET})
-    public HttpResult getModelMaterialSettings() {
-        return HttpResult.successResult();
+    public HttpResult getModelMaterialSettings(@RequestParam(value = "modelId") Long modelId) {
+        return HttpResult.successResult(modelService.getModelMaterialSettings(modelId));
     }
 
-    // TODO
+
     @ApiOperation(value = "编辑模型材料设置")
     @RequestMapping(value = "/material/edit", method = {RequestMethod.POST})
-    public HttpResult editModelMaterialSettings() {
+    public HttpResult editModelMaterialSettings(@RequestBody ModelMaterialSettingsDO modelMaterialSettingsDO) {
+        modelService.editModelMaterialSettings(modelMaterialSettingsDO);
         return HttpResult.successResult();
     }
 
-    // TODO
+
     @ApiOperation(value = "获取模型后期设置")
     @RequestMapping(value = "/postprocessing", method = {RequestMethod.GET})
-    public HttpResult getModelPostProcessingSettings() {
-        return HttpResult.successResult();
+    public HttpResult getModelPostProcessingSettings(@RequestParam(value = "modelId") Long modelId) {
+        return HttpResult.successResult(modelService.getModelPostProcessingSettings(modelId));
     }
 
-    // TODO
+
     @ApiOperation(value = "编辑模型后期设置")
     @RequestMapping(value = "/postprocessing/edit", method = {RequestMethod.POST})
-    public HttpResult editModelPostprocessingSettings() {
+    public HttpResult editModelPostprocessingSettings(@RequestBody ModelPostprocessingSettingsDO modelPostprocessingSettingsDO) {
+        modelService.editModelPostprocessingSettings(modelPostprocessingSettingsDO);
         return HttpResult.successResult();
     }
 }

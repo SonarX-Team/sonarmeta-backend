@@ -1,6 +1,7 @@
 package com.sonarx.sonarmeta.service.impl;
 
 import com.sonarx.sonarmeta.common.BusinessException;
+import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
@@ -49,7 +50,7 @@ public class Web3ServiceImpl {
         try {
             blockNumber = web3j.ethBlockNumber().send();
         } catch (IOException e) {
-            throw new BusinessException("交易异常: " + e.getMessage());
+            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
         }
 
         return blockNumber.getBlockNumber().longValue();
@@ -60,7 +61,7 @@ public class Web3ServiceImpl {
             EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(address, DefaultBlockParameterName.LATEST).send();
             return ethGetTransactionCount.getTransactionCount();
         } catch (IOException e) {
-            throw new BusinessException("交易异常: " + e.getMessage());
+            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
         }
     }
 
@@ -69,7 +70,7 @@ public class Web3ServiceImpl {
             EthGetBalance balanceWei = web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).send();
             return Convert.fromWei(balanceWei.getBalance().toString(), Convert.Unit.ETHER);
         } catch (IOException e) {
-            throw new BusinessException("交易异常: " + e.getMessage());
+            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
         }
     }
 
@@ -99,7 +100,7 @@ public class Web3ServiceImpl {
                                 TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
                 return receiptProcessor.waitForTransactionReceipt(send.getTransactionHash());
             } catch (IOException | TransactionException e) {
-                throw new BusinessException("交易异常: " + e.getMessage());
+                throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
             }
         }
         return null;
@@ -117,7 +118,7 @@ public class Web3ServiceImpl {
             EthCall ethCall = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send();
             return FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
         } catch (IOException e) {
-            throw new BusinessException("交易异常: " + e.getMessage());
+            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
         }
     }
 
@@ -138,7 +139,7 @@ public class Web3ServiceImpl {
                             TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
             return receiptProcessor.waitForTransactionReceipt(txHash);
         } catch (IOException | TransactionException e) {
-            throw new BusinessException("交易异常: " + e.getMessage());
+            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
         }
     }
 
@@ -160,7 +161,7 @@ public class Web3ServiceImpl {
         try {
             return Transfer.sendFunds(web3j, credentials, recipientAddress, amount, unit).send();
         } catch (Exception e) {
-            throw new BusinessException("交易异常: " + e.getMessage());
+            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
         }
     }
 

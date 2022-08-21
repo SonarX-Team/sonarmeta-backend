@@ -4,7 +4,8 @@ public enum BusinessError {
 
     CREATE_MODEL_ERROR("创建模型错误"),
     EDIT_MODEL_ERROR("编辑模型错误"),
-    CREATE_USER_AND_MODEL_ERROR("创建用户和模型关系错误");
+    CREATE_USER_AND_MODEL_ERROR("创建用户和模型关系错误"),
+    TRANSACTION_ERROR("交易异常");
 
 
     private final String desc;
