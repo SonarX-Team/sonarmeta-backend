@@ -1,5 +1,6 @@
 package com.sonarx.sonarmeta.common;
 
+import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 
 /**
@@ -28,6 +29,11 @@ public class BusinessException extends RuntimeException {
         super(message);
         this.code = code;
         this.message = message;
+    }
+
+    public BusinessException(BusinessError businessError) {
+        this.code = ErrorCodeEnum.FAIL.getCode();
+        this.message = businessError.getDesc();
     }
 
     public static BusinessException fail(String message) {
