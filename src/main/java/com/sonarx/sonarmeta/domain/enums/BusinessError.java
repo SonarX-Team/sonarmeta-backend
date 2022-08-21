@@ -9,6 +9,7 @@ public enum BusinessError {
     USER_NOT_EXIST_ERROR("用户不存在"),
 
 
+
     /**
      * 模型/场景错误
      */
@@ -37,6 +38,8 @@ public enum BusinessError {
     TRANSACTION_OBJECT_NOT_EXIST("消费对象不存在"),
 
     TRANSACTION_ERROR("交易异常");
+
+
 
 
     private final String desc;
