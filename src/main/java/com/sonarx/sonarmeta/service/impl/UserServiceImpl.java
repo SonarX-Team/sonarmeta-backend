@@ -14,14 +14,11 @@ import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.sonarx.sonarmeta.domain.model.UserModelOwnershipRelationDO;
 import com.sonarx.sonarmeta.mapper.ModelMapper;
 import com.sonarx.sonarmeta.mapper.SceneMapper;
+import com.sonarx.sonarmeta.mapper.UserMapper;
 import com.sonarx.sonarmeta.mapper.UserModelOwnershipRelationMapper;
 import com.sonarx.sonarmeta.service.ModelService;
-import com.sonarx.sonarmeta.service.UserModelOwnershipRelationService;
 import com.sonarx.sonarmeta.service.UserService;
-import com.sonarx.sonarmeta.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.User;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,19 +40,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     UserMapper userMapper;
 
     @Resource
-    ModelMapper modelMapper;
-
-    @Resource
-    SceneMapper sceneMapper;
-
-    @Resource
-    UserModelOwnershipRelationMapper userModelOwnershipRelationMapper;
-
-    @Resource
-    UserModelOwnershipRelationService userModelOwnershipRelationService;
-
-    @Resource
     ModelService modelService;
+
 
     public UserDO getOrCreateUserProfileByAddress(String address) {
         // 根据address查询用户信息
@@ -102,7 +88,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         if (consumeType == ConsumeTypeEnum.CONSUME_PURCHASE_MODEL.getCode()) {
             // 购买模型
             // 获取用户和该对象的所属关系
-            UserModelOwnershipRelationDO relation = userModelOwnershipRelationService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
+            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
 
             if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.OWN.getCode()) {
                 // 所属关系不存在或者已经获得了相同或更高的权限
@@ -115,14 +101,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 获取模型拥有者信息
-                UserModelOwnershipRelationDO beforeOwnRelation = userModelOwnershipRelationService.getModelOwnRelation(form.getId());
+                UserModelOwnershipRelationDO beforeOwnRelation = modelService.getModelOwnRelation(form.getId());
                 if (beforeOwnRelation == null) {
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 转账
                 transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getPurchasePrice());
                 // 修改模型所有关系
-                userModelOwnershipRelationService.updateModelOwner(form.getUserId(), beforeOwnRelation);
+                modelService.updateModelOwner(form.getUserId(), beforeOwnRelation);
                 // NFT所有权转让
                 // TODO
                 log.info("用户{} 购买了 模型{} 所有权", form.getUserId(), form.getId());
@@ -130,7 +116,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         } else if (consumeType == ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode()) {
             // 使用模型
             // 获取用户和该对象的所属关系
-            UserModelOwnershipRelationDO relation = userModelOwnershipRelationService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
+            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
 
             if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.GRANT.getCode()) {
                 // 所属关系不存在或者已经获得了相同或更高的权限
@@ -143,14 +129,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 获取模型拥有者信息
-                UserModelOwnershipRelationDO beforeOwnRelation = userModelOwnershipRelationService.getModelOwnRelation(form.getId());
+                UserModelOwnershipRelationDO beforeOwnRelation = modelService.getModelOwnRelation(form.getId());
                 if (beforeOwnRelation == null) {
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 转账
                 transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getGrantPrice());
                 // 添加模型使用权限
-                userModelOwnershipRelationService.addUserModelOwnershipRelation(form.getUserId(), model.getId(), OwnershipTypeEnum.GRANT.GRANT);
+                modelService.addUserModelOwnershipRelation(form.getUserId(), model.getId(), OwnershipTypeEnum.GRANT.GRANT);
 
                 // NFT所有权转让
                 // TODO
@@ -159,7 +145,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         } else if (consumeType == ConsumeTypeEnum.CONSUME_EXPERIENCE_MODEL.getCode()) {
             // 体验模型
             // 获取用户和该对象的所属关系
-            UserModelOwnershipRelationDO relation = userModelOwnershipRelationService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
+            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
 
             if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.EXPERIENCE.getCode()) {
                 // 所属关系不存在或者已经获得了相同或更高的权限
@@ -172,14 +158,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 获取模型拥有者信息
-                UserModelOwnershipRelationDO beforeOwnRelation = userModelOwnershipRelationService.getModelOwnRelation(form.getId());
+                UserModelOwnershipRelationDO beforeOwnRelation = modelService.getModelOwnRelation(form.getId());
                 if (beforeOwnRelation == null) {
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 转账
                 transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getExperiencePrice());
                 // 添加模型使用权限
-                userModelOwnershipRelationService.addUserModelOwnershipRelation(form.getUserId(), model.getId(), OwnershipTypeEnum.EXPERIENCE);
+                modelService.addUserModelOwnershipRelation(form.getUserId(), model.getId(), OwnershipTypeEnum.EXPERIENCE);
 
                 // NFT所有权转让
                 // TODO

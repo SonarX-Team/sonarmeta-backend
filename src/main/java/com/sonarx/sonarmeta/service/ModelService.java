@@ -1,5 +1,6 @@
 package com.sonarx.sonarmeta.service;
 
+import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.CreateModelForm;
 import com.sonarx.sonarmeta.domain.form.EditModelForm;
 import com.sonarx.sonarmeta.domain.model.*;
@@ -33,4 +34,12 @@ public interface ModelService extends IService<ModelDO> {
     ModelPostprocessingSettingsDO getModelPostProcessingSettings(Long modelId);
 
     void editModelPostprocessingSettings(ModelPostprocessingSettingsDO modelPostprocessingSettingsDO);
+
+    void addUserModelOwnershipRelation(Long user, Long model, OwnershipTypeEnum ownershipType);
+
+    void updateModelOwner(Long newUser, UserModelOwnershipRelationDO beforeRelation);
+
+    UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(Long userId, Long id);
+
+    UserModelOwnershipRelationDO getModelOwnRelation(Long id);
 }
