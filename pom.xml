@@ -113,7 +113,7 @@
                 <artifactId>web3j-maven-plugin</artifactId>
                 <version>4.8.7</version>
                 <configuration>
-                    <packageName>com.contract</packageName>
+                    <packageName>com.sonarx.sonarmeta.contract</packageName>
                     <sourceDestination>src/main/java/generated</sourceDestination>
                     <nativeJavaType>true</nativeJavaType>
                     <outputFormat>java,bin</outputFormat>
