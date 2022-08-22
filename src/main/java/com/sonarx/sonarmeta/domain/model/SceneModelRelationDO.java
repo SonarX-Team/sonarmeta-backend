@@ -32,4 +32,9 @@ public class SceneModelRelationDO implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+
+    public SceneModelRelationDO(Long sceneId, Long modelId) {
+        this.sceneId = sceneId;
+        this.modelId = modelId;
+    }
 }

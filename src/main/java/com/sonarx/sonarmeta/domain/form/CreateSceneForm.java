@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
 @ApiModel("创建场景信息Form")
@@ -42,4 +43,7 @@ public class CreateSceneForm {
 
     @NotBlank(message = "体验费用不能为空")
     private Long experiencePrice;
+
+    @NotBlank(message = "模型列表不能为空")
+    private List<Long> modelIdList;
 }
