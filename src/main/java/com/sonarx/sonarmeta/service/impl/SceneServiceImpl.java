@@ -129,6 +129,36 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     @Override
     public void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation) {
 
+        //拥有场景的用户才能更新场景与模型的关系
+        QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("user_id", sceneModelRelation.getUserId())
+                .eq("scene_id", sceneModelRelation.getSceneId());
+        UserSceneOwnershipRelationDO userSceneOwnershipRelationDO  = userSceneOwnershipRelationMapper.selectOne(queryWrapper1);
+        if (userSceneOwnershipRelationDO == null || !userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.OWN.getCode())) {
+            throw new BusinessException(BusinessError.USER_SCENE_PERMISSION_DENIED);
+        }
+
+        //该用户必须同时具备对应模型的拥有权或授予权
+        for (Long modelId : sceneModelRelation.getModelIdList()) {
+            QueryWrapper<UserModelOwnershipRelationDO> queryWrapper2 = new QueryWrapper<>();
+            queryWrapper2.eq("user_id", sceneModelRelation.getUserId())
+                    .eq("model_id", modelId);
+            UserModelOwnershipRelationDO userModelOwnershipRelationDO = userModelOwnershipRelationMapper.selectOne(queryWrapper2);
+            if (userModelOwnershipRelationDO == null || userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.EXPERIENCE.getCode())) {
+                throw new BusinessException(BusinessError.USER_MODEL_PERMISSION_DENIED);
+            }
+        }
+
+        //删除原有scene的关系
+        QueryWrapper<SceneModelRelationDO> queryWrapper3 = new QueryWrapper<>();
+        queryWrapper3.eq("scene_id", sceneModelRelation.getSceneId());
+        sceneModelRelationMapper.delete(queryWrapper3);
+
+        //新增关系
+        for (Long modelId : sceneModelRelation.getModelIdList()) {
+            sceneModelRelationMapper.insert(new SceneModelRelationDO(sceneModelRelation.getSceneId(), modelId));
+        }
+
     }
 }
 

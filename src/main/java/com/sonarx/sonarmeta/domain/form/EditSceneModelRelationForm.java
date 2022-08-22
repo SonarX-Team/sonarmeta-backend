@@ -6,9 +6,10 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Data
-@ApiModel("创建场景与模型关系Form")
+@ApiModel("编辑场景与模型关系Form")
 public class EditSceneModelRelationForm {
 
     @NotNull(message = "用户不能为空")
@@ -19,6 +20,6 @@ public class EditSceneModelRelationForm {
     private Long sceneId;
 
     @NotBlank(message = "模型不能为空")
-    private Long modelId;
+    private List<Long> modelIdList;
 
 }
