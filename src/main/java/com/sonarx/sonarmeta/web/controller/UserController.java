@@ -4,6 +4,7 @@ import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
 import com.sonarx.sonarmeta.domain.form.UpdateUserForm;
 import com.sonarx.sonarmeta.domain.model.UserDO;
+import com.sonarx.sonarmeta.domain.view.WorksView;
 import com.sonarx.sonarmeta.service.UserService;
 import com.sonarx.sonarmeta.service.WorksService;
 import io.swagger.annotations.Api;
@@ -13,6 +14,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+
+import java.util.List;
+import java.util.Map;
 
 import static com.sonarx.sonarmeta.common.Constants.API_PREFIX;
 
@@ -34,13 +38,13 @@ public class UserController {
 
     @ApiOperation(value = "通过钱包地址获取用户个人信息")
     @RequestMapping(value = "/profile/byAddress", method = {RequestMethod.GET})
-    public HttpResult getUserProfileByAddress(@RequestParam(value = "address") String address) {
+    public HttpResult<UserDO> getUserProfileByAddress(@RequestParam(value = "address") String address) {
         return HttpResult.successResult(userService.getOrCreateUserProfileByAddress(address));
     }
 
     @ApiOperation(value = "通过ID获取用户个人信息")
     @RequestMapping(value = "/profile/byId", method = {RequestMethod.GET})
-    public HttpResult getUserProfileById(@RequestParam(value = "id") String id) {
+    public HttpResult<UserDO> getUserProfileById(@RequestParam(value = "id") String id) {
         UserDO user = userService.getUserProfileById(id);
         if (user == null) {
             return HttpResult.errorResult("用户不存在");
@@ -52,7 +56,7 @@ public class UserController {
 
     @ApiOperation(value = "获取用户个人空间作品列表")
     @RequestMapping(value = "/workslist", method = {RequestMethod.GET})
-    public HttpResult getUserWorksList(@RequestParam(value = "id") String id) {
+    public HttpResult<Map<Integer, List<WorksView>>> getUserWorksList(@RequestParam(value = "id") String id) {
         UserDO user = userService.getUserProfileById(id);
         if (user == null) {
             return HttpResult.errorResult("用户不存在");

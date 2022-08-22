@@ -3,6 +3,7 @@ package com.sonarx.sonarmeta.web.controller;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
+import com.sonarx.sonarmeta.domain.view.SceneView;
 import com.sonarx.sonarmeta.service.SceneService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -44,7 +45,7 @@ public class SceneController {
 
     @ApiOperation(value = "获取场景作品")
     @RequestMapping(value = "/get", method = {RequestMethod.GET})
-    public HttpResult getScene(@RequestParam(value = "sceneId") Long sceneId) {
+    public HttpResult<SceneView> getScene(@RequestParam(value = "sceneId") Long sceneId) {
         return  HttpResult.successResult(sceneService.getScene(sceneId));
     }
 
