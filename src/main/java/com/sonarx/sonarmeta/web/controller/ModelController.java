@@ -3,10 +3,7 @@ package com.sonarx.sonarmeta.web.controller;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.CreateModelForm;
 import com.sonarx.sonarmeta.domain.form.EditModelForm;
-import com.sonarx.sonarmeta.domain.model.ModelBasicSettingsDO;
-import com.sonarx.sonarmeta.domain.model.ModelLightSettingsDO;
-import com.sonarx.sonarmeta.domain.model.ModelMaterialSettingsDO;
-import com.sonarx.sonarmeta.domain.model.ModelPostprocessingSettingsDO;
+import com.sonarx.sonarmeta.domain.model.*;
 import com.sonarx.sonarmeta.service.ModelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,13 +44,13 @@ public class ModelController {
 
     @ApiOperation(value = "获取模型信息")
     @RequestMapping(value = "/get", method = {RequestMethod.GET})
-    public HttpResult getModel(@RequestParam(value = "modelId") Long modelId) {
+    public HttpResult<ModelDO> getModel(@RequestParam(value = "modelId") Long modelId) {
         return HttpResult.successResult(modelService.getModelById(modelId));
     }
 
     @ApiOperation(value = "获取模型基本设置")
     @RequestMapping(value = "/basic", method = {RequestMethod.GET})
-    public HttpResult getModelBasicSettings(@RequestParam(value = "modelId") Long modelId) {
+    public HttpResult<ModelBasicSettingsDO> getModelBasicSettings(@RequestParam(value = "modelId") Long modelId) {
         return HttpResult.successResult(modelService.getModelBasicSettings(modelId));
     }
 
@@ -68,7 +65,7 @@ public class ModelController {
 
     @ApiOperation(value = "获取模型基本设置")
     @RequestMapping(value = "/light", method = {RequestMethod.GET})
-    public HttpResult getModelLightSettings(@RequestParam(value = "modelId") Long modelId) {
+    public HttpResult<ModelLightSettingsDO> getModelLightSettings(@RequestParam(value = "modelId") Long modelId) {
         return HttpResult.successResult(modelService.getModelLightSettings(modelId));
     }
 
@@ -83,7 +80,7 @@ public class ModelController {
 
     @ApiOperation(value = "获取模型材料设置")
     @RequestMapping(value = "/material", method = {RequestMethod.GET})
-    public HttpResult getModelMaterialSettings(@RequestParam(value = "modelId") Long modelId) {
+    public HttpResult<ModelMaterialSettingsDO> getModelMaterialSettings(@RequestParam(value = "modelId") Long modelId) {
         return HttpResult.successResult(modelService.getModelMaterialSettings(modelId));
     }
 
@@ -98,7 +95,7 @@ public class ModelController {
 
     @ApiOperation(value = "获取模型后期设置")
     @RequestMapping(value = "/postprocessing", method = {RequestMethod.GET})
-    public HttpResult getModelPostProcessingSettings(@RequestParam(value = "modelId") Long modelId) {
+    public HttpResult<ModelPostprocessingSettingsDO> getModelPostProcessingSettings(@RequestParam(value = "modelId") Long modelId) {
         return HttpResult.successResult(modelService.getModelPostProcessingSettings(modelId));
     }
 

@@ -2,8 +2,10 @@ package com.sonarx.sonarmeta.web.controller;
 
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.common.PageParam;
+import com.sonarx.sonarmeta.domain.common.PageWrapper;
 import com.sonarx.sonarmeta.domain.query.AllWorksListQuery;
 import com.sonarx.sonarmeta.domain.query.SearchWorksListQuery;
+import com.sonarx.sonarmeta.domain.view.WorksView;
 import com.sonarx.sonarmeta.service.WorksService;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +33,13 @@ public class WorksController {
 
     @ApiOperation(value = "作品列表")
     @RequestMapping(value = "/list", method = {RequestMethod.GET})
-    public HttpResult getWorksList(@ModelAttribute AllWorksListQuery query) {
+    public HttpResult<PageWrapper<WorksView>> getWorksList(@ModelAttribute AllWorksListQuery query) {
         return HttpResult.successResult(worksService.getWorksList(query));
     }
 
     @ApiOperation(value = "搜索作品")
     @RequestMapping(value = "/search", method = {RequestMethod.GET})
-    public HttpResult searchWorks(@ModelAttribute SearchWorksListQuery query) {
+    public HttpResult<PageWrapper<WorksView>> searchWorks(@ModelAttribute SearchWorksListQuery query) {
         return HttpResult.successResult(worksService.searchWorksList(query));
     }
 }
