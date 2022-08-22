@@ -3,6 +3,7 @@ package com.sonarx.sonarmeta.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
+import com.sonarx.sonarmeta.domain.form.EditSceneModelRelationForm;
 import com.sonarx.sonarmeta.domain.model.SceneDO;
 import com.sonarx.sonarmeta.domain.view.SceneView;
 
@@ -18,4 +19,6 @@ public interface SceneService extends IService<SceneDO> {
     void editSceneWithForm(EditSceneForm form);
 
     SceneView getScene(Long sceneId);
+
+    void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation);
 }

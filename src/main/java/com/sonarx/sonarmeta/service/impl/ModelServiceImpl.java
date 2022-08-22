@@ -190,6 +190,47 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         }
         log.info("编辑模型信息：模型{}", modelPostprocessingSettingsDO.getModelId());
     }
+    
+
+    public void addUserModelOwnershipRelation(Long user, Long model, OwnershipTypeEnum ownershipType) {
+        UserModelOwnershipRelationDO relation = new UserModelOwnershipRelationDO();
+        relation.setUserId(user);
+        relation.setModelId(model);
+        relation.setOwnershipType(ownershipType.getCode());
+        int affectCount = userModelOwnershipRelationMapper.insert(relation);
+        if (affectCount <= 0) {
+            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "新增模型" + ownershipType.getDesc() + "权限失败");
+        }
+    }
+
+    @Override
+    public void updateModelOwner(Long newUser, UserModelOwnershipRelationDO beforeRelation) {
+        UserModelOwnershipRelationDO afterRelation = new UserModelOwnershipRelationDO();
+        BeanUtils.copyProperties(beforeRelation, afterRelation);
+        afterRelation.setUserId(newUser);
+        int affectCount = userModelOwnershipRelationMapper.updateById(afterRelation);
+        if (affectCount <= 0) {
+            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "模型拥有权转让失败");
+        }
+    }
+
+    @Override
+    public UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(Long userId, Long id) {
+        return userModelOwnershipRelationMapper.selectOne(
+                new QueryWrapper<UserModelOwnershipRelationDO>()
+                        .eq("model_id", id)
+                        .eq("user_id", userId)
+        );
+    }
+
+    @Override
+    public UserModelOwnershipRelationDO getModelOwnRelation(Long id) {
+        return userModelOwnershipRelationMapper.selectOne(
+                new QueryWrapper<UserModelOwnershipRelationDO>()
+                        .eq("model_id", id)
+                        .eq("ownership_type", OwnershipTypeEnum.OWN.getCode())
+        );
+    }
 }
 
 

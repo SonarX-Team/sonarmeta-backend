@@ -7,15 +7,10 @@ import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
-import com.sonarx.sonarmeta.domain.model.ModelDO;
-import com.sonarx.sonarmeta.domain.model.SceneDO;
-import com.sonarx.sonarmeta.domain.model.SceneModelRelationDO;
-import com.sonarx.sonarmeta.domain.model.UserSceneOwnershipRelationDO;
+import com.sonarx.sonarmeta.domain.form.EditSceneModelRelationForm;
+import com.sonarx.sonarmeta.domain.model.*;
 import com.sonarx.sonarmeta.domain.view.SceneView;
-import com.sonarx.sonarmeta.mapper.ModelMapper;
-import com.sonarx.sonarmeta.mapper.SceneMapper;
-import com.sonarx.sonarmeta.mapper.SceneModelRelationMapper;
-import com.sonarx.sonarmeta.mapper.UserSceneOwnershipRelationMapper;
+import com.sonarx.sonarmeta.mapper.*;
 import com.sonarx.sonarmeta.service.SceneService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -49,6 +44,9 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     @Resource
     ModelMapper modelMapper;
 
+    @Resource
+    UserModelOwnershipRelationMapper userModelOwnershipRelationMapper;
+
     @Override
     @Transactional
     public void createSceneWithForm(CreateSceneForm createSceneForm) {
@@ -72,6 +70,17 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         affectCount = userSceneOwnershipRelationMapper.insert(relation);
         if (affectCount <= 0) {
             throw new BusinessException(BusinessError.CREATE_USER_AND_SCENE_ERROR);
+        }
+
+        for (Long modelId : createSceneForm.getModelIdList()) {
+            QueryWrapper<UserModelOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("user_id", createSceneForm.getUserId())
+                    .eq("model_id", modelId);
+            UserModelOwnershipRelationDO userModelOwnershipRelationDO = userModelOwnershipRelationMapper.selectOne(queryWrapper);
+            if (userModelOwnershipRelationDO == null || userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.EXPERIENCE.getCode())) {
+                throw new BusinessException(BusinessError.USER_MODEL_PERMISSION_DENIED);
+            }
+            sceneModelRelationMapper.insert(new SceneModelRelationDO(sceneDO.getId(), modelId));
         }
 
         log.info("新建场景信息：用户{}，场景{}，NFT{}", relation.getUserId(), relation.getSceneId(), sceneDO.getNftTokenId());
@@ -115,6 +124,41 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         }
         sceneView.setModelList(modelList);
         return null;
+    }
+
+    @Override
+    public void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation) {
+
+        //拥有场景的用户才能更新场景与模型的关系
+        QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("user_id", sceneModelRelation.getUserId())
+                .eq("scene_id", sceneModelRelation.getSceneId());
+        UserSceneOwnershipRelationDO userSceneOwnershipRelationDO  = userSceneOwnershipRelationMapper.selectOne(queryWrapper1);
+        if (userSceneOwnershipRelationDO == null || !userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.OWN.getCode())) {
+            throw new BusinessException(BusinessError.USER_SCENE_PERMISSION_DENIED);
+        }
+
+        //该用户必须同时具备对应模型的拥有权或授予权
+        for (Long modelId : sceneModelRelation.getModelIdList()) {
+            QueryWrapper<UserModelOwnershipRelationDO> queryWrapper2 = new QueryWrapper<>();
+            queryWrapper2.eq("user_id", sceneModelRelation.getUserId())
+                    .eq("model_id", modelId);
+            UserModelOwnershipRelationDO userModelOwnershipRelationDO = userModelOwnershipRelationMapper.selectOne(queryWrapper2);
+            if (userModelOwnershipRelationDO == null || userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.EXPERIENCE.getCode())) {
+                throw new BusinessException(BusinessError.USER_MODEL_PERMISSION_DENIED);
+            }
+        }
+
+        //删除原有scene的关系
+        QueryWrapper<SceneModelRelationDO> queryWrapper3 = new QueryWrapper<>();
+        queryWrapper3.eq("scene_id", sceneModelRelation.getSceneId());
+        sceneModelRelationMapper.delete(queryWrapper3);
+
+        //新增关系
+        for (Long modelId : sceneModelRelation.getModelIdList()) {
+            sceneModelRelationMapper.insert(new SceneModelRelationDO(sceneModelRelation.getSceneId(), modelId));
+        }
+
     }
 }
 

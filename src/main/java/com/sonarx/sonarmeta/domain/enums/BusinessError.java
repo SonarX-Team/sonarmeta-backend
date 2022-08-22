@@ -8,6 +8,9 @@ public enum BusinessError {
 
     USER_NOT_EXIST_ERROR("用户不存在"),
 
+    USER_SCENE_PERMISSION_DENIED("用户没有场景权限"),
+
+    USER_MODEL_PERMISSION_DENIED("用户没有模型权限"),
 
 
     /**
