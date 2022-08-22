@@ -41,7 +41,6 @@ public class Web3ServiceImpl {
     @Resource
     Web3j web3j;
 
-    @Resource
     public static final int pollingInterval = 3000;
 
     public Long getHeight() {
