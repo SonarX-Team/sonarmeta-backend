@@ -1,17 +1,23 @@
 package com.sonarx.sonarmeta.service.impl;
 
 import com.sonarx.sonarmeta.common.BusinessException;
+import com.sonarx.sonarmeta.common.EthTransactionException;
 import com.sonarx.sonarmeta.domain.enums.BusinessError;
+import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.Function;
 import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.request.EthFilter;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.*;
 import org.web3j.protocol.exceptions.TransactionException;
@@ -28,6 +34,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -36,20 +43,57 @@ import java.util.List;
  */
 @Slf4j
 @Service
-public class Web3ServiceImpl {
+public class EthServiceImpl implements Web3Service {
 
     @Resource
     Web3j web3j;
 
-    public static final int pollingInterval = 3000;
+    @Value("${web3j.contracts.main}")
+    private String mainContract;
+
+    @Value("${web3j.contracts.ERC20}")
+    private String ERC20Contract;
+
+    @Value("${web3j.contracts.ERC721}")
+    private String ERC721Contract;
+
+    @Value("${web3j.contracts.ERC998}")
+    private String ERC998Contract;
+
+    @Value("${web3j.accounts-pk.controller1}")
+    private String controller1PrivateKey;
+
+    @Override
+    public Long mintERC721(String address) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(address));
+        outputParameters.add(new TypeReference<Uint256>() {
+        });
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "mintERC721",
+                inputParameters,
+                outputParameters
+        );
+
+        List<Log> logs = receipt.getLogs();
+        List<String> topic = receipt.getLogs().size() > 0 ? receipt.getLogs().get(1).getTopics() : null;
+        String requiredTopic = topic.size() > 0 ? topic.get(2) : null;
+        if(requiredTopic == null) {
+            throw new EthTransactionException();
+        }
+        return Long.parseLong(requiredTopic.substring(2), 16);
+    }
 
     public Long getHeight() {
-        EthBlockNumber blockNumber = null;
+        EthBlockNumber blockNumber;
 
         try {
             blockNumber = web3j.ethBlockNumber().send();
         } catch (IOException e) {
-            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
+            throw new EthTransactionException(e.getMessage());
         }
 
         return blockNumber.getBlockNumber().longValue();
@@ -60,7 +104,7 @@ public class Web3ServiceImpl {
             EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(address, DefaultBlockParameterName.LATEST).send();
             return ethGetTransactionCount.getTransactionCount();
         } catch (IOException e) {
-            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
+            throw new EthTransactionException(e.getMessage());
         }
     }
 
@@ -69,7 +113,7 @@ public class Web3ServiceImpl {
             EthGetBalance balanceWei = web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).send();
             return Convert.fromWei(balanceWei.getBalance().toString(), Convert.Unit.ETHER);
         } catch (IOException e) {
-            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
+            throw new EthTransactionException(e.getMessage());
         }
     }
 
@@ -93,13 +137,18 @@ public class Web3ServiceImpl {
 
         if (!"".equals(signedDataHexValue)) {
             try {
-                EthSendTransaction send = web3j.ethSendRawTransaction(signedDataHexValue).send();
+                EthSendTransaction sendTransaction = web3j.ethSendRawTransaction(signedDataHexValue).send();
+                String txHash = sendTransaction.getTransactionHash();
+                if (txHash == null) {
+                    throw new EthTransactionException(sendTransaction.getError().getMessage());
+                }
+
                 TransactionReceiptProcessor receiptProcessor =
                         new PollingTransactionReceiptProcessor(web3j, TransactionManager.DEFAULT_POLLING_FREQUENCY,
                                 TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
-                return receiptProcessor.waitForTransactionReceipt(send.getTransactionHash());
+                return receiptProcessor.waitForTransactionReceipt(sendTransaction.getTransactionHash());
             } catch (IOException | TransactionException e) {
-                throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
+                throw new EthTransactionException(e.getMessage());
             }
         }
         return null;
@@ -117,7 +166,7 @@ public class Web3ServiceImpl {
             EthCall ethCall = web3j.ethCall(transaction, DefaultBlockParameterName.LATEST).send();
             return FunctionReturnDecoder.decode(ethCall.getValue(), function.getOutputParameters());
         } catch (IOException e) {
-            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
+            throw new EthTransactionException(e.getMessage());
         }
     }
 
@@ -125,20 +174,24 @@ public class Web3ServiceImpl {
      * Call contract function with parameters, may modify the contract state,
      * which means the transaction should be signed by the credential.
      */
-    public TransactionReceipt invokeContractWithParameters(String from, Credentials credentials, String contractAddress, String methodName, List<Type> inputParameters, List<TypeReference<?>> outputParameters) {
+    public TransactionReceipt invokeContractWithParameters(Credentials credentials, String contractAddress, String methodName, List<Type> inputParameters, List<TypeReference<?>> outputParameters) {
         Function function = new Function(methodName, inputParameters, outputParameters);
         String data = FunctionEncoder.encode(function);
         try {
             TransactionManager transactionManager = new FastRawTransactionManager(web3j, credentials);
-            String txHash = transactionManager.sendTransaction(DefaultGasProvider.GAS_PRICE, DefaultGasProvider.GAS_LIMIT,
-                    contractAddress, data, BigInteger.ZERO).getTransactionHash();
+            EthSendTransaction sendTransaction = transactionManager.sendTransaction(DefaultGasProvider.GAS_PRICE, BigInteger.valueOf(6700000),
+                    contractAddress, data, BigInteger.ZERO);
+            String txHash = sendTransaction.getTransactionHash();
+            if (sendTransaction.hasError() || txHash == null) {
+                throw new EthTransactionException(sendTransaction.getError().getMessage());
+            }
 
             TransactionReceiptProcessor receiptProcessor =
                     new PollingTransactionReceiptProcessor(web3j, TransactionManager.DEFAULT_POLLING_FREQUENCY,
                             TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
             return receiptProcessor.waitForTransactionReceipt(txHash);
         } catch (IOException | TransactionException e) {
-            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
+            throw new EthTransactionException(e.getMessage());
         }
     }
 
@@ -160,8 +213,7 @@ public class Web3ServiceImpl {
         try {
             return Transfer.sendFunds(web3j, credentials, recipientAddress, amount, unit).send();
         } catch (Exception e) {
-            throw new BusinessException(BusinessError.TRANSACTION_ERROR + e.getMessage());
+            throw new EthTransactionException(e.getMessage());
         }
     }
-
 }

@@ -1,9 +1,11 @@
 package com.sonarx.sonarmeta.web.controller;
 
 import com.sonarx.sonarmeta.domain.common.HttpResult;
+import com.sonarx.sonarmeta.service.Web3Service;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -19,6 +21,9 @@ import java.util.Map;
 @RequestMapping
 public class DefaultController {
 
+    @Resource
+    Web3Service web3Service;
+
     @RequestMapping(value = "/error", method = {RequestMethod.POST, RequestMethod.GET})
     public HttpResult error() {
         return HttpResult.errorResult("服务器内部错误");
@@ -27,6 +32,11 @@ public class DefaultController {
     @RequestMapping(value = "/index", method = {RequestMethod.GET})
     public String index() {
         return "Hello Index Page!";
+    }
+
+    @RequestMapping(value = "/test", method = {RequestMethod.GET})
+    public HttpResult test() {
+        return HttpResult.successResult(web3Service.mintERC721("0x1806041041052158694A97EFA1840F717A11f6ac"));
     }
 
     // Test PathVariable

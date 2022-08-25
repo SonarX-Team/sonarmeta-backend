@@ -12,6 +12,8 @@ import com.sonarx.sonarmeta.domain.form.EditModelForm;
 import com.sonarx.sonarmeta.domain.model.*;
 import com.sonarx.sonarmeta.mapper.*;
 import com.sonarx.sonarmeta.service.ModelService;
+import com.sonarx.sonarmeta.service.UserService;
+import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -47,11 +49,21 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     @Resource
     ModelPostprocessingSettingsMapper modelPostprocessingSettingsMapper;
 
+    @Resource
+    Web3Service web3Service;
+
+    @Resource
+    UserService userService;
+
     @Override
     @Transactional
     public void createModelWithForm(CreateModelForm form) {
-        // TODO 创建NFT
-        Long nftTokenId = 11111L;
+        // 创建NFT
+        UserDO user = userService.getById(form.getUserId());
+        if(user == null) {
+            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
+        }
+        Long nftTokenId = web3Service.mintERC721(user.getAddress());
 
         // 新增模型信息
         ModelDO model = new ModelDO();

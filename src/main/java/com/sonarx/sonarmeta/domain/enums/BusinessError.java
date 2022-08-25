@@ -40,7 +40,7 @@ public enum BusinessError {
 
     TRANSACTION_OBJECT_NOT_EXIST("消费对象不存在"),
 
-    TRANSACTION_ERROR("交易异常");
+    TRANSACTION_ERROR("交易异常: ");
 
 
 
