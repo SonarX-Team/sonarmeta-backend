@@ -1,6 +1,5 @@
 package com.sonarx.sonarmeta.web;
 
-import com.sonarx.sonarmeta.common.utils.https.SSLUtil;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

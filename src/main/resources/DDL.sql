@@ -11,7 +11,7 @@ create table `sonarmeta`.`t_user`
     `avatar`      VARCHAR(255)          DEFAULT 'https://ik.imagekit.io/bayc/assets/ape1.png' COMMENT '用户头像',
     `gender`      INT                   DEFAULT 0 COMMENT '用户性别',
     `description` TEXT COMMENT '用户描述',
-    `birth_date`  DATETIME              DEFAULT CURRENT_TIMESTAMP COMMENT '出生日期',
+    `birth_date`  TIMESTAMP              DEFAULT CURRENT_TIMESTAMP COMMENT '出生日期',
     `wechat`      TEXT COMMENT '微信号',
     `twitter`     TEXT COMMENT '推特号',
 
