@@ -2,6 +2,7 @@ package com.sonarx.sonarmeta.service.impl;
 
 import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.common.EthTransactionException;
+import com.sonarx.sonarmeta.common.utils.https.SSLUtil;
 import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
@@ -10,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
 import org.web3j.abi.TypeReference;
-import org.web3j.abi.datatypes.Address;
-import org.web3j.abi.datatypes.Function;
-import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.*;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.*;
 import org.web3j.protocol.Web3j;
@@ -36,6 +35,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @description: Web3 相关功能
@@ -63,11 +63,97 @@ public class EthServiceImpl implements Web3Service {
     @Value("${web3j.accounts-pk.controller1}")
     private String controller1PrivateKey;
 
+    @Value("${web3j.accounts-pk.controller2}")
+    private String controller2PrivateKey;
+
     @Override
-    public Long mintERC721(String address) {
+    public void fundTreasury(BigInteger amount) {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
-        inputParameters.add(new Address(address));
+        inputParameters.add(new Uint256(amount));
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "fundTreasury",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        List<Log> logs = receipt.getLogs();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        }
+    }
+
+    @Override
+    public void transferERC20UsingSonarMetaAllowance(String to, BigInteger amount) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(to));
+        inputParameters.add(new Uint256(amount));
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "transferERC20UsingSonarMetaAllowance",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        List<Log> logs = receipt.getLogs();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        }
+    }
+
+    @Override
+    public void grantERC721UsingSonarMetaApproval(Long tokenId, String to) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Uint256(tokenId));
+        inputParameters.add(new Address(to));
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "grantERC721UsingSonarMetaApproval",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        List<Log> logs = receipt.getLogs();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        }
+    }
+
+    @Override
+    public void transferERC721UsingSonarMetaApproval(Long tokenId, String to) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Uint256(tokenId));
+        inputParameters.add(new Address(to));
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "transferERC721UsingSonarMetaApproval",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        List<Log> logs = receipt.getLogs();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        }
+    }
+
+    @Override
+    public Long mintERC721(String to) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(to));
         outputParameters.add(new TypeReference<Uint256>() {
         });
         TransactionReceipt receipt = invokeContractWithParameters(
@@ -77,12 +163,118 @@ public class EthServiceImpl implements Web3Service {
                 inputParameters,
                 outputParameters
         );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        // Get return value from logs in receipt
+        List<Log> logs = receipt.getLogs();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.INCORRECT_CONTRACT.getDesc());
+        }
+        List<String> topics = receipt.getLogs().get(1).getTopics();
+        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(2) : null;
+        if (requiredTopic == null) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        }
+        return Long.parseLong(requiredTopic.substring(2), 16);
+    }
+
+    @Override
+    public void grantERC998UsingSonarMetaApproval(Long tokenId, String to) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Uint256(tokenId));
+        inputParameters.add(new Address(to));
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "grantERC998UsingSonarMetaApproval",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
 
         List<Log> logs = receipt.getLogs();
-        List<String> topic = receipt.getLogs().size() > 0 ? receipt.getLogs().get(1).getTopics() : null;
-        String requiredTopic = topic.size() > 0 ? topic.get(2) : null;
-        if(requiredTopic == null) {
-            throw new EthTransactionException();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        }
+    }
+
+    @Override
+    public void transferERC998UsingSonarMetaApproval(Long tokenId, String to) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Uint256(tokenId));
+        inputParameters.add(new Address(to));
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "transferERC998UsingSonarMetaApproval",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        List<Log> logs = receipt.getLogs();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        }
+    }
+
+    @Override
+    public Long mintERC998(String to) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(to));
+        outputParameters.add(new TypeReference<Uint256>() {
+        });
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "mintERC998",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        // Get return value from logs in receipt
+        List<Log> logs = receipt.getLogs();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.INCORRECT_CONTRACT.getDesc());
+        }
+        List<String> topics = receipt.getLogs().get(1).getTopics();
+        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(2) : null;
+        if (requiredTopic == null) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        }
+        return Long.parseLong(requiredTopic.substring(2), 16);
+    }
+
+    @Override
+    public Long mintERC998WithBatchTokens(String to, List<Long> childTokenIds) {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(to));
+        inputParameters.add(new DynamicArray<>(Uint256.class, childTokenIds.stream().map(Uint256::new).collect(Collectors.toList())));
+        outputParameters.add(new TypeReference<Uint256>() {
+        });
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                mainContract,
+                "mintERC998WithBatchTokens",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        // Get return value from logs in receipt
+        List<Log> logs = receipt.getLogs();
+        if(logs.size() == 0) {
+            throw new EthTransactionException(BusinessError.INCORRECT_CONTRACT.getDesc());
+        }
+        List<String> topics = receipt.getLogs().get(1).getTopics();
+        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(2) : null;
+        if (requiredTopic == null) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
         }
         return Long.parseLong(requiredTopic.substring(2), 16);
     }
@@ -179,7 +371,7 @@ public class EthServiceImpl implements Web3Service {
         String data = FunctionEncoder.encode(function);
         try {
             TransactionManager transactionManager = new FastRawTransactionManager(web3j, credentials);
-            EthSendTransaction sendTransaction = transactionManager.sendTransaction(DefaultGasProvider.GAS_PRICE, BigInteger.valueOf(6700000),
+            EthSendTransaction sendTransaction = transactionManager.sendTransaction(BigInteger.valueOf(20000000000L), BigInteger.valueOf(6700000),
                     contractAddress, data, BigInteger.ZERO);
             String txHash = sendTransaction.getTransactionHash();
             if (sendTransaction.hasError() || txHash == null) {

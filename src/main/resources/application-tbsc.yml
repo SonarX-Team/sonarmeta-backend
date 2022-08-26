@@ -1,0 +1,20 @@
+web3j:
+  rpc-url: https://data-seed-prebsc-1-s1.binance.org:8545
+  #  No '0x' prefix
+  contracts:
+    main: Ff2a5133c107dd832B134FE9077124802334D486
+    ERC20: F8d3bd14910A8ca5b8c627a40017aBBeeB55D19f
+    ERC721: Ef24e4e19c6d3906ec1da8140e4D703981dcB3c6
+    ERC998: 4130F0E8c038ac13d9Ee099e5d862D67658723D3
+  accounts-pk:
+    controller1: 8f01ac58c592328b827eeb73a0f024475133088038845a29ac16c31a6c761927
+    controller2: a78dd2aa256882a25fe5b929575f6f70c6e8b1872b22c1925274dee71596d940
+
+
+
+
+
+
+
+
+
