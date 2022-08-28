@@ -13,8 +13,8 @@ import java.util.List;
 public class EditSceneModelRelationForm {
 
     @NotNull(message = "用户不能为空")
-    @ApiModelProperty(value = "发起创建请求的用户id")
-    private Long userId;
+    @ApiModelProperty(value = "发起创建请求的用户地址")
+    private String userAddress;
 
     @NotBlank(message = "场景不能为空")
     private Long sceneId;

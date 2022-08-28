@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.enums.BusinessError;
+import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
@@ -12,6 +13,8 @@ import com.sonarx.sonarmeta.domain.model.*;
 import com.sonarx.sonarmeta.domain.view.SceneView;
 import com.sonarx.sonarmeta.mapper.*;
 import com.sonarx.sonarmeta.service.SceneService;
+import com.sonarx.sonarmeta.service.UserService;
+import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -47,15 +50,25 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     @Resource
     UserModelOwnershipRelationMapper userModelOwnershipRelationMapper;
 
+    @Resource
+    Web3Service web3Service;
+
+    @Resource
+    UserService userService;
+
     @Override
     @Transactional
-    public void createSceneWithForm(CreateSceneForm createSceneForm) {
-        // TODO 创建NFT
-        Long nftTokenId = 11111L;
+    public void createSceneWithForm(CreateSceneForm form) {
+        // 创建NFT
+        UserDO user = userService.getById(form.getUserAddress());
+        if(user == null) {
+            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
+        }
+        Long nftTokenId = web3Service.mintERC721(user.getAddress());
 
         // 新增场景信息
         SceneDO sceneDO = new SceneDO();
-        BeanUtils.copyProperties(createSceneForm, sceneDO);
+        BeanUtils.copyProperties(form, sceneDO);
         sceneDO.setNftTokenId(nftTokenId);
         int affectCount = sceneMapper.insert(sceneDO);
         if (affectCount <= 0) {
@@ -63,47 +76,41 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         }
 
         // 新增用户和场景关联信息
-        UserSceneOwnershipRelationDO relation = new UserSceneOwnershipRelationDO();
-        relation.setSceneId(sceneDO.getId());
-        relation.setUserId(createSceneForm.getUserId());
-        relation.setOwnershipType(OwnershipTypeEnum.OWN.getCode());
-        affectCount = userSceneOwnershipRelationMapper.insert(relation);
-        if (affectCount <= 0) {
-            throw new BusinessException(BusinessError.CREATE_USER_AND_SCENE_ERROR);
-        }
+        addUserSceneOwnershipRelation(form.getUserAddress(), sceneDO.getId(), OwnershipTypeEnum.SCENE_CREATOR);
+        addUserSceneOwnershipRelation(form.getUserAddress(), sceneDO.getId(), OwnershipTypeEnum.SCENE_OWNER);
 
-        for (Long modelId : createSceneForm.getModelIdList()) {
+        for (Long modelId : form.getModelIdList()) {
             QueryWrapper<UserModelOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("user_id", createSceneForm.getUserId())
+            queryWrapper.eq("address", form.getUserAddress())
                     .eq("model_id", modelId);
             UserModelOwnershipRelationDO userModelOwnershipRelationDO = userModelOwnershipRelationMapper.selectOne(queryWrapper);
-            if (userModelOwnershipRelationDO == null || userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.EXPERIENCE.getCode())) {
+            if (userModelOwnershipRelationDO == null) {
                 throw new BusinessException(BusinessError.USER_MODEL_PERMISSION_DENIED);
             }
             sceneModelRelationMapper.insert(new SceneModelRelationDO(sceneDO.getId(), modelId));
         }
 
-        log.info("新建场景信息：用户{}，场景{}，NFT{}", relation.getUserId(), relation.getSceneId(), sceneDO.getNftTokenId());
+        log.info("新建场景信息：用户{}，场景{}，NFT{}", form.getUserAddress(), sceneDO.getId(), sceneDO.getNftTokenId());
     }
 
     @Override
     @Transactional
-    public void editSceneWithForm(EditSceneForm editSceneForm) {
+    public void editSceneWithForm(EditSceneForm form) {
         QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("user_id", editSceneForm.getUserId()).eq("scene_id", editSceneForm.getId());
+        queryWrapper.eq("address", form.getUserAddress()).eq("scene_id", form.getId());
         UserSceneOwnershipRelationDO relation = userSceneOwnershipRelationMapper.selectOne(queryWrapper);
         if (relation == null) {
             throw new BusinessException(BusinessError.EDIT_SCENE_ERROR);
         }
 
         SceneDO sceneDO = new SceneDO();
-        BeanUtils.copyProperties(editSceneForm, sceneDO);
+        BeanUtils.copyProperties(form, sceneDO);
         int affectCount = sceneMapper.updateById(sceneDO);
         if (affectCount <= 0) {
             throw new BusinessException(BusinessError.EDIT_SCENE_ERROR);
         }
 
-        log.info("编辑模型信息：用户{}，场景{}", relation.getUserId(), relation.getSceneId());
+        log.info("编辑模型信息：用户{}，场景{}", relation.getAddress(), relation.getSceneId());
     }
 
     @Override
@@ -131,20 +138,20 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
 
         //拥有场景的用户才能更新场景与模型的关系
         QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper1 = new QueryWrapper<>();
-        queryWrapper1.eq("user_id", sceneModelRelation.getUserId())
+        queryWrapper1.eq("address", sceneModelRelation.getUserAddress())
                 .eq("scene_id", sceneModelRelation.getSceneId());
         UserSceneOwnershipRelationDO userSceneOwnershipRelationDO  = userSceneOwnershipRelationMapper.selectOne(queryWrapper1);
-        if (userSceneOwnershipRelationDO == null || !userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.OWN.getCode())) {
+        if (userSceneOwnershipRelationDO == null || !userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_OWNER.getCode())) {
             throw new BusinessException(BusinessError.USER_SCENE_PERMISSION_DENIED);
         }
 
         //该用户必须同时具备对应模型的拥有权或授予权
         for (Long modelId : sceneModelRelation.getModelIdList()) {
             QueryWrapper<UserModelOwnershipRelationDO> queryWrapper2 = new QueryWrapper<>();
-            queryWrapper2.eq("user_id", sceneModelRelation.getUserId())
+            queryWrapper2.eq("address", sceneModelRelation.getUserAddress())
                     .eq("model_id", modelId);
             UserModelOwnershipRelationDO userModelOwnershipRelationDO = userModelOwnershipRelationMapper.selectOne(queryWrapper2);
-            if (userModelOwnershipRelationDO == null || userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.EXPERIENCE.getCode())) {
+            if (userModelOwnershipRelationDO == null) {
                 throw new BusinessException(BusinessError.USER_MODEL_PERMISSION_DENIED);
             }
         }
@@ -159,6 +166,19 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
             sceneModelRelationMapper.insert(new SceneModelRelationDO(sceneModelRelation.getSceneId(), modelId));
         }
 
+    }
+
+    public void addUserSceneOwnershipRelation(String userAddress, Long sceneId, OwnershipTypeEnum ownershipType) {
+        QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("address",userAddress)
+                .eq("scene_id",sceneId)
+                .eq("ownership_type", ownershipType);
+        if (userSceneOwnershipRelationMapper.selectOne(queryWrapper) == null) {
+            int affectCount = userSceneOwnershipRelationMapper.insert(new UserSceneOwnershipRelationDO(userAddress, sceneId, ownershipType.getCode()));
+            if (affectCount <= 0) {
+                throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "新增模型" + ownershipType.getDesc() + "权限失败");
+            }
+        }
     }
 }
 

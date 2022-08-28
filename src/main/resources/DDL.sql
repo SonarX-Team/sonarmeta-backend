@@ -5,8 +5,8 @@ use sonarmeta;
 
 create table `sonarmeta`.`t_user`
 (
-    `id`          BIGINT       NOT NULL AUTO_INCREMENT,
-    `username`    VARCHAR(255) NOT NULL COMMENT '用户姓名',
+    `username`    VARCHAR(255) COMMENT '用户姓名',
+    `telephone`   VARCHAR(255) COMMENT '用户手机号',
     `email`       VARCHAR(255) COMMENT '用户邮箱',
     `avatar`      VARCHAR(255)          DEFAULT 'https://ik.imagekit.io/bayc/assets/ape1.png' COMMENT '用户头像',
     `gender`      INT                   DEFAULT 0 COMMENT '用户性别',
@@ -14,16 +14,15 @@ create table `sonarmeta`.`t_user`
     `birth_date`  TIMESTAMP              DEFAULT CURRENT_TIMESTAMP COMMENT '出生日期',
     `wechat`      TEXT COMMENT '微信号',
     `twitter`     TEXT COMMENT '推特号',
-
-    `address`     VARCHAR(255) NOT NULL COMMENT '钱包账户 ',
+    `address`     VARCHAR(255) NOT NULL COMMENT '钱包账户',
     `balance`     BIGINT       NOT NULL DEFAULT 0 COMMENT '钱包余额',
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`address`)
 ) COMMENT ='用户信息';
 
 create table `sonarmeta`.`t_user_model_ownership_relation`
 (
     `id`             BIGINT    NOT NULL AUTO_INCREMENT,
-    `user_id`        BIGINT    NOT NULL COMMENT '用户ID',
+    `address`        VARCHAR(255)    NOT NULL COMMENT '用户地址',
     `model_id`       BIGINT    NOT NULL COMMENT '模型ID',
     `ownership_type` INT       NOT NULL COMMENT '拥有权类型',
     `create_time`    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -33,7 +32,7 @@ create table `sonarmeta`.`t_user_model_ownership_relation`
 create table `sonarmeta`.`t_user_scene_ownership_relation`
 (
     `id`             BIGINT    NOT NULL AUTO_INCREMENT,
-    `user_id`        BIGINT    NOT NULL COMMENT '用户ID',
+    `address`        VARCHAR(255)    NOT NULL COMMENT '用户地址',
     `scene_id`       BIGINT    NOT NULL COMMENT '场景ID',
     `ownership_type` INT       NOT NULL COMMENT '拥有权类型',
     `create_time`    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -53,10 +52,10 @@ create table `sonarmeta`.`t_model`
     `tags`             VARCHAR(1024) NOT NULL COMMENT '模型标签',
     `category`         VARCHAR(2)    NOT NULL COMMENT '模型分类',
     `create_time`      TIMESTAMP              DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-
-    `purchase_price`   BIGINT        NOT NULL DEFAULT 0 COMMENT '购买费用',
+    `grant_flag`       INT                   DEFAULT 0 COMMENT '是否可借用',
+    `token_flag`        INT                   DEFAULT 0 COMMENT '是否可作为NFT出售',
     `grant_price`      BIGINT        NOT NULL DEFAULT 0 COMMENT '借用费用',
-    `experience_price` BIGINT        NOT NULL DEFAULT 0 COMMENT '体验费用',
+    `token_price`      BIGINT        NOT NULL DEFAULT 0 COMMENT '模型NFT费用',
     `nft_token_id`     BIGINT        NOT NULL COMMENT '对应NFT TokenId',
     PRIMARY KEY (`id`)
 ) COMMENT ='模型信息';
@@ -71,10 +70,10 @@ create table `sonarmeta`.`t_scene`
     `tags`             VARCHAR(1024) NOT NULL COMMENT '场景标签',
     `category`         VARCHAR(2)    NOT NULL COMMENT '场景分类',
     `create_time`      TIMESTAMP              DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-
-    `purchase_price`   BIGINT        NOT NULL DEFAULT 0 COMMENT '购买费用',
-    `grant_price`      BIGINT        NOT NULL DEFAULT 0 COMMENT '借用费用',
-    `experience_price` BIGINT        NOT NULL DEFAULT 0 COMMENT '体验费用',
+    `dive_flag`       INT                   DEFAULT 0 COMMENT '是否可体验',
+    `token_flag`        INT                   DEFAULT 0 COMMENT '是否可作为NFT出售',
+    `dive_price` BIGINT        NOT NULL DEFAULT 0 COMMENT '体验费用',
+    `token_price`   BIGINT        NOT NULL DEFAULT 0 COMMENT '场景NFT费用',
     `nft_token_id`     BIGINT        NOT NULL COMMENT '对应NFT TokenId',
     PRIMARY KEY (`id`)
 ) COMMENT ='场景信息';

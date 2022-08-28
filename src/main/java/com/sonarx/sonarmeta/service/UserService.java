@@ -14,9 +14,9 @@ import org.springframework.stereotype.Service;
 */
 public interface UserService extends IService<UserDO> {
 
-    UserDO getOrCreateUserProfileByAddress(String id);
+    void createUser(String userAddress);
 
-    UserDO getUserProfileById(String id);
+    UserDO getUser(String userAddress);
 
     void consume(ConsumeActionForm form);
 

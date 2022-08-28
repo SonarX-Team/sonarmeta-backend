@@ -13,16 +13,18 @@
             <result property="tags" column="tags" jdbcType="VARCHAR"/>
             <result property="category" column="category" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="purchasePrice" column="purchase_price" jdbcType="BIGINT"/>
-            <result property="grantPrice" column="grant_price" jdbcType="BIGINT"/>
-            <result property="experiencePrice" column="experience_price" jdbcType="BIGINT"/>
+            <result property="diveFlag" column="dive_flag" jdbcType="INTEGER"/>
+            <result property="tokenFlag" column="token_flag" jdbcType="INTEGER"/>
+            <result property="divePrice" column="dive_price" jdbcType="BIGINT"/>
+            <result property="tokenPrice" column="token_price" jdbcType="BIGINT"/>
             <result property="nftTokenId" column="nft_token_id" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,status,title,
         description,cover,tags,
-        category,create_time,purchase_price,
-        grant_price,experience_price,nft_token_id
+        category,create_time,dive_flag,
+        token_flag,dive_price,token_price,
+        nft_token_id
     </sql>
 </mapper>

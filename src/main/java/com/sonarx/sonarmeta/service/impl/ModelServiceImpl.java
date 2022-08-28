@@ -59,7 +59,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     @Transactional
     public void createModelWithForm(CreateModelForm form) {
         // 创建NFT
-        UserDO user = userService.getById(form.getUserId());
+        UserDO user = userService.getById(form.getUserAddress());
         if(user == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
         }
@@ -74,28 +74,20 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
             throw new BusinessException(BusinessError.CREATE_MODEL_ERROR);
         }
         // 新增用户和模型关联信息
-        UserModelOwnershipRelationDO relation = new UserModelOwnershipRelationDO();
-        relation.setModelId(model.getId());
-        relation.setUserId(form.getUserId());
-        relation.setOwnershipType(OwnershipTypeEnum.OWN.getCode());
-        affectCount = userModelOwnershipRelationMapper.insert(relation);
-        if (affectCount <= 0) {
-            throw new BusinessException(BusinessError.CREATE_USER_AND_MODEL_ERROR);
-        }
-
-        log.info("新建模型信息：用户{}，模型{}，NFT{}", relation.getUserId(), relation.getModelId(), model.getNftTokenId());
+        addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_CREATOR);
+        addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_OWNER);
+        log.info("新建模型信息：用户{}，模型{}，NFT{}", form.getUserAddress(), model.getId(), model.getNftTokenId());
     }
 
     @Override
     @Transactional
     public void editModelWithForm(EditModelForm form) {
         QueryWrapper<UserModelOwnershipRelationDO> qw = new QueryWrapper<>();
-        qw.eq("user_id", form.getUserId()).eq("model_id", form.getId());
+        qw.eq("address", form.getUserAddress()).eq("model_id", form.getId());
         UserModelOwnershipRelationDO relation = userModelOwnershipRelationMapper.selectOne(qw);
         if (relation == null) {
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
         }
-
         ModelDO model = new ModelDO();
         BeanUtils.copyProperties(form, model);
         int affectCount = modelMapper.updateById(model);
@@ -103,7 +95,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
         }
 
-        log.info("编辑模型信息：用户{}，模型{}", relation.getUserId(), relation.getModelId());
+        log.info("编辑模型信息：用户{}，模型{}", relation.getAddress(), relation.getModelId());
     }
 
     @Override
@@ -204,34 +196,38 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
     
 
-    public void addUserModelOwnershipRelation(Long user, Long model, OwnershipTypeEnum ownershipType) {
-        UserModelOwnershipRelationDO relation = new UserModelOwnershipRelationDO();
-        relation.setUserId(user);
-        relation.setModelId(model);
-        relation.setOwnershipType(ownershipType.getCode());
-        int affectCount = userModelOwnershipRelationMapper.insert(relation);
-        if (affectCount <= 0) {
-            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "新增模型" + ownershipType.getDesc() + "权限失败");
+    @Override
+    public void addUserModelOwnershipRelation(String userAddress, Long modelId, OwnershipTypeEnum ownershipType) {
+        QueryWrapper<UserModelOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("address",userAddress)
+                .eq("model_id",modelId)
+                .eq("ownership_type", ownershipType);
+        if (userModelOwnershipRelationMapper.selectOne(queryWrapper) == null) {
+            int affectCount = userModelOwnershipRelationMapper.insert(new UserModelOwnershipRelationDO(userAddress, modelId, ownershipType.getCode()));
+            if (affectCount <= 0) {
+                throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "新增模型" + ownershipType.getDesc() + "权限失败");
+            }
         }
     }
 
     @Override
-    public void updateModelOwner(Long newUser, UserModelOwnershipRelationDO beforeRelation) {
-        UserModelOwnershipRelationDO afterRelation = new UserModelOwnershipRelationDO();
-        BeanUtils.copyProperties(beforeRelation, afterRelation);
-        afterRelation.setUserId(newUser);
-        int affectCount = userModelOwnershipRelationMapper.updateById(afterRelation);
+    public void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation) {
+        UpdateWrapper<UserModelOwnershipRelationDO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("model_id", beforeRelation.getModelId())
+                .eq("ownership_type", beforeRelation.getOwnershipType());
+        UserModelOwnershipRelationDO userModelOwnershipRelationDO = new UserModelOwnershipRelationDO(userAddress, beforeRelation.getModelId(), beforeRelation.getOwnershipType());
+        int affectCount = userModelOwnershipRelationMapper.update(userModelOwnershipRelationDO, updateWrapper);
         if (affectCount <= 0) {
             throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "模型拥有权转让失败");
         }
     }
 
     @Override
-    public UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(Long userId, Long id) {
+    public UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(String userAddress, Long id) {
         return userModelOwnershipRelationMapper.selectOne(
                 new QueryWrapper<UserModelOwnershipRelationDO>()
                         .eq("model_id", id)
-                        .eq("user_id", userId)
+                        .eq("address", userAddress)
         );
     }
 
@@ -240,7 +236,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         return userModelOwnershipRelationMapper.selectOne(
                 new QueryWrapper<UserModelOwnershipRelationDO>()
                         .eq("model_id", id)
-                        .eq("ownership_type", OwnershipTypeEnum.OWN.getCode())
+                        .eq("ownership_type", OwnershipTypeEnum.MODEL_OWNER.getCode())
         );
     }
 }

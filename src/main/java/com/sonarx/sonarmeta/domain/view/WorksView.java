@@ -80,7 +80,7 @@ public class WorksView {
     /**
      * 购买费用
      */
-    private Long purchasePrice;
+    private Long tokenPrice;
 
     /**
      * 借用费用
@@ -90,7 +90,7 @@ public class WorksView {
     /**
      * 观看费用
      */
-    private Long watchPrice;
+    private Long divePrice;
 
     /**
      * 对应NFT TokenId

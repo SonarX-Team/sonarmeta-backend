@@ -13,8 +13,8 @@ import java.util.List;
 public class CreateSceneForm {
 
     @NotNull(message = "用户不能为空")
-    @ApiModelProperty(value = "发起创建请求的用户id")
-    private Long userId;
+    @ApiModelProperty(value = "发起创建请求的用户地址")
+    private String userAddress;
 
     @NotBlank(message = "场景状态不能为空")
     private Integer status;
@@ -22,9 +22,7 @@ public class CreateSceneForm {
     @NotBlank(message = "场景名称不能为空")
     private String title;
 
-
     private String description;
-
 
     private String cover;
 
@@ -34,15 +32,17 @@ public class CreateSceneForm {
     @NotBlank(message = "场景分类不能为空")
     private String category;
 
+    @NotBlank(message = "是否可体验不能为空")
+    private Integer diveFlag;
 
-    @NotBlank(message = "购买费用不能为空")
-    private Long purchasePrice;
-
-    @NotBlank(message = "借用费用不能为空")
-    private Long grantPrice;
+    @NotBlank(message = "是否可作为NFT出售不能为空")
+    private Integer tokenFlag;
 
     @NotBlank(message = "体验费用不能为空")
-    private Long experiencePrice;
+    private Long divePrice;
+
+    @NotBlank(message = "购买费用不能为空")
+    private Long tokenPrice;
 
     @NotBlank(message = "模型列表不能为空")
     private List<Long> modelIdList;

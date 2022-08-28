@@ -5,11 +5,17 @@ import io.swagger.annotations.ApiModel;
 @ApiModel(description = "所有权类别")
 public enum OwnershipTypeEnum {
 
-    OWN(1, "拥有权"),
+    MODEL_CREATOR(1, "模型创建者"),
 
-    EXPERIENCE(2, "体验权"),
+    MODEL_OWNER(2, "模型拥有者"),
 
-    GRANT(3, "使用权");
+    MODEL_GRANTOR(3, "模型授权者"),
+
+    SCENE_CREATOR(4, "场景创建者"),
+
+    SCENE_OWNER(5, "场景拥有者"),
+
+    SCENE_DIVER(6, "场景体验者");
 
     private final Integer code;
 
