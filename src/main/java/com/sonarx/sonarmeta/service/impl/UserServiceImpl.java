@@ -1,6 +1,5 @@
 package com.sonarx.sonarmeta.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.enums.BusinessError;
@@ -15,6 +14,7 @@ import com.sonarx.sonarmeta.domain.model.UserModelOwnershipRelationDO;
 import com.sonarx.sonarmeta.mapper.UserMapper;
 import com.sonarx.sonarmeta.service.ModelService;
 import com.sonarx.sonarmeta.service.UserService;
+import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,37 +39,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Resource
     ModelService modelService;
 
+    @Resource
+    Web3Service web3Service;
 
-    public UserDO getOrCreateUserProfileByAddress(String address) {
-        // 根据address查询用户信息
-        QueryWrapper<UserDO> qw = new QueryWrapper<>();
-        qw.select().eq("address", address);
-        UserDO user = userMapper.selectOne(qw);
-
-        if (user != null) {
-            log.info("获取用户信息，id：{}，钱包地址：{}", user.getId(), user.getAddress());
-            return user;
-        } else {
-            // 如果不存在，则创建新的用户
-            UserDO newUser = new UserDO();
-            newUser.setAddress(address);
-            newUser.setUsername(APP_NAME + DEFAULT_CONNECTOR + address);
-            int affectCount = userMapper.insert(newUser);
-            if (affectCount > 0) {
-                log.info("插入用户信息成功，钱包地址：{}", newUser.getAddress());
-                newUser = userMapper.selectById(newUser.getId());
-                log.info("获取用户信息，id：{}，钱包地址：{}", newUser.getId(), newUser.getAddress());
-            } else {
-                log.warn("插入用户信息失败，钱包地址：{}", newUser.getAddress());
-                throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "插入用户信息失败");
-            }
-            return newUser;
+    @Override
+    public UserDO getUser(String address) {
+        UserDO user = userMapper.selectById(address);
+        if (user == null) {
+            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
         }
+        return user;
     }
 
     @Override
-    public UserDO getUserProfileById(String id) {
-        return userMapper.selectById(id);
+    public void createUser(String address) {
+        UserDO newUser = new UserDO();
+        newUser.setAddress(address);
+        newUser.setUsername(APP_NAME + DEFAULT_CONNECTOR + address);
+        int affectCount = userMapper.insert(newUser);
+        if (affectCount > 0) {
+            log.info("插入用户信息成功，钱包地址：{}", newUser.getAddress());
+            newUser = userMapper.selectById(newUser.getAddress());
+            log.info("获取用户钱包地址：{}", newUser.getAddress());
+        } else {
+            log.warn("插入用户信息失败，钱包地址：{}", newUser.getAddress());
+            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "插入用户信息失败");
+        }
+
+
     }
 
     /**
@@ -81,13 +78,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Transactional
     public void consume(ConsumeActionForm form) {
         Integer consumeType = form.getType();
-
-        if (consumeType == ConsumeTypeEnum.CONSUME_PURCHASE_MODEL.getCode()) {
+        if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_MODEL.getCode())) {
             // 购买模型
             // 获取用户和该对象的所属关系
-            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
-
-            if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.OWN.getCode()) {
+            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserAddress(), form.getId());
+            if (relation == null || relation.getOwnershipType().equals(OwnershipTypeEnum.MODEL_CREATOR.getCode()) || relation.getOwnershipType().equals(OwnershipTypeEnum.MODEL_OWNER.getCode())) {
                 // 所属关系不存在或者已经获得了相同或更高的权限
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
@@ -103,19 +98,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 转账
-                transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getPurchasePrice());
+                transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
                 // 修改模型所有关系
-                modelService.updateModelOwner(form.getUserId(), beforeOwnRelation);
+                modelService.updateModelOwner(form.getUserAddress(), beforeOwnRelation);
                 // NFT所有权转让
-                // TODO
-                log.info("用户{} 购买了 模型{} 所有权", form.getUserId(), form.getId());
+                web3Service.transferERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
+                log.info("用户{} 购买了 模型{} 所有权", form.getUserAddress(), form.getId());
             }
-        } else if (consumeType == ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode()) {
+        } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
             // 使用模型
             // 获取用户和该对象的所属关系
-            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
+            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserAddress(), form.getId());
 
-            if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.GRANT.getCode()) {
+            if (relation == null) {
                 // 所属关系不存在或者已经获得了相同或更高的权限
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
@@ -131,48 +126,47 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
                 // 转账
-                transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getGrantPrice());
+                transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
                 // 添加模型使用权限
-                modelService.addUserModelOwnershipRelation(form.getUserId(), model.getId(), OwnershipTypeEnum.GRANT.GRANT);
-
+                modelService.addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_GRANTOR);
                 // NFT所有权转让
-                // TODO
-                log.info("用户{} 购买了 模型{} 使用权", form.getUserId(), form.getId());
+                web3Service.grantERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
+                log.info("用户{} 购买了 模型{} 使用权", form.getUserAddress(), form.getId());
             }
-        } else if (consumeType == ConsumeTypeEnum.CONSUME_EXPERIENCE_MODEL.getCode()) {
-            // 体验模型
-            // 获取用户和该对象的所属关系
-            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
-
-            if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.EXPERIENCE.getCode()) {
-                // 所属关系不存在或者已经获得了相同或更高的权限
-                throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
-            } else {
-                // 可以进行消费，修改金额，修改模型所属关系
-                // 获取模型的信息
-                ModelDO model = modelService.getModelById(form.getId());
-                if (model == null) {
-                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
-                }
-                // 获取模型拥有者信息
-                UserModelOwnershipRelationDO beforeOwnRelation = modelService.getModelOwnRelation(form.getId());
-                if (beforeOwnRelation == null) {
-                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
-                }
-                // 转账
-                transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getExperiencePrice());
-                // 添加模型使用权限
-                modelService.addUserModelOwnershipRelation(form.getUserId(), model.getId(), OwnershipTypeEnum.EXPERIENCE);
-
-                // NFT所有权转让
-                // TODO
-                log.info("用户{} 购买了 模型{} 使用权", form.getUserId(), form.getId());
-            }
-        } else if (consumeType == ConsumeTypeEnum.CONSUME_PURCHASE_SCENE.getCode()) {
+        }
+//        else if (consumeType.equals(ConsumeTypeEnum.CONSUME_EXPERIENCE_MODEL.getCode())) {
+//            // 体验模型
+//            // 获取用户和该对象的所属关系
+//            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
+//
+//            if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.EXPERIENCE.getCode()) {
+//                // 所属关系不存在或者已经获得了相同或更高的权限
+//                throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
+//            } else {
+//                // 可以进行消费，修改金额，修改模型所属关系
+//                // 获取模型的信息
+//                ModelDO model = modelService.getModelById(form.getId());
+//                if (model == null) {
+//                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+//                }
+//                // 获取模型拥有者信息
+//                UserModelOwnershipRelationDO beforeOwnRelation = modelService.getModelOwnRelation(form.getId());
+//                if (beforeOwnRelation == null) {
+//                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+//                }
+//                // 转账
+//                transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getExperiencePrice());
+//                // 添加模型使用权限
+//                modelService.addUserModelOwnershipRelation(form.getUserId(), model.getId(), OwnershipTypeEnum.EXPERIENCE);
+//
+//                // NFT所有权转让
+//                // TODO
+//                log.info("用户{} 购买了 模型{} 使用权", form.getUserId(), form.getId());
+//            }
+//        }
+        else if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_SCENE.getCode())) {
             // TODO
-        } else if (consumeType == ConsumeTypeEnum.CONSUME_GRANT_SCENE.getCode()) {
-            // TODO
-        } else if (consumeType == ConsumeTypeEnum.CONSUME_EXPERIENCE_SCENE.getCode()) {
+        } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_DIVE_SCENE.getCode())) {
             // TODO
         } else {
             throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
@@ -180,22 +174,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     }
 
     @Override
-    public void updateUser(UpdateUserForm userForm) {
-        UserDO user = userMapper.selectById(userForm.getId());
+    public void updateUser(UpdateUserForm form) {
+        UserDO user = userMapper.selectById(form.getUserAddress());
         if (user == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
         }
-        user.setEmail(userForm.getEmail());
-        user.setAvatar(userForm.getAvatar());
-        user.setGender(userForm.getGender());
-        user.setDescription(userForm.getDescription());
-        user.setBirthDate(userForm.getBirthDate());
-        user.setWechat(userForm.getWechat());
-        user.setTwitter(userForm.getTwitter());
-        user.setBalance(userForm.getBalance());
+        user.setUsername(form.getUsername());
+        user.setTelephone(form.getTelephone());
+        user.setEmail(form.getEmail());
+        user.setAvatar(form.getAvatar());
+        user.setGender(form.getGender());
+        user.setDescription(form.getDescription());
+        user.setBirthDate(form.getBirthDate());
+        user.setWechat(form.getWechat());
+        user.setTwitter(form.getTwitter());
+        user.setBalance(form.getBalance());
+        int affectCount = userMapper.insert(user);
+        if (affectCount > 0) {
+            log.info("插入用户信息成功，钱包地址：{}", user.getAddress());
+            user = userMapper.selectById(user.getAddress());
+            log.info("获取用户钱包地址：{}", user.getAddress());
+        } else {
+            log.warn("插入用户信息失败，钱包地址：{}", user.getAddress());
+            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "插入用户信息失败");
+        }
     }
 
-    private void transfer(Long from, Long to, Long amount) {
+    private void transfer(String from, String to, Long amount) {
         UserDO fromUser = userMapper.selectById(from);
         if (fromUser == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);

@@ -1,0 +1,20 @@
+web3j:
+  rpc-url: https://ethereum-rinkeby.s.chainbase.online/v1/2Dhf8fn69zor7wXkQU0NxVm8jGq
+  #  No '0x' prefix
+  contracts:
+    main: D4110B84b4f9B14f71c5f1d176D60639AEbb1146
+    ERC20: 7BC6312FF95d2827EA8c414B5056434E91b1113f
+    ERC721: D274fB777eB9341185660Fd5f0336A8B9f88E9f3
+    ERC998: F56a10296BE43aE9409A546754905785b80a5a9F
+  accounts-pk:
+    controller1: 8f01ac58c592328b827eeb73a0f024475133088038845a29ac16c31a6c761927
+    controller2: a78dd2aa256882a25fe5b929575f6f70c6e8b1872b22c1925274dee71596d940
+
+
+
+
+
+
+
+
+

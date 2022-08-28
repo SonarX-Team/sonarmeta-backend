@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
@@ -11,12 +12,14 @@ import javax.validation.constraints.NotNull;
 public class EditSceneForm {
 
     @NotNull(message = "用户不能为空")
-    @ApiModelProperty(value = "发起修改请求的用户id")
-    private Long userId;
+    @ApiModelProperty(value = "发起创建请求的用户地址")
+    private String userAddress;
 
     @NotNull(message = "场景不能为空")
     @ApiModelProperty(value = "场景id")
     private Long id;
+
+    private Integer status;
 
     private String title;
 
@@ -28,9 +31,13 @@ public class EditSceneForm {
 
     private String category;
 
-    private Long purchasePrice;
+    private Integer diveFlag;
 
-    private Long grantPrice;
+    private Integer tokenFlag;
 
-    private Long experiencePrice;
+    private Long divePrice;
+
+    private Long tokenPrice;
+
+
 }

@@ -33,6 +33,9 @@ public enum BusinessError {
     /**
      * 交易错误
      */
+    INCORRECT_CONTRACT("合约异常"),
+
+    ETH_TRANSACTION_ERROR("交易失败"),
 
     OUT_OF_BALANCE_ERROR("余额不足"),
 
@@ -40,7 +43,7 @@ public enum BusinessError {
 
     TRANSACTION_OBJECT_NOT_EXIST("消费对象不存在"),
 
-    TRANSACTION_ERROR("交易异常");
+    TRANSACTION_ERROR("转账异常");
 
 
 

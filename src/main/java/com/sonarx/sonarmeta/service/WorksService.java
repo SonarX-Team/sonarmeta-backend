@@ -13,5 +13,5 @@ public interface WorksService {
 
     PageWrapper<WorksView> searchWorksList(SearchWorksListQuery query);
 
-    Map<Integer, List<WorksView>> getWorksByUserId(String userId);
+    Map<Integer, List<WorksView>> getWorksByUserAddress(String userAddress);
 }

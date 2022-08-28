@@ -6,14 +6,14 @@
 
     <resultMap id="BaseResultMap" type="com.sonarx.sonarmeta.domain.model.UserModelOwnershipRelationDO">
             <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="userId" column="user_id" jdbcType="BIGINT"/>
+            <result property="address" column="address" jdbcType="VARCHAR"/>
             <result property="modelId" column="model_id" jdbcType="BIGINT"/>
             <result property="ownershipType" column="ownership_type" jdbcType="INTEGER"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,user_id,model_id,
+        id,address,model_id,
         ownership_type,create_time
     </sql>
 </mapper>

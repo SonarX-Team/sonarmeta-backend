@@ -35,11 +35,11 @@ public interface ModelService extends IService<ModelDO> {
 
     void editModelPostprocessingSettings(ModelPostprocessingSettingsDO modelPostprocessingSettingsDO);
 
-    void addUserModelOwnershipRelation(Long user, Long model, OwnershipTypeEnum ownershipType);
+    void addUserModelOwnershipRelation(String userAddress, Long model, OwnershipTypeEnum ownershipType);
 
-    void updateModelOwner(Long newUser, UserModelOwnershipRelationDO beforeRelation);
+    void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation);
 
-    UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(Long userId, Long id);
+    UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(String userAddress, Long id);
 
     UserModelOwnershipRelationDO getModelOwnRelation(Long id);
 }

@@ -1,6 +1,5 @@
 package com.sonarx.sonarmeta.domain.form;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -15,14 +14,16 @@ import javax.validation.constraints.NotNull;
 @Data
 @ApiModel("编辑模型信息Form")
 public class EditModelForm {
+
     @NotNull(message = "用户不能为空")
-    @ApiModelProperty(value = "发起修改请求的用户id")
-    private Long userId;
+    @ApiModelProperty(value = "发起创建请求的用户地址")
+    private String userAddress;
 
     @NotNull(message = "模型不能为空")
     @ApiModelProperty(value = "模型id")
     private Long id;
 
+    @NotBlank(message = "模型路径不能为空")
     private String path;
 
     private String attached;
@@ -39,10 +40,12 @@ public class EditModelForm {
 
     private String category;
 
-    private Long purchasePrice;
+    private Integer grantFlag;
+
+    private Integer tokenFlag;
 
     private Long grantPrice;
 
-    private Long experiencePrice;
+    private Long tokenPrice;
 
 }

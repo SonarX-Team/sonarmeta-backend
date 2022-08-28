@@ -2,6 +2,7 @@ package com.sonarx.sonarmeta.domain.view;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import io.swagger.annotations.ApiModel;
 import lombok.Data;
 
 import java.util.Date;
@@ -11,6 +12,7 @@ import java.util.Date;
  * @author: liuxuanming
  */
 @Data
+@ApiModel("作品视图")
 public class WorksView {
 
     private Long id;
@@ -78,7 +80,7 @@ public class WorksView {
     /**
      * 购买费用
      */
-    private Long purchasePrice;
+    private Long tokenPrice;
 
     /**
      * 借用费用
@@ -88,7 +90,7 @@ public class WorksView {
     /**
      * 观看费用
      */
-    private Long watchPrice;
+    private Long divePrice;
 
     /**
      * 对应NFT TokenId

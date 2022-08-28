@@ -10,13 +10,9 @@ public enum ConsumeTypeEnum {
 
     CONSUME_GRANT_MODEL(2, "使用模型"),
 
-    CONSUME_EXPERIENCE_MODEL(3, "体验模型"),
+    CONSUME_PURCHASE_SCENE(3, "购买场景"),
 
-    CONSUME_PURCHASE_SCENE(4, "购买场景"),
-
-    CONSUME_GRANT_SCENE(5, "使用场景"),
-
-    CONSUME_EXPERIENCE_SCENE(6, "体验场景");
+    CONSUME_DIVE_SCENE(4, "体验场景");
 
     private final Integer code;
 
