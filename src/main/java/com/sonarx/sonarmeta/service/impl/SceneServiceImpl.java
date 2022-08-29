@@ -64,7 +64,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         if(user == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
         }
-        Long nftTokenId = web3Service.mintERC721(user.getAddress());
+        Long nftTokenId = web3Service.mintERC998WithBatchTokens(form.getUserAddress(), form.getModelIdList());
 
         // 新增场景信息
         SceneDO sceneDO = new SceneDO();
