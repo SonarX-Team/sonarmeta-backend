@@ -23,7 +23,7 @@ public class ConsumeActionForm {
     private String userAddress;
 
     @ApiModelProperty("模型或场景ID")
-    @NotBlank(message = "消费对象不能为空")
+    @NotNull(message = "消费对象不能为空")
     private Long id;
 
     @ApiModelProperty("消费类型")

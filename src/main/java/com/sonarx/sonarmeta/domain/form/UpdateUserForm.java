@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -11,7 +12,7 @@ import java.util.Date;
 @ApiModel("编辑用户信息Form")
 public class UpdateUserForm {
 
-    @NotNull(message = "用户不能为空")
+    @NotBlank(message = "用户不能为空")
     @ApiModelProperty(value = "发起创建请求的用户地址")
     private String userAddress;
 
