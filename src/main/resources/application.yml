@@ -1,9 +1,9 @@
 server:
-  port: 8080
+  port: 8000
 
 spring:
   profiles:
-    active: tbsc
+    active: chainbasetbsc
   datasource:
     url: jdbc:mysql://124.221.134.180:3306/sonarmeta?characterEncoding=utf8
     username: ${mysql.username:root}
