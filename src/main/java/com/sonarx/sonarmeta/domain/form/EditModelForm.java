@@ -23,12 +23,13 @@ public class EditModelForm {
     @ApiModelProperty(value = "模型id")
     private Long id;
 
-    @NotBlank(message = "模型路径不能为空")
     private String path;
 
     private String attached;
 
     private String pathFolderList;
+
+    private Integer status;
 
     private String title;
 

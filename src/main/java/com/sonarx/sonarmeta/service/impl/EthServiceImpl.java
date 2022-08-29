@@ -66,7 +66,7 @@ public class EthServiceImpl implements Web3Service {
     private String controller2PrivateKey;
 
     @Override
-    public void fundTreasury(BigInteger amount) {
+    public void fundTreasury(BigInteger amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Uint256(amount));
@@ -86,7 +86,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public void transferERC20UsingSonarMetaAllowance(String to, BigInteger amount) {
+    public void transferERC20UsingSonarMetaAllowance(String to, BigInteger amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Address(to));
@@ -107,7 +107,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public void grantERC721UsingSonarMetaApproval(Long tokenId, String to) {
+    public void grantERC721UsingSonarMetaApproval(Long tokenId, String to) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Uint256(tokenId));
@@ -128,7 +128,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public void transferERC721UsingSonarMetaApproval(Long tokenId, String to) {
+    public void transferERC721UsingSonarMetaApproval(Long tokenId, String to) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Uint256(tokenId));
@@ -149,7 +149,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public Long mintERC721(String to) {
+    public Long mintERC721(String to) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Address(to));
@@ -178,7 +178,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public void grantERC998UsingSonarMetaApproval(Long tokenId, String to) {
+    public void grantERC998UsingSonarMetaApproval(Long tokenId, String to) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Uint256(tokenId));
@@ -199,7 +199,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public void transferERC998UsingSonarMetaApproval(Long tokenId, String to) {
+    public void transferERC998UsingSonarMetaApproval(Long tokenId, String to) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Uint256(tokenId));
@@ -220,7 +220,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public Long mintERC998(String to) {
+    public Long mintERC998(String to) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Address(to));
@@ -249,7 +249,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public Long mintERC998WithBatchTokens(String to, List<Long> childTokenIds) {
+    public Long mintERC998WithBatchTokens(String to, List<Long> childTokenIds) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Address(to));
@@ -278,7 +278,7 @@ public class EthServiceImpl implements Web3Service {
         return Long.parseLong(requiredTopic.substring(2), 16);
     }
 
-    public Long getHeight() {
+    public Long getHeight() throws EthTransactionException {
         EthBlockNumber blockNumber;
 
         try {
@@ -290,7 +290,7 @@ public class EthServiceImpl implements Web3Service {
         return blockNumber.getBlockNumber().longValue();
     }
 
-    public BigInteger getNonce(Web3j web3j, String address) {
+    public BigInteger getNonce(Web3j web3j, String address) throws EthTransactionException {
         try {
             EthGetTransactionCount ethGetTransactionCount = web3j.ethGetTransactionCount(address, DefaultBlockParameterName.LATEST).send();
             return ethGetTransactionCount.getTransactionCount();
@@ -299,7 +299,7 @@ public class EthServiceImpl implements Web3Service {
         }
     }
 
-    public BigDecimal getEthBalance(Web3j web3j, String address) {
+    public BigDecimal getEthBalance(Web3j web3j, String address) throws EthTransactionException {
         try {
             EthGetBalance balanceWei = web3j.ethGetBalance(address, DefaultBlockParameterName.LATEST).send();
             return Convert.fromWei(balanceWei.getBalance().toString(), Convert.Unit.ETHER);
@@ -315,7 +315,7 @@ public class EthServiceImpl implements Web3Service {
             String recipientAddress,
             BigInteger value,
             String data,
-            String privateKey) {
+            String privateKey) throws EthTransactionException {
         RawTransaction rawTransaction = RawTransaction.createTransaction(nonce, gasPrice, gasLimit, recipientAddress, value, data);
 
         // Sign the transaction
@@ -338,7 +338,7 @@ public class EthServiceImpl implements Web3Service {
                         new PollingTransactionReceiptProcessor(web3j, TransactionManager.DEFAULT_POLLING_FREQUENCY,
                                 TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
                 return receiptProcessor.waitForTransactionReceipt(sendTransaction.getTransactionHash());
-            } catch (IOException | TransactionException e) {
+            } catch (IOException | TransactionException | EthTransactionException e) {
                 throw new EthTransactionException(e.getMessage());
             }
         }
@@ -349,7 +349,7 @@ public class EthServiceImpl implements Web3Service {
      * Call contract function with parameters,
      * but don't modify the contract state.
      */
-    public List<Type> callContractWithParameters(String from, String contractAddress, String methodName, List<Type> inputParameters, List<TypeReference<?>> outputParameters) {
+    public List<Type> callContractWithParameters(String from, String contractAddress, String methodName, List<Type> inputParameters, List<TypeReference<?>> outputParameters) throws EthTransactionException {
         Function function = new Function(methodName, inputParameters, outputParameters);
         String data = FunctionEncoder.encode(function);
         try {
@@ -365,7 +365,7 @@ public class EthServiceImpl implements Web3Service {
      * Call contract function with parameters, may modify the contract state,
      * which means the transaction should be signed by the credential.
      */
-    public TransactionReceipt invokeContractWithParameters(Credentials credentials, String contractAddress, String methodName, List<Type> inputParameters, List<TypeReference<?>> outputParameters) {
+    public TransactionReceipt invokeContractWithParameters(Credentials credentials, String contractAddress, String methodName, List<Type> inputParameters, List<TypeReference<?>> outputParameters) throws EthTransactionException {
         Function function = new Function(methodName, inputParameters, outputParameters);
         String data = FunctionEncoder.encode(function);
         try {
@@ -381,7 +381,7 @@ public class EthServiceImpl implements Web3Service {
                     new PollingTransactionReceiptProcessor(web3j, TransactionManager.DEFAULT_POLLING_FREQUENCY,
                             TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
             return receiptProcessor.waitForTransactionReceipt(txHash);
-        } catch (IOException | TransactionException e) {
+        } catch (IOException | TransactionException | EthTransactionException e) {
             throw new EthTransactionException(e.getMessage());
         }
     }
@@ -400,7 +400,7 @@ public class EthServiceImpl implements Web3Service {
         return Credentials.create(privateKey);
     }
 
-    public TransactionReceipt transferEth(Credentials credentials, String recipientAddress, BigDecimal amount, Convert.Unit unit) {
+    public TransactionReceipt transferEth(Credentials credentials, String recipientAddress, BigDecimal amount, Convert.Unit unit) throws EthTransactionException {
         try {
             return Transfer.sendFunds(web3j, credentials, recipientAddress, amount, unit).send();
         } catch (Exception e) {

@@ -133,15 +133,17 @@ public class WorksServiceImpl implements WorksService {
         QueryWrapper<UserModelOwnershipRelationDO> userModelOwnershipRelationDOQueryWrapper = new QueryWrapper<>();
         userModelOwnershipRelationDOQueryWrapper.select().eq("address", userAddress);
         List<UserModelOwnershipRelationDO> userModelOwnershipRelationDOS = userModelOwnershipRelationMapper.selectList(userModelOwnershipRelationDOQueryWrapper);
-        for (UserModelOwnershipRelationDO userModelOwnershipRelationDO : userModelOwnershipRelationDOS) {
-            if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_CREATOR.getCode())) {
-                createModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
-            }
-            if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_OWNER.getCode())) {
-                ownModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
-            }
-            if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_GRANTOR.getCode())) {
-                grantModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+        if (userModelOwnershipRelationDOS != null) {
+            for (UserModelOwnershipRelationDO userModelOwnershipRelationDO : userModelOwnershipRelationDOS) {
+                if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_CREATOR.getCode())) {
+                    createModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+                }
+                if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_OWNER.getCode())) {
+                    ownModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+                }
+                if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_GRANTOR.getCode())) {
+                    grantModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+                }
             }
         }
 
@@ -149,18 +151,19 @@ public class WorksServiceImpl implements WorksService {
         QueryWrapper<UserSceneOwnershipRelationDO> userSceneOwnershipRelationDOQueryWrapper = new QueryWrapper<>();
         userSceneOwnershipRelationDOQueryWrapper.select().eq("address", userAddress);
         List<UserSceneOwnershipRelationDO> userSceneOwnershipRelationDOS = userSceneOwnershipRelationMapper.selectList(userSceneOwnershipRelationDOQueryWrapper);
-        for (UserSceneOwnershipRelationDO userSceneOwnershipRelationDO : userSceneOwnershipRelationDOS) {
-            if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_CREATOR.getCode())) {
-                createSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
-            }
-            if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_OWNER.getCode())) {
-                ownSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
-            }
-            if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_DIVER.getCode())) {
-                diveSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+        if (userSceneOwnershipRelationDOS != null) {
+            for (UserSceneOwnershipRelationDO userSceneOwnershipRelationDO : userSceneOwnershipRelationDOS) {
+                if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_CREATOR.getCode())) {
+                    createSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+                }
+                if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_OWNER.getCode())) {
+                    ownSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+                }
+                if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_DIVER.getCode())) {
+                    diveSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+                }
             }
         }
-
         res.put(OwnershipTypeEnum.MODEL_CREATOR.getCode(), createModelList);
         res.put(OwnershipTypeEnum.MODEL_OWNER.getCode(), ownModelList);
         res.put(OwnershipTypeEnum.MODEL_GRANTOR.getCode(), grantModelList);

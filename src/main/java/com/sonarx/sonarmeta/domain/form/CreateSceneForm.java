@@ -24,6 +24,7 @@ public class CreateSceneForm {
 
     private String description;
 
+    @NotBlank(message = "封面不能为空")
     private String cover;
 
     @NotBlank(message = "场景标签不能为空")

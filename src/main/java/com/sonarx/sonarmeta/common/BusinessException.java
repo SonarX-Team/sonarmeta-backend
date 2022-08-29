@@ -7,7 +7,7 @@ import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
  * @Description: 业务异常
  * @author: liuxuanming
  */
-public class BusinessException extends RuntimeException {
+public class BusinessException extends Exception {
 
     //业务异常编码 @see ErrorCodeEnum
     private int code;

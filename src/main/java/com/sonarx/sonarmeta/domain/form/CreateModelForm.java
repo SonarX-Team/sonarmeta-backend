@@ -22,17 +22,20 @@ public class CreateModelForm {
     @NotBlank(message = "模型路径不能为空")
     private String path;
 
-    @NotBlank(message = "模型路径不能为空")
     private String attached;
 
     @NotBlank(message = "模型路径不能为空")
     private String pathFolderList;
+
+    @NotBlank(message = "模型状态不能为空")
+    private Integer status;
 
     @NotBlank(message = "模型标题不能为空")
     private String title;
 
     private String description;
 
+    @NotBlank(message = "封面不能为空")
     private String cover;
 
     @NotBlank(message = "模型标签不能为空")

@@ -43,30 +43,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     Web3Service web3Service;
 
     @Override
-    public UserDO getUser(String address) {
+    public UserDO getOrCreateUser(String address) {
         UserDO user = userMapper.selectById(address);
         if (user == null) {
-            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
+            UserDO newUser = new UserDO();
+            newUser.setAddress(address);
+            newUser.setUsername(APP_NAME + DEFAULT_CONNECTOR + address);
+            userMapper.insert(newUser);
+            return newUser;
         }
         return user;
-    }
-
-    @Override
-    public void createUser(String address) {
-        UserDO newUser = new UserDO();
-        newUser.setAddress(address);
-        newUser.setUsername(APP_NAME + DEFAULT_CONNECTOR + address);
-        int affectCount = userMapper.insert(newUser);
-        if (affectCount > 0) {
-            log.info("插入用户信息成功，钱包地址：{}", newUser.getAddress());
-            newUser = userMapper.selectById(newUser.getAddress());
-            log.info("获取用户钱包地址：{}", newUser.getAddress());
-        } else {
-            log.warn("插入用户信息失败，钱包地址：{}", newUser.getAddress());
-            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "插入用户信息失败");
-        }
-
-
     }
 
     /**
@@ -76,7 +62,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
      */
     @Override
     @Transactional
-    public void consume(ConsumeActionForm form) {
+    public void consume(ConsumeActionForm form) throws BusinessException {
         Integer consumeType = form.getType();
         if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_MODEL.getCode())) {
             // 购买模型
@@ -174,7 +160,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     }
 
     @Override
-    public void updateUser(UpdateUserForm form) {
+    public UserDO updateUser(UpdateUserForm form) throws BusinessException {
         UserDO user = userMapper.selectById(form.getUserAddress());
         if (user == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
@@ -198,9 +184,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             log.warn("插入用户信息失败，钱包地址：{}", user.getAddress());
             throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "插入用户信息失败");
         }
+        return user;
     }
 
-    private void transfer(String from, String to, Long amount) {
+    private void transfer(String from, String to, Long amount) throws BusinessException {
         UserDO fromUser = userMapper.selectById(from);
         if (fromUser == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
