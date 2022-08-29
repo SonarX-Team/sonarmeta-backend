@@ -58,13 +58,13 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
 
     @Override
     @Transactional
-    public void createSceneWithForm(CreateSceneForm form) {
+    public SceneDO createSceneWithForm(CreateSceneForm form) throws BusinessException {
         // 创建NFT
         UserDO user = userService.getById(form.getUserAddress());
         if(user == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
         }
-        Long nftTokenId = web3Service.mintERC721(user.getAddress());
+        Long nftTokenId = web3Service.mintERC998WithBatchTokens(form.getUserAddress(), form.getModelIdList());
 
         // 新增场景信息
         SceneDO sceneDO = new SceneDO();
@@ -91,11 +91,12 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         }
 
         log.info("新建场景信息：用户{}，场景{}，NFT{}", form.getUserAddress(), sceneDO.getId(), sceneDO.getNftTokenId());
+        return sceneDO;
     }
 
     @Override
     @Transactional
-    public void editSceneWithForm(EditSceneForm form) {
+    public SceneDO editSceneWithForm(EditSceneForm form) throws BusinessException {
         QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("address", form.getUserAddress()).eq("scene_id", form.getId());
         UserSceneOwnershipRelationDO relation = userSceneOwnershipRelationMapper.selectOne(queryWrapper);
@@ -111,6 +112,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         }
 
         log.info("编辑模型信息：用户{}，场景{}", relation.getAddress(), relation.getSceneId());
+        return sceneDO;
     }
 
     @Override
@@ -134,7 +136,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     }
 
     @Override
-    public void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation) {
+    public void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation) throws BusinessException {
 
         //拥有场景的用户才能更新场景与模型的关系
         QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper1 = new QueryWrapper<>();
@@ -168,7 +170,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
 
     }
 
-    public void addUserSceneOwnershipRelation(String userAddress, Long sceneId, OwnershipTypeEnum ownershipType) {
+    public void addUserSceneOwnershipRelation(String userAddress, Long sceneId, OwnershipTypeEnum ownershipType) throws BusinessException {
         QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("address",userAddress)
                 .eq("scene_id",sceneId)

@@ -1,5 +1,6 @@
 package com.sonarx.sonarmeta.service;
 
+import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.CreateModelForm;
 import com.sonarx.sonarmeta.domain.form.EditModelForm;
@@ -13,31 +14,31 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface ModelService extends IService<ModelDO> {
 
-    void createModelWithForm(CreateModelForm form);
+    ModelDO createModelWithForm(CreateModelForm form) throws BusinessException;
 
-    void editModelWithForm(EditModelForm form);
+    ModelDO editModelWithForm(EditModelForm form) throws BusinessException;
 
     ModelDO getModelById(Long id);
 
     ModelBasicSettingsDO getModelBasicSettings(Long modelId);
 
-    void editModelBasicSettings(ModelBasicSettingsDO modelBasicSettingsDO);
+    ModelBasicSettingsDO editModelBasicSettings(ModelBasicSettingsDO modelBasicSettingsDO) throws BusinessException;
 
     ModelLightSettingsDO getModelLightSettings(Long modelId);
 
-    void editModelLightSettings(ModelLightSettingsDO modelLightSettingsDO);
+    ModelLightSettingsDO editModelLightSettings(ModelLightSettingsDO modelLightSettingsDO) throws BusinessException;
 
     ModelMaterialSettingsDO getModelMaterialSettings(Long modelId);
 
-    void editModelMaterialSettings(ModelMaterialSettingsDO modelMaterialSettingsDO);
+    ModelMaterialSettingsDO editModelMaterialSettings(ModelMaterialSettingsDO modelMaterialSettingsDO) throws BusinessException;
 
     ModelPostprocessingSettingsDO getModelPostProcessingSettings(Long modelId);
 
-    void editModelPostprocessingSettings(ModelPostprocessingSettingsDO modelPostprocessingSettingsDO);
+    ModelPostprocessingSettingsDO editModelPostprocessingSettings(ModelPostprocessingSettingsDO modelPostprocessingSettingsDO) throws BusinessException;
 
-    void addUserModelOwnershipRelation(String userAddress, Long model, OwnershipTypeEnum ownershipType);
+    void addUserModelOwnershipRelation(String userAddress, Long model, OwnershipTypeEnum ownershipType) throws BusinessException;
 
-    void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation);
+    void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation) throws BusinessException;
 
     UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(String userAddress, Long id);
 

@@ -1,8 +1,10 @@
 package com.sonarx.sonarmeta.web.controller;
 
+import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
+import com.sonarx.sonarmeta.domain.model.SceneDO;
 import com.sonarx.sonarmeta.domain.view.SceneView;
 import com.sonarx.sonarmeta.service.SceneService;
 import io.swagger.annotations.Api;
@@ -31,16 +33,26 @@ public class SceneController {
     @ApiOperation(value = "创建场景作品")
     @RequestMapping(value = "/create", method = {RequestMethod.POST})
     public HttpResult createScene(@RequestBody @Validated CreateSceneForm createSceneForm) {
-        sceneService.createSceneWithForm(createSceneForm);
-        return  HttpResult.successResult();
+        SceneDO sceneDO = null;
+        try {
+            sceneDO = sceneService.createSceneWithForm(createSceneForm);
+        } catch (BusinessException e) {
+            HttpResult.errorResult(e.getMessage());
+        }
+        return  HttpResult.successResult(sceneDO);
     }
 
 
     @ApiOperation(value = "编辑场景作品")
     @RequestMapping(value = "/edit", method = {RequestMethod.POST})
     public HttpResult editScene(@RequestBody @Validated EditSceneForm editSceneForm) {
-        sceneService.editSceneWithForm(editSceneForm);
-        return  HttpResult.successResult();
+        SceneDO sceneDO = null;
+        try {
+            sceneDO = sceneService.editSceneWithForm(editSceneForm);
+        } catch (BusinessException e) {
+            HttpResult.errorResult(e.getMessage());
+        }
+        return  HttpResult.successResult(sceneDO);
     }
 
     @ApiOperation(value = "获取场景作品")

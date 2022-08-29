@@ -57,7 +57,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
 
     @Override
     @Transactional
-    public void createModelWithForm(CreateModelForm form) {
+    public ModelDO createModelWithForm(CreateModelForm form) throws BusinessException {
         // 创建NFT
         UserDO user = userService.getById(form.getUserAddress());
         if(user == null) {
@@ -77,11 +77,12 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_CREATOR);
         addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_OWNER);
         log.info("新建模型信息：用户{}，模型{}，NFT{}", form.getUserAddress(), model.getId(), model.getNftTokenId());
+        return model;
     }
 
     @Override
     @Transactional
-    public void editModelWithForm(EditModelForm form) {
+    public ModelDO editModelWithForm(EditModelForm form) throws BusinessException {
         QueryWrapper<UserModelOwnershipRelationDO> qw = new QueryWrapper<>();
         qw.eq("address", form.getUserAddress()).eq("model_id", form.getId());
         UserModelOwnershipRelationDO relation = userModelOwnershipRelationMapper.selectOne(qw);
@@ -94,8 +95,8 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         if (affectCount <= 0) {
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
         }
-
         log.info("编辑模型信息：用户{}，模型{}", relation.getAddress(), relation.getModelId());
+        return model;
     }
 
     @Override
@@ -111,7 +112,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public void editModelBasicSettings(ModelBasicSettingsDO modelBasicSettingsDO) {
+    public ModelBasicSettingsDO editModelBasicSettings(ModelBasicSettingsDO modelBasicSettingsDO) throws BusinessException {
         QueryWrapper<ModelBasicSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelBasicSettingsDO.getModelId());
         if (modelBasicSettingsMapper.selectOne(queryWrapper) == null) {
@@ -124,6 +125,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
         }
         log.info("编辑模型信息：模型{}", modelBasicSettingsDO.getModelId());
+        return modelBasicSettingsDO;
     }
 
     @Override
@@ -134,7 +136,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public void editModelLightSettings(ModelLightSettingsDO modelLightSettingsDO) {
+    public ModelLightSettingsDO editModelLightSettings(ModelLightSettingsDO modelLightSettingsDO) throws BusinessException {
         QueryWrapper<ModelLightSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelLightSettingsDO.getModelId());
         if (modelLightSettingsMapper.selectOne(queryWrapper) == null) {
@@ -147,6 +149,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
         }
         log.info("编辑模型信息：模型{}", modelLightSettingsDO.getModelId());
+        return modelLightSettingsDO;
     }
 
     @Override
@@ -157,7 +160,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public void editModelMaterialSettings(ModelMaterialSettingsDO modelMaterialSettingsDO) {
+    public ModelMaterialSettingsDO editModelMaterialSettings(ModelMaterialSettingsDO modelMaterialSettingsDO) throws BusinessException {
         QueryWrapper<ModelMaterialSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelMaterialSettingsDO.getModelId());
         if (modelMaterialSettingsMapper.selectOne(queryWrapper) == null) {
@@ -170,6 +173,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
         }
         log.info("编辑模型信息：模型{}", modelMaterialSettingsDO.getModelId());
+        return modelMaterialSettingsDO;
     }
 
     @Override
@@ -180,7 +184,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public void editModelPostprocessingSettings(ModelPostprocessingSettingsDO modelPostprocessingSettingsDO) {
+    public ModelPostprocessingSettingsDO editModelPostprocessingSettings(ModelPostprocessingSettingsDO modelPostprocessingSettingsDO) throws BusinessException {
         QueryWrapper<ModelPostprocessingSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelPostprocessingSettingsDO.getModelId());
         if (modelPostprocessingSettingsMapper.selectOne(queryWrapper) == null) {
@@ -193,11 +197,12 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
         }
         log.info("编辑模型信息：模型{}", modelPostprocessingSettingsDO.getModelId());
+        return modelPostprocessingSettingsDO;
     }
     
 
     @Override
-    public void addUserModelOwnershipRelation(String userAddress, Long modelId, OwnershipTypeEnum ownershipType) {
+    public void addUserModelOwnershipRelation(String userAddress, Long modelId, OwnershipTypeEnum ownershipType) throws BusinessException {
         QueryWrapper<UserModelOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("address",userAddress)
                 .eq("model_id",modelId)
@@ -211,7 +216,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation) {
+    public void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation) throws BusinessException {
         UpdateWrapper<UserModelOwnershipRelationDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("model_id", beforeRelation.getModelId())
                 .eq("ownership_type", beforeRelation.getOwnershipType());

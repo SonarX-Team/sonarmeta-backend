@@ -1,5 +1,6 @@
 package com.sonarx.sonarmeta.web.controller;
 
+import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.CreateModelForm;
 import com.sonarx.sonarmeta.domain.form.EditModelForm;
@@ -30,16 +31,27 @@ public class ModelController {
 
     @ApiOperation(value = "创建模型作品")
     @RequestMapping(value = "/create", method = {RequestMethod.POST})
-    public HttpResult createModel(@RequestBody @Validated CreateModelForm form) {
-        modelService.createModelWithForm(form);
-        return HttpResult.successResult();
+    public HttpResult<ModelDO> createModel(@RequestBody @Validated CreateModelForm form) {
+        ModelDO modelDO = null;
+        try {
+            modelDO = modelService.createModelWithForm(form);
+        } catch (BusinessException e) {
+            HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(modelDO);
     }
 
     @ApiOperation(value = "编辑模型作品")
     @RequestMapping(value = "/edit", method = {RequestMethod.POST})
-    public HttpResult editModel(@RequestBody @Validated EditModelForm form) {
-        modelService.editModelWithForm(form);
-        return HttpResult.successResult();
+    public HttpResult<ModelDO> editModel(@RequestBody @Validated EditModelForm form) {
+        ModelDO modelDO = null;
+        try {
+            modelDO = modelService.editModelWithForm(form);
+        } catch (BusinessException e) {
+            HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(modelDO);
+
     }
 
     @ApiOperation(value = "获取模型信息")
@@ -57,13 +69,18 @@ public class ModelController {
 
     @ApiOperation(value = "编辑模型基本设置")
     @RequestMapping(value = "/basic/edit", method = {RequestMethod.POST})
-    public HttpResult editModelBasicSettings(@RequestBody ModelBasicSettingsDO modelBasicSettingsDO) {
-        modelService.editModelBasicSettings(modelBasicSettingsDO);
-        return HttpResult.successResult();
+    public HttpResult<ModelBasicSettingsDO> editModelBasicSettings(@RequestBody ModelBasicSettingsDO modelBasicSettingsDO) {
+        ModelBasicSettingsDO res = null;
+        try {
+            res = modelService.editModelBasicSettings(modelBasicSettingsDO);
+        } catch (BusinessException e) {
+            HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(res);
     }
 
 
-    @ApiOperation(value = "获取模型基本设置")
+    @ApiOperation(value = "获取模型光线设置")
     @RequestMapping(value = "/light", method = {RequestMethod.GET})
     public HttpResult<ModelLightSettingsDO> getModelLightSettings(@RequestParam(value = "modelId") Long modelId) {
         return HttpResult.successResult(modelService.getModelLightSettings(modelId));
@@ -72,9 +89,14 @@ public class ModelController {
 
     @ApiOperation(value = "编辑模型光线设置")
     @RequestMapping(value = "/light/edit", method = {RequestMethod.POST})
-    public HttpResult editModelLightSettings(@RequestBody ModelLightSettingsDO modelLightSettingsDO) {
-        modelService.editModelLightSettings(modelLightSettingsDO);
-        return HttpResult.successResult();
+    public HttpResult<ModelLightSettingsDO> editModelLightSettings(@RequestBody ModelLightSettingsDO modelLightSettingsDO) {
+        ModelLightSettingsDO res = null;
+        try {
+            res = modelService.editModelLightSettings(modelLightSettingsDO);
+        } catch (BusinessException e) {
+            HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(res);
     }
 
 
@@ -87,9 +109,14 @@ public class ModelController {
 
     @ApiOperation(value = "编辑模型材料设置")
     @RequestMapping(value = "/material/edit", method = {RequestMethod.POST})
-    public HttpResult editModelMaterialSettings(@RequestBody ModelMaterialSettingsDO modelMaterialSettingsDO) {
-        modelService.editModelMaterialSettings(modelMaterialSettingsDO);
-        return HttpResult.successResult();
+    public HttpResult<ModelMaterialSettingsDO> editModelMaterialSettings(@RequestBody ModelMaterialSettingsDO modelMaterialSettingsDO) {
+        ModelMaterialSettingsDO res = null;
+        try {
+            res = modelService.editModelMaterialSettings(modelMaterialSettingsDO);
+        } catch (BusinessException e) {
+            HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(res);
     }
 
 
@@ -102,8 +129,14 @@ public class ModelController {
 
     @ApiOperation(value = "编辑模型后期设置")
     @RequestMapping(value = "/postprocessing/edit", method = {RequestMethod.POST})
-    public HttpResult editModelPostprocessingSettings(@RequestBody ModelPostprocessingSettingsDO modelPostprocessingSettingsDO) {
-        modelService.editModelPostprocessingSettings(modelPostprocessingSettingsDO);
-        return HttpResult.successResult();
+    public HttpResult<ModelPostprocessingSettingsDO> editModelPostprocessingSettings(@RequestBody ModelPostprocessingSettingsDO modelPostprocessingSettingsDO) {
+        ModelPostprocessingSettingsDO res = null;
+        try {
+            res = modelService.editModelPostprocessingSettings(modelPostprocessingSettingsDO);
+        } catch (BusinessException e) {
+            HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(res);
+
     }
 }

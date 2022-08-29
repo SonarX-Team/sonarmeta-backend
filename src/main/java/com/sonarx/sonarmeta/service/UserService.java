@@ -1,5 +1,6 @@
 package com.sonarx.sonarmeta.service;
 
+import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
 import com.sonarx.sonarmeta.domain.form.UpdateUserForm;
@@ -14,11 +15,9 @@ import org.springframework.stereotype.Service;
 */
 public interface UserService extends IService<UserDO> {
 
-    void createUser(String userAddress);
+    UserDO getOrCreateUser(String userAddress);
 
-    UserDO getUser(String userAddress);
+    void consume(ConsumeActionForm form) throws BusinessException;
 
-    void consume(ConsumeActionForm form);
-
-    void updateUser(UpdateUserForm userForm);
+    UserDO updateUser(UpdateUserForm userForm) throws BusinessException;
 }

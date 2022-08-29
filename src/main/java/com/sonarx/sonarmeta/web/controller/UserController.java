@@ -1,5 +1,6 @@
 package com.sonarx.sonarmeta.web.controller;
 
+import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
 import com.sonarx.sonarmeta.domain.form.UpdateUserForm;
@@ -36,47 +37,41 @@ public class UserController {
     @Resource
     WorksService worksService;
 
-    @ApiOperation(value = "创建新用户")
-    @RequestMapping(value = "/profile/create", method = {RequestMethod.GET})
-    public HttpResult getUserProfileByAddress(@RequestParam(value = "userAddress") String userAddress) {
-        userService.createUser(userAddress);
-        return HttpResult.successResult();
-    }
 
     @ApiOperation(value = "更新用户个人信息")
     @RequestMapping(value = "/profile/update", method = {RequestMethod.POST})
-    public HttpResult updateUserProfile(@RequestBody @Validated UpdateUserForm userForm) {
-        userService.updateUser(userForm);
-        return HttpResult.successResult();
+    public HttpResult<UserDO> updateUserProfile(@RequestBody @Validated UpdateUserForm userForm) {
+        UserDO user;
+        try {
+            user = userService.updateUser(userForm);
+        } catch (BusinessException e) {
+            return HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(user);
     }
 
-    @ApiOperation(value = "通过钱包地址获取用户个人信息")
+    @ApiOperation(value = "通过钱包地址获取用户个人信息，没有用户则创建")
     @RequestMapping(value = "/profile/get", method = {RequestMethod.GET})
     public HttpResult<UserDO> getUserProfileById(@RequestParam(value = "userAddress") String userAddress) {
-        UserDO user = userService.getUser(userAddress);
-        if (user == null) {
-            return HttpResult.errorResult("用户不存在");
-        } else {
-            return HttpResult.successResult(user);
-        }
+        UserDO user = userService.getOrCreateUser(userAddress);
+        return HttpResult.successResult(user);
     }
 
 
     @ApiOperation(value = "获取用户个人空间作品列表")
     @RequestMapping(value = "/workslist", method = {RequestMethod.GET})
     public HttpResult<Map<Integer, List<WorksView>>> getUserWorksList(@RequestParam(value = "userAddress") String userAddress) {
-        UserDO user = userService.getUser(userAddress);
-        if (user == null) {
-            return HttpResult.errorResult("用户不存在");
-        } else {
-            return HttpResult.successResult(worksService.getWorksByUserAddress(userAddress));
-        }
+        return HttpResult.successResult(worksService.getWorksByUserAddress(userAddress));
     }
 
     @ApiOperation(value = "用户消费行为")
     @RequestMapping(value = "/consume", method = {RequestMethod.POST})
     public HttpResult userActions(@RequestBody @Validated ConsumeActionForm form) {
-        userService.consume(form);
+        try {
+            userService.consume(form);
+        } catch (BusinessException e) {
+            return HttpResult.errorResult(e.getMessage());
+        }
         return HttpResult.successResult();
     }
 }

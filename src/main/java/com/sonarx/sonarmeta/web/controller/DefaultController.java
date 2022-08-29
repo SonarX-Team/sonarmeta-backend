@@ -1,5 +1,6 @@
 package com.sonarx.sonarmeta.web.controller;
 
+import com.sonarx.sonarmeta.common.EthTransactionException;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.service.Web3Service;
 import io.swagger.annotations.Api;
@@ -36,8 +37,9 @@ public class DefaultController {
     }
 
     @RequestMapping(value = "/test", method = {RequestMethod.GET})
-    public HttpResult test() {
-        return HttpResult.successResult(web3Service.mintERC721("0x1806041041052158694A97EFA1840F717A11f6ac"));
+    public HttpResult test() throws EthTransactionException {
+        Long aLong = web3Service.mintERC721("0x1806041041052158694A97EFA1840F717A11f6ac");
+        return HttpResult.successResult(aLong);
     }
 
     // Test PathVariable

@@ -1,6 +1,7 @@
 package com.sonarx.sonarmeta.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneModelRelationForm;
@@ -14,11 +15,11 @@ import com.sonarx.sonarmeta.domain.view.SceneView;
 */
 public interface SceneService extends IService<SceneDO> {
 
-    void createSceneWithForm(CreateSceneForm form);
+    SceneDO createSceneWithForm(CreateSceneForm form) throws BusinessException;
 
-    void editSceneWithForm(EditSceneForm form);
+    SceneDO editSceneWithForm(EditSceneForm form) throws BusinessException;
 
     SceneView getScene(Long sceneId);
 
-    void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation);
+    void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation) throws BusinessException;
 }
