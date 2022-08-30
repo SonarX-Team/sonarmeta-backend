@@ -147,7 +147,7 @@ public class WorksServiceImpl implements WorksService {
 
         // 根据user address查询用户models
         QueryWrapper<UserModelOwnershipRelationDO> userModelOwnershipRelationDOQueryWrapper = new QueryWrapper<>();
-        userModelOwnershipRelationDOQueryWrapper.select().eq("address", userAddress);
+        userModelOwnershipRelationDOQueryWrapper.eq("address", userAddress);
         List<UserModelOwnershipRelationDO> userModelOwnershipRelationDOS = userModelOwnershipRelationMapper.selectList(userModelOwnershipRelationDOQueryWrapper);
         if (userModelOwnershipRelationDOS != null) {
             for (UserModelOwnershipRelationDO userModelOwnershipRelationDO : userModelOwnershipRelationDOS) {
@@ -174,7 +174,7 @@ public class WorksServiceImpl implements WorksService {
 
         // 根据user address查询用户scenes
         QueryWrapper<UserSceneOwnershipRelationDO> userSceneOwnershipRelationDOQueryWrapper = new QueryWrapper<>();
-        userSceneOwnershipRelationDOQueryWrapper.select().eq("address", userAddress);
+        userSceneOwnershipRelationDOQueryWrapper.eq("address", userAddress);
         List<UserSceneOwnershipRelationDO> userSceneOwnershipRelationDOS = userSceneOwnershipRelationMapper.selectList(userSceneOwnershipRelationDOQueryWrapper);
         if (userSceneOwnershipRelationDOS != null) {
             for (UserSceneOwnershipRelationDO userSceneOwnershipRelationDO : userSceneOwnershipRelationDOS) {
