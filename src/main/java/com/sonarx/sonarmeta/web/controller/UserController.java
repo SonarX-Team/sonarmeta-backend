@@ -60,10 +60,10 @@ public class UserController {
 
     @ApiOperation(value = "获取用户个人空间作品列表")
     @RequestMapping(value = "/workslist", method = {RequestMethod.GET})
-    public HttpResult<Map<Integer, List<WorksView>>> getUserWorksList(@RequestParam(value = "userAddress") String userAddress) {
+    public HttpResult<Map<Integer, List<WorksView>>> getUserWorksList(@RequestParam(value = "address1") String address1, @RequestParam(value = "address2") String address2) {
         Map<Integer, List<WorksView>> res;
         try {
-            res = worksService.getWorksByUserAddress(userAddress);
+            res = worksService.getWorksByUserAddress(address1, address2);
         } catch (BusinessException e) {
             return HttpResult.errorResult(e.getMessage());
         }

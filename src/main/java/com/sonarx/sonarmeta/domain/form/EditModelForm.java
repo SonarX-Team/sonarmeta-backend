@@ -45,8 +45,8 @@ public class EditModelForm {
 
     private Integer tokenFlag;
 
-    private Long grantPrice;
+    private Double grantPrice;
 
-    private Long tokenPrice;
+    private Double tokenPrice;
 
 }

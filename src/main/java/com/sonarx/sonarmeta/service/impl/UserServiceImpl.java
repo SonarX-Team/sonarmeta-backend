@@ -187,7 +187,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         return user;
     }
 
-    private void transfer(String from, String to, Long amount) throws BusinessException {
+    private void transfer(String from, String to, Double amount) throws BusinessException {
         UserDO fromUser = userMapper.selectById(from);
         if (fromUser == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);

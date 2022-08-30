@@ -51,8 +51,8 @@ public class CreateModelForm {
     private Integer tokenFlag;
 
     @NotNull(message = "借用价格不能为空")
-    private Long grantPrice;
+    private Double grantPrice;
 
     @NotNull(message = "模型NFT价格不能为空")
-    private Long tokenPrice;
+    private Double tokenPrice;
 }

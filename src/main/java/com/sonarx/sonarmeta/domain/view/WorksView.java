@@ -27,6 +27,6 @@ public class WorksView {
 
     private Date createTime;
 
-    private Long price;
+    private Double price;
 
 }

@@ -15,7 +15,7 @@
             <result property="birthDate" column="birth_date" jdbcType="TIMESTAMP"/>
             <result property="wechat" column="wechat" jdbcType="VARCHAR"/>
             <result property="twitter" column="twitter" jdbcType="VARCHAR"/>
-            <result property="balance" column="balance" jdbcType="BIGINT"/>
+            <result property="balance" column="balance" jdbcType="DOUBLE"/>
     </resultMap>
 
     <sql id="Base_Column_List">

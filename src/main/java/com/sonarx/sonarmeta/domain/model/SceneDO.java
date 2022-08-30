@@ -74,12 +74,12 @@ public class SceneDO implements Serializable {
     /**
      * 体验费用
      */
-    private Long divePrice;
+    private Double divePrice;
 
     /**
      * 场景NFT费用
      */
-    private Long tokenPrice;
+    private Double tokenPrice;
 
     /**
      * 对应NFT TokenId

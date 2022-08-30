@@ -35,9 +35,9 @@ public class EditSceneForm {
 
     private Integer tokenFlag;
 
-    private Long divePrice;
+    private Double divePrice;
 
-    private Long tokenPrice;
+    private Double tokenPrice;
 
 
 }

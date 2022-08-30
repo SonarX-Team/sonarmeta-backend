@@ -84,12 +84,12 @@ public class ModelDO implements Serializable {
     /**
      * 借用费用
      */
-    private Long grantPrice;
+    private Double grantPrice;
 
     /**
      * 模型NFT费用
      */
-    private Long tokenPrice;
+    private Double tokenPrice;
 
     /**
      * 对应NFT TokenId

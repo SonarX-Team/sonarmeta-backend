@@ -130,12 +130,7 @@ public class WorksServiceImpl implements WorksService {
     }
 
     @Override
-    public Map<Integer, List<WorksView>> getWorksByUserAddress(String userAddress) throws BusinessException {
-
-        UserDO userDO = userMapper.selectById(userAddress);
-        if (userDO == null) {
-            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
-        }
+    public Map<Integer, List<WorksView>> getWorksByUserAddress(String address1, String address2) throws BusinessException {
 
         Map<Integer, List<WorksView>> res = new HashMap<>();
         List<WorksView> createModelList = new LinkedList<>();
@@ -145,28 +140,37 @@ public class WorksServiceImpl implements WorksService {
         List<WorksView> ownSceneList = new LinkedList<>();
         List<WorksView> diveSceneList = new LinkedList<>();
 
+        UserDO userDO1 = userMapper.selectById(address1);
+        UserDO userDO2 = userMapper.selectById(address2);
+        if (userDO2 == null || userDO1 == null) {
+            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
+        }
+
+        //是否是当前登陆的用户
+        boolean isCurrentUser = address1.equals(address2);
+
         // 根据user address查询用户models
         QueryWrapper<UserModelOwnershipRelationDO> userModelOwnershipRelationDOQueryWrapper = new QueryWrapper<>();
-        userModelOwnershipRelationDOQueryWrapper.eq("address", userAddress);
+        userModelOwnershipRelationDOQueryWrapper.eq("address", address2);
         List<UserModelOwnershipRelationDO> userModelOwnershipRelationDOS = userModelOwnershipRelationMapper.selectList(userModelOwnershipRelationDOQueryWrapper);
         if (userModelOwnershipRelationDOS != null) {
             for (UserModelOwnershipRelationDO userModelOwnershipRelationDO : userModelOwnershipRelationDOS) {
+                ModelDO modelDO = modelMapper.selectById(userModelOwnershipRelationDO.getModelId());
+                if (modelDO == null) {break;}
+                boolean isPublished =  modelDO.getStatus().equals(ModelStatusEnum.MODEL_STATUS_PASSED.getStatusCode());
                 if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_CREATOR.getCode())) {
-                    ModelDO modelDO = modelMapper.selectById(userModelOwnershipRelationDO.getModelId());
-                    if (modelDO != null) {
-                        createModelList.add(getWorksFromModel(modelDO, userDO));
+                    if (isCurrentUser || isPublished) {
+                        createModelList.add(getWorksFromModel(modelDO, userDO2));
                     }
                 }
                 if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_OWNER.getCode())) {
-                    ModelDO modelDO = modelMapper.selectById(userModelOwnershipRelationDO.getModelId());
-                    if (modelDO != null) {
-                        ownModelList.add(getWorksFromModel(modelDO, userDO));
+                    if (isCurrentUser || isPublished) {
+                        ownModelList.add(getWorksFromModel(modelDO, userDO2));
                     }
                 }
                 if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_GRANTOR.getCode())) {
-                    ModelDO modelDO = modelMapper.selectById(userModelOwnershipRelationDO.getModelId());
-                    if (modelDO != null) {
-                        grantModelList.add(getWorksFromModel(modelDO, userDO));
+                    if (isCurrentUser || isPublished) {
+                        grantModelList.add(getWorksFromModel(modelDO, userDO2));
                     }
                 }
             }
@@ -174,30 +178,31 @@ public class WorksServiceImpl implements WorksService {
 
         // 根据user address查询用户scenes
         QueryWrapper<UserSceneOwnershipRelationDO> userSceneOwnershipRelationDOQueryWrapper = new QueryWrapper<>();
-        userSceneOwnershipRelationDOQueryWrapper.eq("address", userAddress);
+        userSceneOwnershipRelationDOQueryWrapper.eq("address", address2);
         List<UserSceneOwnershipRelationDO> userSceneOwnershipRelationDOS = userSceneOwnershipRelationMapper.selectList(userSceneOwnershipRelationDOQueryWrapper);
         if (userSceneOwnershipRelationDOS != null) {
             for (UserSceneOwnershipRelationDO userSceneOwnershipRelationDO : userSceneOwnershipRelationDOS) {
+                SceneDO sceneDO = sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId());
+                if (sceneDO == null) {break;}
+                boolean isPublished =  sceneDO.getStatus().equals(ModelStatusEnum.MODEL_STATUS_PASSED.getStatusCode());
                 if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_CREATOR.getCode())) {
-                    SceneDO sceneDO = sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId());
-                    if (sceneDO != null) {
-                        createSceneList.add(getWorksFromScene(sceneDO, userDO));
+                    if (isCurrentUser || isPublished) {
+                        createSceneList.add(getWorksFromScene(sceneDO, userDO2));
                     }
                 }
                 if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_OWNER.getCode())) {
-                    SceneDO sceneDO = sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId());
-                    if (sceneDO != null) {
-                        ownSceneList.add(getWorksFromScene(sceneDO, userDO));
+                    if (isCurrentUser || isPublished) {
+                        ownSceneList.add(getWorksFromScene(sceneDO, userDO2));
                     }
                 }
                 if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_DIVER.getCode())) {
-                    SceneDO sceneDO = sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId());
-                    if (sceneDO != null) {
-                        diveSceneList.add(getWorksFromScene(sceneDO, userDO));
+                    if (isCurrentUser || isPublished) {
+                        diveSceneList.add(getWorksFromScene(sceneDO, userDO2));
                     }
                 }
             }
         }
+
         res.put(OwnershipTypeEnum.MODEL_CREATOR.getCode(), createModelList);
         res.put(OwnershipTypeEnum.MODEL_OWNER.getCode(), ownModelList);
         res.put(OwnershipTypeEnum.MODEL_GRANTOR.getCode(), grantModelList);
