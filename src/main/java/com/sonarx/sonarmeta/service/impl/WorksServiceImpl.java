@@ -2,23 +2,17 @@ package com.sonarx.sonarmeta.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sonarx.sonarmeta.domain.enums.ModelStatusEnum;
-import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
-import com.sonarx.sonarmeta.domain.enums.SceneStatusEnum;
-import com.sonarx.sonarmeta.domain.enums.WorksTypeEnum;
+import com.sonarx.sonarmeta.common.BusinessException;
+import com.sonarx.sonarmeta.domain.enums.*;
 import com.sonarx.sonarmeta.domain.common.PageWrapper;
 import com.sonarx.sonarmeta.domain.common.PageParam;
-import com.sonarx.sonarmeta.domain.model.ModelDO;
-import com.sonarx.sonarmeta.domain.model.SceneDO;
-import com.sonarx.sonarmeta.domain.model.UserModelOwnershipRelationDO;
-import com.sonarx.sonarmeta.domain.model.UserSceneOwnershipRelationDO;
+import com.sonarx.sonarmeta.domain.model.*;
 import com.sonarx.sonarmeta.domain.query.AllWorksListQuery;
 import com.sonarx.sonarmeta.domain.query.SearchWorksListQuery;
 import com.sonarx.sonarmeta.domain.view.WorksView;
-import com.sonarx.sonarmeta.mapper.ModelMapper;
-import com.sonarx.sonarmeta.mapper.SceneMapper;
-import com.sonarx.sonarmeta.mapper.UserModelOwnershipRelationMapper;
-import com.sonarx.sonarmeta.mapper.UserSceneOwnershipRelationMapper;
+import com.sonarx.sonarmeta.mapper.*;
+import com.sonarx.sonarmeta.service.ModelService;
+import com.sonarx.sonarmeta.service.SceneService;
 import com.sonarx.sonarmeta.service.WorksService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -39,6 +33,9 @@ import java.util.Map;
 public class WorksServiceImpl implements WorksService {
 
     @Resource
+    UserMapper userMapper;
+
+    @Resource
     ModelMapper modelMapper;
 
     @Resource
@@ -49,6 +46,12 @@ public class WorksServiceImpl implements WorksService {
 
     @Resource
     UserSceneOwnershipRelationMapper userSceneOwnershipRelationMapper;
+
+    @Resource
+    ModelService modelService;
+
+    @Resource
+    SceneService sceneService;
 
     @Override
     public PageWrapper<WorksView> getWorksList(AllWorksListQuery query) {
@@ -62,7 +65,9 @@ public class WorksServiceImpl implements WorksService {
         qw1.eq("status", ModelStatusEnum.MODEL_STATUS_PASSED.getStatusCode());
         Page<ModelDO> models = modelMapper.selectPage(pageSelector1, qw1);
         models.getRecords().forEach(modelDO -> {
-            result.add(getWorksFromModel(modelDO));
+            UserModelOwnershipRelationDO modelOwnRelation = modelService.getModelOwnRelation(modelDO.getId());
+            UserDO userDO = userMapper.selectById(modelOwnRelation.getAddress());
+            result.add(getWorksFromModel(modelDO, userDO));
         });
 
         // 获取Scenes
@@ -71,7 +76,9 @@ public class WorksServiceImpl implements WorksService {
         qw2.eq("status", SceneStatusEnum.SCENE_STATUS_PASSED.getStatusCode());
         Page<SceneDO> scenes = sceneMapper.selectPage(pageSelector2, qw2);
         scenes.getRecords().forEach(sceneDO -> {
-            result.add(getWorksFromScene(sceneDO));
+            UserSceneOwnershipRelationDO sceneOwnershipRelationDO = sceneService.getUserSceneRelation(sceneDO.getId());
+            UserDO userDO = userMapper.selectById(sceneOwnershipRelationDO.getAddress());
+            result.add(getWorksFromScene(sceneDO, userDO));
         });
 
         return new PageWrapper<>(query.getPage(), query.getPageSize(), result.size(), result);
@@ -96,7 +103,9 @@ public class WorksServiceImpl implements WorksService {
                 });
         Page<ModelDO> models = modelMapper.selectPage(pageSelector1, qw1);
         models.getRecords().forEach(modelDO -> {
-            result.add(getWorksFromModel(modelDO));
+            UserModelOwnershipRelationDO modelOwnRelation = modelService.getModelOwnRelation(modelDO.getId());
+            UserDO userDO = userMapper.selectById(modelOwnRelation.getAddress());
+            result.add(getWorksFromModel(modelDO, userDO));
         });
 
         // 获取Scenes
@@ -112,14 +121,21 @@ public class WorksServiceImpl implements WorksService {
                 });
         Page<SceneDO> scenes = sceneMapper.selectPage(pageSelector2, qw2);
         scenes.getRecords().forEach(sceneDO -> {
-            result.add(getWorksFromScene(sceneDO));
+            UserSceneOwnershipRelationDO sceneOwnershipRelationDO = sceneService.getUserSceneRelation(sceneDO.getId());
+            UserDO userDO = userMapper.selectById(sceneOwnershipRelationDO.getAddress());
+            result.add(getWorksFromScene(sceneDO, userDO));
         });
 
         return new PageWrapper<>(query.getPage(), query.getPageSize(), result.size(), result);
     }
 
     @Override
-    public Map<Integer, List<WorksView>> getWorksByUserAddress(String userAddress) {
+    public Map<Integer, List<WorksView>> getWorksByUserAddress(String userAddress) throws BusinessException {
+
+        UserDO userDO = userMapper.selectById(userAddress);
+        if (userDO == null) {
+            throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
+        }
 
         Map<Integer, List<WorksView>> res = new HashMap<>();
         List<WorksView> createModelList = new LinkedList<>();
@@ -136,13 +152,22 @@ public class WorksServiceImpl implements WorksService {
         if (userModelOwnershipRelationDOS != null) {
             for (UserModelOwnershipRelationDO userModelOwnershipRelationDO : userModelOwnershipRelationDOS) {
                 if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_CREATOR.getCode())) {
-                    createModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+                    ModelDO modelDO = modelMapper.selectById(userModelOwnershipRelationDO.getModelId());
+                    if (modelDO != null) {
+                        createModelList.add(getWorksFromModel(modelDO, userDO));
+                    }
                 }
                 if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_OWNER.getCode())) {
-                    ownModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+                    ModelDO modelDO = modelMapper.selectById(userModelOwnershipRelationDO.getModelId());
+                    if (modelDO != null) {
+                        ownModelList.add(getWorksFromModel(modelDO, userDO));
+                    }
                 }
                 if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_GRANTOR.getCode())) {
-                    grantModelList.add(getWorksFromModel(modelMapper.selectById(userModelOwnershipRelationDO.getModelId())));
+                    ModelDO modelDO = modelMapper.selectById(userModelOwnershipRelationDO.getModelId());
+                    if (modelDO != null) {
+                        grantModelList.add(getWorksFromModel(modelDO, userDO));
+                    }
                 }
             }
         }
@@ -154,13 +179,22 @@ public class WorksServiceImpl implements WorksService {
         if (userSceneOwnershipRelationDOS != null) {
             for (UserSceneOwnershipRelationDO userSceneOwnershipRelationDO : userSceneOwnershipRelationDOS) {
                 if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_CREATOR.getCode())) {
-                    createSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+                    SceneDO sceneDO = sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId());
+                    if (sceneDO != null) {
+                        createSceneList.add(getWorksFromScene(sceneDO, userDO));
+                    }
                 }
                 if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_OWNER.getCode())) {
-                    ownSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+                    SceneDO sceneDO = sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId());
+                    if (sceneDO != null) {
+                        ownSceneList.add(getWorksFromScene(sceneDO, userDO));
+                    }
                 }
                 if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_DIVER.getCode())) {
-                    diveSceneList.add(getWorksFromScene(sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId())));
+                    SceneDO sceneDO = sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId());
+                    if (sceneDO != null) {
+                        diveSceneList.add(getWorksFromScene(sceneDO, userDO));
+                    }
                 }
             }
         }
@@ -174,16 +208,28 @@ public class WorksServiceImpl implements WorksService {
 
     }
 
-    private WorksView getWorksFromScene(SceneDO sceneDO) {
+    private WorksView getWorksFromScene(SceneDO sceneDO, UserDO userDO) {
         WorksView worksView = new WorksView();
-        BeanUtils.copyProperties(sceneDO, worksView);
+        worksView.setCover(sceneDO.getCover());
+        worksView.setCreateTime(sceneDO.getCreateTime());
+        worksView.setPrice(sceneDO.getDivePrice());
+        worksView.setId(sceneDO.getId());
+        worksView.setTitle(sceneDO.getTitle());
+        worksView.setAvatar(userDO.getAvatar());
+        worksView.setUsername(userDO.getUsername());
         worksView.setWorksType(WorksTypeEnum.WORKS_SCENE.getCode());
         return worksView;
     }
 
-    private WorksView getWorksFromModel(ModelDO modelDO) {
+    private WorksView getWorksFromModel(ModelDO modelDO, UserDO userDO) {
         WorksView worksView = new WorksView();
-        BeanUtils.copyProperties(modelDO, worksView);
+        worksView.setCover(modelDO.getCover());
+        worksView.setCreateTime(modelDO.getCreateTime());
+        worksView.setPrice(modelDO.getGrantPrice());
+        worksView.setId(modelDO.getId());
+        worksView.setTitle(modelDO.getTitle());
+        worksView.setAvatar(userDO.getAvatar());
+        worksView.setUsername(userDO.getUsername());
         worksView.setWorksType(WorksTypeEnum.WORKS_MODEL.getCode());
         return worksView;
     }
