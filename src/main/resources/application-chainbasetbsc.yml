@@ -1,4 +1,5 @@
 web3j:
+  chainId: 97
   rpc-url: https://bsc-testnet.s.chainbase.online/v1/2DlNmx0PiuN6Ww9iyS1qxY67AmO
   #  No '0x' prefix
   contracts:

@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @ApiModel("编辑模型信息Form")
 public class EditModelForm {
 
-    @NotNull(message = "用户不能为空")
+    @NotBlank(message = "用户不能为空")
     @ApiModelProperty(value = "发起创建请求的用户地址")
     private String userAddress;
 

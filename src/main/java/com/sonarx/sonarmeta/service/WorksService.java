@@ -1,5 +1,6 @@
 package com.sonarx.sonarmeta.service;
 
+import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.common.PageWrapper;
 import com.sonarx.sonarmeta.domain.query.AllWorksListQuery;
 import com.sonarx.sonarmeta.domain.query.SearchWorksListQuery;
@@ -13,5 +14,5 @@ public interface WorksService {
 
     PageWrapper<WorksView> searchWorksList(SearchWorksListQuery query);
 
-    Map<Integer, List<WorksView>> getWorksByUserAddress(String userAddress);
+    Map<Integer, List<WorksView>> getWorksByUserAddress(String userAddress) throws BusinessException;
 }

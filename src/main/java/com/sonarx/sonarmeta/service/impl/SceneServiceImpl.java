@@ -170,6 +170,15 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
 
     }
 
+    @Override
+    public UserSceneOwnershipRelationDO getUserSceneRelation(Long id) {
+        return userSceneOwnershipRelationMapper.selectOne(
+                new QueryWrapper<UserSceneOwnershipRelationDO>()
+                        .eq("scene_id", id)
+                        .eq("ownership_type", OwnershipTypeEnum.SCENE_OWNER.getCode())
+        );
+    }
+
     public void addUserSceneOwnershipRelation(String userAddress, Long sceneId, OwnershipTypeEnum ownershipType) throws BusinessException {
         QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("address",userAddress)

@@ -33,11 +33,11 @@ public class SceneController {
     @ApiOperation(value = "创建场景作品")
     @RequestMapping(value = "/create", method = {RequestMethod.POST})
     public HttpResult createScene(@RequestBody @Validated CreateSceneForm createSceneForm) {
-        SceneDO sceneDO = null;
+        SceneDO sceneDO;
         try {
             sceneDO = sceneService.createSceneWithForm(createSceneForm);
         } catch (BusinessException e) {
-            HttpResult.errorResult(e.getMessage());
+            return HttpResult.errorResult(e.getMessage());
         }
         return  HttpResult.successResult(sceneDO);
     }
@@ -46,11 +46,11 @@ public class SceneController {
     @ApiOperation(value = "编辑场景作品")
     @RequestMapping(value = "/edit", method = {RequestMethod.POST})
     public HttpResult editScene(@RequestBody @Validated EditSceneForm editSceneForm) {
-        SceneDO sceneDO = null;
+        SceneDO sceneDO;
         try {
             sceneDO = sceneService.editSceneWithForm(editSceneForm);
         } catch (BusinessException e) {
-            HttpResult.errorResult(e.getMessage());
+            return HttpResult.errorResult(e.getMessage());
         }
         return  HttpResult.successResult(sceneDO);
     }

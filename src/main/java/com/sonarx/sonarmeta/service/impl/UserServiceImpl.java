@@ -175,7 +175,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         user.setWechat(form.getWechat());
         user.setTwitter(form.getTwitter());
         user.setBalance(form.getBalance());
-        int affectCount = userMapper.insert(user);
+        int affectCount = userMapper.updateById(user);
         if (affectCount > 0) {
             log.info("插入用户信息成功，钱包地址：{}", user.getAddress());
             user = userMapper.selectById(user.getAddress());

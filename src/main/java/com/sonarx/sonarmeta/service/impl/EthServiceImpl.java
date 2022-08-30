@@ -47,6 +47,9 @@ public class EthServiceImpl implements Web3Service {
     @Resource
     Web3j web3j;
 
+    @Value("${web3j.chainId}")
+    private Long chainId;
+
     @Value("${web3j.contracts.main}")
     private String mainContract;
 
@@ -369,7 +372,7 @@ public class EthServiceImpl implements Web3Service {
         Function function = new Function(methodName, inputParameters, outputParameters);
         String data = FunctionEncoder.encode(function);
         try {
-            TransactionManager transactionManager = new FastRawTransactionManager(web3j, credentials);
+            TransactionManager transactionManager = new FastRawTransactionManager(web3j, credentials, chainId);
             EthSendTransaction sendTransaction = transactionManager.sendTransaction(BigInteger.valueOf(20000000000L), BigInteger.valueOf(6700000),
                     contractAddress, data, BigInteger.ZERO);
             String txHash = sendTransaction.getTransactionHash();

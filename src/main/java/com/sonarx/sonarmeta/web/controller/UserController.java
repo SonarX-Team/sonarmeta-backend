@@ -61,7 +61,13 @@ public class UserController {
     @ApiOperation(value = "获取用户个人空间作品列表")
     @RequestMapping(value = "/workslist", method = {RequestMethod.GET})
     public HttpResult<Map<Integer, List<WorksView>>> getUserWorksList(@RequestParam(value = "userAddress") String userAddress) {
-        return HttpResult.successResult(worksService.getWorksByUserAddress(userAddress));
+        Map<Integer, List<WorksView>> res;
+        try {
+            res = worksService.getWorksByUserAddress(userAddress);
+        } catch (BusinessException e) {
+            return HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(res);
     }
 
     @ApiOperation(value = "用户消费行为")
