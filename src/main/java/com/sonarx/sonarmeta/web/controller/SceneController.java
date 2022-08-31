@@ -58,7 +58,13 @@ public class SceneController {
     @ApiOperation(value = "获取场景作品")
     @RequestMapping(value = "/get", method = {RequestMethod.GET})
     public HttpResult<SceneView> getScene(@RequestParam(value = "sceneId") Long sceneId) {
-        return  HttpResult.successResult(sceneService.getScene(sceneId));
+        SceneView scene;
+        try {
+            scene = sceneService.getScene(sceneId);
+        } catch (BusinessException e) {
+            return HttpResult.errorResult(e.getMessage());
+        }
+        return  HttpResult.successResult(scene);
     }
 
 }

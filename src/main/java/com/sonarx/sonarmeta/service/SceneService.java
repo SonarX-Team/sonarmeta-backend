@@ -20,7 +20,7 @@ public interface SceneService extends IService<SceneDO> {
 
     SceneDO editSceneWithForm(EditSceneForm form) throws BusinessException;
 
-    SceneView getScene(Long sceneId);
+    SceneView getScene(Long sceneId) throws BusinessException;
 
     void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation) throws BusinessException;
 

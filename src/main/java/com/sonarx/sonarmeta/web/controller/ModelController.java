@@ -5,6 +5,7 @@ import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.domain.form.CreateModelForm;
 import com.sonarx.sonarmeta.domain.form.EditModelForm;
 import com.sonarx.sonarmeta.domain.model.*;
+import com.sonarx.sonarmeta.domain.view.ModelView;
 import com.sonarx.sonarmeta.service.ModelService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -13,6 +14,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+
+import java.util.Map;
 
 import static com.sonarx.sonarmeta.common.Constants.API_PREFIX;
 
@@ -54,16 +57,28 @@ public class ModelController {
 
     }
 
-    @ApiOperation(value = "获取模型信息")
+    @ApiOperation(value = "获取模型视图")
     @RequestMapping(value = "/get", method = {RequestMethod.GET})
-    public HttpResult<ModelDO> getModel(@RequestParam(value = "modelId") Long modelId) {
-        return HttpResult.successResult(modelService.getModelById(modelId));
+    public HttpResult<ModelView> getModel(@RequestParam(value = "modelId") Long modelId) {
+        ModelView modelView;
+        try {
+            modelView = modelService.getModelViewById(modelId);
+        } catch (BusinessException e) {
+            return HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(modelView);
     }
 
-    @ApiOperation(value = "获取模型基本设置")
-    @RequestMapping(value = "/basic", method = {RequestMethod.GET})
-    public HttpResult<ModelBasicSettingsDO> getModelBasicSettings(@RequestParam(value = "modelId") Long modelId) {
-        return HttpResult.successResult(modelService.getModelBasicSettings(modelId));
+    @ApiOperation(value = "获取模型详细设置")
+    @RequestMapping(value = "/detail", method = {RequestMethod.GET})
+    public HttpResult<Map<String, Object>> getModelDetailSettings(@RequestParam(value = "modelId") Long modelId) {
+        Map<String, Object> res;
+        try {
+            res = modelService.getModelDetailSettings(modelId);
+        } catch (BusinessException e) {
+            return HttpResult.errorResult(e.getMessage());
+        }
+        return HttpResult.successResult(res);
     }
 
 
@@ -80,13 +95,6 @@ public class ModelController {
     }
 
 
-    @ApiOperation(value = "获取模型光线设置")
-    @RequestMapping(value = "/light", method = {RequestMethod.GET})
-    public HttpResult<ModelLightSettingsDO> getModelLightSettings(@RequestParam(value = "modelId") Long modelId) {
-        return HttpResult.successResult(modelService.getModelLightSettings(modelId));
-    }
-
-
     @ApiOperation(value = "编辑模型光线设置")
     @RequestMapping(value = "/light/edit", method = {RequestMethod.POST})
     public HttpResult<ModelLightSettingsDO> editModelLightSettings(@RequestBody ModelLightSettingsDO modelLightSettingsDO) {
@@ -97,13 +105,6 @@ public class ModelController {
             return HttpResult.errorResult(e.getMessage());
         }
         return HttpResult.successResult(res);
-    }
-
-
-    @ApiOperation(value = "获取模型材料设置")
-    @RequestMapping(value = "/material", method = {RequestMethod.GET})
-    public HttpResult<ModelMaterialSettingsDO> getModelMaterialSettings(@RequestParam(value = "modelId") Long modelId) {
-        return HttpResult.successResult(modelService.getModelMaterialSettings(modelId));
     }
 
 
@@ -119,12 +120,6 @@ public class ModelController {
         return HttpResult.successResult(res);
     }
 
-
-    @ApiOperation(value = "获取模型后期设置")
-    @RequestMapping(value = "/postprocessing", method = {RequestMethod.GET})
-    public HttpResult<ModelPostprocessingSettingsDO> getModelPostProcessingSettings(@RequestParam(value = "modelId") Long modelId) {
-        return HttpResult.successResult(modelService.getModelPostProcessingSettings(modelId));
-    }
 
 
     @ApiOperation(value = "编辑模型后期设置")

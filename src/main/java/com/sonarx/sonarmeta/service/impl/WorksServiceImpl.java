@@ -223,6 +223,7 @@ public class WorksServiceImpl implements WorksService {
         worksView.setAvatar(userDO.getAvatar());
         worksView.setUsername(userDO.getUsername());
         worksView.setWorksType(WorksTypeEnum.WORKS_SCENE.getCode());
+        worksView.setUserAddress(userDO.getAddress());
         return worksView;
     }
 
@@ -236,6 +237,7 @@ public class WorksServiceImpl implements WorksService {
         worksView.setAvatar(userDO.getAvatar());
         worksView.setUsername(userDO.getUsername());
         worksView.setWorksType(WorksTypeEnum.WORKS_MODEL.getCode());
+        worksView.setUserAddress(userDO.getAddress());
         return worksView;
     }
 }

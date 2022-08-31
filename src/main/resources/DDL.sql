@@ -176,7 +176,7 @@ create table `sonarmeta`.`t_model_postprocessing_settings`
 (
     id                          bigint auto_increment,
     model_id                    bigint       not null,
-    switch                      tinyint(1)   not null,
+    postprocessing_switch       tinyint(1)   not null,
     ssao_switch                 tinyint(1)   not null,
     ssao_radius                 varchar(255) not null,
     ssao_intensity              varchar(255) not null,

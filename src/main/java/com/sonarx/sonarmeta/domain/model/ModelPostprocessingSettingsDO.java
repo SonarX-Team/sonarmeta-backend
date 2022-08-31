@@ -28,7 +28,7 @@ public class ModelPostprocessingSettingsDO implements Serializable {
     /**
      * 
      */
-    private Integer _switch;
+    private Integer postProcessingSwitch;
 
     /**
      * 

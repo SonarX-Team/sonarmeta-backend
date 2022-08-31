@@ -6,6 +6,9 @@ import com.sonarx.sonarmeta.domain.form.CreateModelForm;
 import com.sonarx.sonarmeta.domain.form.EditModelForm;
 import com.sonarx.sonarmeta.domain.model.*;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.sonarx.sonarmeta.domain.view.ModelView;
+
+import java.util.Map;
 
 /**
 * @author hinsliu
@@ -18,21 +21,17 @@ public interface ModelService extends IService<ModelDO> {
 
     ModelDO editModelWithForm(EditModelForm form) throws BusinessException;
 
-    ModelDO getModelById(Long id);
+    ModelDO getModelById(Long id) throws BusinessException;
 
-    ModelBasicSettingsDO getModelBasicSettings(Long modelId);
+    ModelView getModelViewById(Long id) throws BusinessException;
 
     ModelBasicSettingsDO editModelBasicSettings(ModelBasicSettingsDO modelBasicSettingsDO) throws BusinessException;
 
-    ModelLightSettingsDO getModelLightSettings(Long modelId);
+    Map<String, Object> getModelDetailSettings(Long modelId) throws BusinessException;
 
     ModelLightSettingsDO editModelLightSettings(ModelLightSettingsDO modelLightSettingsDO) throws BusinessException;
 
-    ModelMaterialSettingsDO getModelMaterialSettings(Long modelId);
-
     ModelMaterialSettingsDO editModelMaterialSettings(ModelMaterialSettingsDO modelMaterialSettingsDO) throws BusinessException;
-
-    ModelPostprocessingSettingsDO getModelPostProcessingSettings(Long modelId);
 
     ModelPostprocessingSettingsDO editModelPostprocessingSettings(ModelPostprocessingSettingsDO modelPostprocessingSettingsDO) throws BusinessException;
 
@@ -40,7 +39,7 @@ public interface ModelService extends IService<ModelDO> {
 
     void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation) throws BusinessException;
 
-    UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(String userAddress, Long id);
+    UserDO getModelTargetUser(Long modelId, Integer ownership) throws BusinessException;
 
     UserModelOwnershipRelationDO getModelOwnRelation(Long id);
 }

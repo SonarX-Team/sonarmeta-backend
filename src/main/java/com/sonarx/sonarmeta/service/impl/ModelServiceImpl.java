@@ -10,6 +10,7 @@ import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.CreateModelForm;
 import com.sonarx.sonarmeta.domain.form.EditModelForm;
 import com.sonarx.sonarmeta.domain.model.*;
+import com.sonarx.sonarmeta.domain.view.ModelView;
 import com.sonarx.sonarmeta.mapper.*;
 import com.sonarx.sonarmeta.service.ModelService;
 import com.sonarx.sonarmeta.service.UserService;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author hinsliu
@@ -84,7 +87,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     @Transactional
     public ModelDO editModelWithForm(EditModelForm form) throws BusinessException {
         QueryWrapper<UserModelOwnershipRelationDO> qw = new QueryWrapper<>();
-        qw.eq("address", form.getUserAddress()).eq("model_id", form.getId());
+        qw.eq("address", form.getUserAddress()).eq("model_id", form.getId()).eq("ownership_type",OwnershipTypeEnum.MODEL_OWNER.getCode());
         UserModelOwnershipRelationDO relation = userModelOwnershipRelationMapper.selectOne(qw);
         if (relation == null) {
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
@@ -100,23 +103,44 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public ModelDO getModelById(Long id) {
-        return modelMapper.selectById(id);
+    public ModelDO getModelById(Long id) throws BusinessException {
+        ModelDO modelDO = modelMapper.selectById(id);
+        if (modelDO == null) {
+            throw new BusinessException(BusinessError.MODEL_NOT_EXIST);
+        }
+        return modelDO;
     }
 
     @Override
-    public ModelBasicSettingsDO getModelBasicSettings(Long modelId) {
-        QueryWrapper<ModelBasicSettingsDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("model_id", modelId);
-        return modelBasicSettingsMapper.selectOne(queryWrapper);
+    public ModelView getModelViewById(Long id) throws BusinessException {
+        ModelView modelView = new ModelView();
+        ModelDO modelDO = modelMapper.selectById(id);
+        if (modelDO == null) {
+            throw new BusinessException(BusinessError.MODEL_NOT_EXIST);
+        }
+        BeanUtils.copyProperties(modelDO, modelView);
+
+        UserDO owner = getModelTargetUser(id, OwnershipTypeEnum.MODEL_OWNER.getCode());
+        modelView.setOwnerAvatar(owner.getAvatar());
+        modelView.setOwnerUsername(owner.getUsername());
+        modelView.setOwnerAddress(owner.getAddress());
+
+        UserDO creator = getModelTargetUser(id, OwnershipTypeEnum.MODEL_CREATOR.getCode());
+        modelView.setCreatorAvatar(creator.getAvatar());
+        modelView.setCreatorUsername(creator.getUsername());
+        modelView.setCreatorAddress(creator.getAddress());
+        return modelView;
+
     }
+
 
     @Override
     public ModelBasicSettingsDO editModelBasicSettings(ModelBasicSettingsDO modelBasicSettingsDO) throws BusinessException {
         QueryWrapper<ModelBasicSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelBasicSettingsDO.getModelId());
         if (modelBasicSettingsMapper.selectOne(queryWrapper) == null) {
-            throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
+            modelBasicSettingsMapper.insert(modelBasicSettingsDO);
+            return modelBasicSettingsDO;
         }
         UpdateWrapper<ModelBasicSettingsDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("model_id", modelBasicSettingsDO.getModelId());
@@ -129,18 +153,42 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public ModelLightSettingsDO getModelLightSettings(Long modelId) {
-        QueryWrapper<ModelLightSettingsDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("model_id", modelId);
-        return modelLightSettingsMapper.selectOne(queryWrapper);
+    public Map<String, Object> getModelDetailSettings(Long modelId) throws BusinessException {
+
+        ModelDO modelDO = modelMapper.selectById(modelId);
+        if (modelDO == null) {
+            throw new BusinessException(BusinessError.MODEL_NOT_EXIST);
+        }
+
+        Map<String, Object> map = new HashMap<>();
+
+        QueryWrapper<ModelBasicSettingsDO> qw1 = new QueryWrapper<>();
+        qw1.eq("model_id", modelId);
+        map.put("ModelBasicSetting", modelBasicSettingsMapper.selectOne(qw1));
+
+        QueryWrapper<ModelLightSettingsDO> qw2 = new QueryWrapper<>();
+        qw2.eq("model_id", modelId);
+        map.put("ModelLightSetting", modelLightSettingsMapper.selectOne(qw2));
+
+        QueryWrapper<ModelMaterialSettingsDO> qw3 = new QueryWrapper<>();
+        qw3.eq("model_id", modelId);
+        map.put("ModelMaterialSetting", modelMaterialSettingsMapper.selectOne(qw3));
+
+        QueryWrapper<ModelPostprocessingSettingsDO> qw4 = new QueryWrapper<>();
+        qw4.eq("model_id", modelId);
+        map.put("ModelPostprocessingSetting", modelPostprocessingSettingsMapper.selectOne(qw4));
+
+        return map;
     }
+
 
     @Override
     public ModelLightSettingsDO editModelLightSettings(ModelLightSettingsDO modelLightSettingsDO) throws BusinessException {
         QueryWrapper<ModelLightSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelLightSettingsDO.getModelId());
         if (modelLightSettingsMapper.selectOne(queryWrapper) == null) {
-            throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
+           modelLightSettingsMapper.insert(modelLightSettingsDO);
+           return modelLightSettingsDO;
         }
         UpdateWrapper<ModelLightSettingsDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("model_id", modelLightSettingsDO.getModelId());
@@ -152,19 +200,14 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         return modelLightSettingsDO;
     }
 
-    @Override
-    public ModelMaterialSettingsDO getModelMaterialSettings(Long modelId) {
-        QueryWrapper<ModelMaterialSettingsDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("model_id", modelId);
-        return modelMaterialSettingsMapper.selectOne(queryWrapper);
-    }
 
     @Override
     public ModelMaterialSettingsDO editModelMaterialSettings(ModelMaterialSettingsDO modelMaterialSettingsDO) throws BusinessException {
         QueryWrapper<ModelMaterialSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelMaterialSettingsDO.getModelId());
         if (modelMaterialSettingsMapper.selectOne(queryWrapper) == null) {
-            throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
+            modelMaterialSettingsMapper.insert(modelMaterialSettingsDO);
+            return modelMaterialSettingsDO;
         }
         UpdateWrapper<ModelMaterialSettingsDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("model_id", modelMaterialSettingsDO.getModelId());
@@ -176,19 +219,14 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         return modelMaterialSettingsDO;
     }
 
-    @Override
-    public ModelPostprocessingSettingsDO getModelPostProcessingSettings(Long modelId) {
-        QueryWrapper<ModelPostprocessingSettingsDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("model_id", modelId);
-        return modelPostprocessingSettingsMapper.selectOne(queryWrapper);
-    }
 
     @Override
     public ModelPostprocessingSettingsDO editModelPostprocessingSettings(ModelPostprocessingSettingsDO modelPostprocessingSettingsDO) throws BusinessException {
         QueryWrapper<ModelPostprocessingSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelPostprocessingSettingsDO.getModelId());
         if (modelPostprocessingSettingsMapper.selectOne(queryWrapper) == null) {
-            throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
+            modelPostprocessingSettingsMapper.insert(modelPostprocessingSettingsDO);
+            return modelPostprocessingSettingsDO;
         }
         UpdateWrapper<ModelPostprocessingSettingsDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("model_id", modelPostprocessingSettingsDO.getModelId());
@@ -228,12 +266,19 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public UserModelOwnershipRelationDO getOwnerShipRelationByUserAndModel(String userAddress, Long id) {
-        return userModelOwnershipRelationMapper.selectOne(
+    public UserDO getModelTargetUser(Long modelId, Integer ownership) throws BusinessException {
+        UserDO userDO = null;
+        if (modelMapper.selectById(modelId) == null) {
+            throw new BusinessException(BusinessError.MODEL_NOT_EXIST);
+        }
+        UserModelOwnershipRelationDO relationDO = userModelOwnershipRelationMapper.selectOne(
                 new QueryWrapper<UserModelOwnershipRelationDO>()
-                        .eq("model_id", id)
-                        .eq("address", userAddress)
-        );
+                        .eq("model_id", modelId)
+                        .eq("ownership_type", ownership));
+        if (relationDO != null) {
+            userDO = userService.getById(relationDO.getAddress());
+        }
+        return userDO;
     }
 
     @Override
