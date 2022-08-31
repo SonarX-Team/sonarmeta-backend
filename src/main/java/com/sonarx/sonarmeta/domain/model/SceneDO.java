@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 场景信息
@@ -14,6 +17,8 @@ import lombok.Data;
  */
 @TableName(value ="t_scene")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SceneDO implements Serializable {
     /**
      * 
@@ -69,12 +74,12 @@ public class SceneDO implements Serializable {
     /**
      * 体验费用
      */
-    private Long divePrice;
+    private Double divePrice;
 
     /**
      * 场景NFT费用
      */
-    private Long tokenPrice;
+    private Double tokenPrice;
 
     /**
      * 对应NFT TokenId
@@ -84,7 +89,6 @@ public class SceneDO implements Serializable {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
-    public SceneDO(){}
 
     public SceneDO(SceneDO sceneDO) {
         this.id = sceneDO.id;

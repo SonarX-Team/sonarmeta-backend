@@ -18,8 +18,8 @@
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="grantFlag" column="grant_flag" jdbcType="INTEGER"/>
             <result property="tokenFlag" column="token_flag" jdbcType="INTEGER"/>
-            <result property="grantPrice" column="grant_price" jdbcType="BIGINT"/>
-            <result property="tokenPrice" column="token_price" jdbcType="BIGINT"/>
+            <result property="grantPrice" column="grant_price" jdbcType="DOUBLE"/>
+            <result property="tokenPrice" column="token_price" jdbcType="DOUBLE"/>
             <result property="nftTokenId" column="nft_token_id" jdbcType="BIGINT"/>
     </resultMap>
 

@@ -69,7 +69,7 @@ public class UserDO implements Serializable {
     /**
      * 钱包余额
      */
-    private Long balance;
+    private Double balance;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

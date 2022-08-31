@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface Web3Service {
 
-    void fundTreasury(BigInteger amount) throws EthTransactionException;
+    void fundTreasury(Double amount) throws EthTransactionException;
 
-    void transferERC20UsingSonarMetaAllowance(String to, BigInteger amount) throws EthTransactionException;
+    void transferERC20UsingSonarMetaAllowance(String to, Double amount) throws EthTransactionException;
 
     void grantERC721UsingSonarMetaApproval(Long tokenId, String to) throws EthTransactionException;
 

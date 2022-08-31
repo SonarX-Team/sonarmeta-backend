@@ -69,10 +69,11 @@ public class EthServiceImpl implements Web3Service {
     private String controller2PrivateKey;
 
     @Override
-    public void fundTreasury(BigInteger amount) throws EthTransactionException {
+    public void fundTreasury(Double amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
-        inputParameters.add(new Uint256(amount));
+        BigInteger Wei = new BigDecimal(amount).multiply(new BigDecimal("1E18")).toBigInteger();
+        inputParameters.add(new Uint256(Wei));
         TransactionReceipt receipt = invokeContractWithParameters(
                 getAccountFromPrivateKey(controller1PrivateKey),
                 mainContract,
@@ -89,11 +90,12 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public void transferERC20UsingSonarMetaAllowance(String to, BigInteger amount) throws EthTransactionException {
+    public void transferERC20UsingSonarMetaAllowance(String to, Double amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
         inputParameters.add(new Address(to));
-        inputParameters.add(new Uint256(amount));
+        BigInteger Wei = new BigDecimal(amount).multiply(new BigDecimal("1E18")).toBigInteger();
+        inputParameters.add(new Uint256(Wei));
         TransactionReceipt receipt = invokeContractWithParameters(
                 getAccountFromPrivateKey(controller1PrivateKey),
                 mainContract,

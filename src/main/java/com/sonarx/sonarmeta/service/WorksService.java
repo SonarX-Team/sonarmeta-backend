@@ -14,5 +14,5 @@ public interface WorksService {
 
     PageWrapper<WorksView> searchWorksList(SearchWorksListQuery query);
 
-    Map<Integer, List<WorksView>> getWorksByUserAddress(String userAddress) throws BusinessException;
+    Map<Integer, List<WorksView>> getWorksByUserAddress(String address1, String address2) throws BusinessException;
 }

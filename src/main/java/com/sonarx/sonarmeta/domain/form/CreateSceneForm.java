@@ -41,10 +41,10 @@ public class CreateSceneForm {
     private Integer tokenFlag;
 
     @NotNull(message = "体验费用不能为空")
-    private Long divePrice;
+    private Double divePrice;
 
     @NotNull(message = "购买费用不能为空")
-    private Long tokenPrice;
+    private Double tokenPrice;
 
     @NotNull(message = "模型列表不能为空")
     private List<Long> modelIdList;

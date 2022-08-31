@@ -34,6 +34,6 @@ public class UpdateUserForm {
 
     private String twitter;
 
-    private Long balance;
+    private Double balance;
 
 }
