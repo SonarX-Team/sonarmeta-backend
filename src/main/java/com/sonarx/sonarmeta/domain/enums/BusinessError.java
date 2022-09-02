@@ -17,6 +17,10 @@ public enum BusinessError {
      * 模型/场景错误
      */
 
+    MODEL_NOT_EXIST("模型不存在"),
+
+    SCENE_NOT_EXIST("场景不存在"),
+
     CREATE_MODEL_ERROR("创建模型错误"),
 
     EDIT_MODEL_ERROR("编辑模型错误"),

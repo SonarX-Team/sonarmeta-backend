@@ -29,4 +29,6 @@ public class WorksView {
 
     private Double price;
 
+    private String userAddress;
+
 }

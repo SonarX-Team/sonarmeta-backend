@@ -64,12 +64,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Transactional
     public void consume(ConsumeActionForm form) throws BusinessException {
         Integer consumeType = form.getType();
+        UserDO modelCreator = modelService.getModelTargetUser(form.getId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
+        UserDO modelOwner = modelService.getModelTargetUser(form.getId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
+        UserDO modelGrantor = modelService.getModelTargetUser(form.getId(), OwnershipTypeEnum.MODEL_GRANTOR.getCode());
         if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_MODEL.getCode())) {
             // 购买模型
             // 获取用户和该对象的所属关系
-            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserAddress(), form.getId());
-            if (relation == null || relation.getOwnershipType().equals(OwnershipTypeEnum.MODEL_CREATOR.getCode()) || relation.getOwnershipType().equals(OwnershipTypeEnum.MODEL_OWNER.getCode())) {
-                // 所属关系不存在或者已经获得了相同或更高的权限
+            if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress())) {
+                // 创建者、拥有者不能买
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
                 // 可以进行消费，修改金额，修改模型所属关系
@@ -94,10 +96,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
             // 使用模型
             // 获取用户和该对象的所属关系
-            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserAddress(), form.getId());
-
-            if (relation == null) {
-                // 所属关系不存在或者已经获得了相同或更高的权限
+            if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress()) || form.getUserAddress().equals(modelGrantor.getAddress())) {
+                // 创建者、拥有者、授权者不能获得授权
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
                 // 可以进行消费，修改金额，修改模型所属关系

@@ -98,7 +98,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     @Transactional
     public SceneDO editSceneWithForm(EditSceneForm form) throws BusinessException {
         QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("address", form.getUserAddress()).eq("scene_id", form.getId());
+        queryWrapper.eq("address", form.getUserAddress()).eq("scene_id", form.getId()).eq("ownership_type",OwnershipTypeEnum.SCENE_OWNER.getCode());
         UserSceneOwnershipRelationDO relation = userSceneOwnershipRelationMapper.selectOne(queryWrapper);
         if (relation == null) {
             throw new BusinessException(BusinessError.EDIT_SCENE_ERROR);
@@ -116,10 +116,10 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     }
 
     @Override
-    public SceneView getScene(Long sceneId) {
+    public SceneView getScene(Long sceneId) throws BusinessException {
         SceneDO sceneDO = sceneMapper.selectById(sceneId);
         if (sceneDO == null) {
-            return null;
+            throw new BusinessException(BusinessError.SCENE_NOT_EXIST);
         }
         SceneView sceneView = new SceneView(sceneDO);
         List<ModelDO> modelList = new LinkedList<>();
