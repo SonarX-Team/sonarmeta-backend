@@ -268,9 +268,6 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     @Override
     public UserDO getModelTargetUser(Long modelId, Integer ownership) throws BusinessException {
         UserDO userDO = null;
-        if (modelMapper.selectById(modelId) == null) {
-            throw new BusinessException(BusinessError.MODEL_NOT_EXIST);
-        }
         UserModelOwnershipRelationDO relationDO = userModelOwnershipRelationMapper.selectOne(
                 new QueryWrapper<UserModelOwnershipRelationDO>()
                         .eq("model_id", modelId)

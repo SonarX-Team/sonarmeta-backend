@@ -96,7 +96,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
             // 使用模型
             // 获取用户和该对象的所属关系
-            if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress()) || form.getUserAddress().equals(modelGrantor.getAddress())) {
+            if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress()) || (modelGrantor != null && form.getUserAddress().equals(modelGrantor.getAddress()))) {
                 // 创建者、拥有者、授权者不能获得授权
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
