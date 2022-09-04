@@ -83,10 +83,10 @@ public class EthServiceImpl implements Web3Service {
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
 
-        List<Log> logs = receipt.getLogs();
-        if(logs.size() == 0) {
-            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
-        }
+//        List<Log> logs = receipt.getLogs();
+//        if(logs.size() == 0) {
+//            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+//        }
     }
 
     @Override
@@ -105,10 +105,10 @@ public class EthServiceImpl implements Web3Service {
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
 
-        List<Log> logs = receipt.getLogs();
-        if(logs.size() == 0) {
-            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
-        }
+//        List<Log> logs = receipt.getLogs();
+//        if(logs.size() == 0) {
+//            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+//        }
     }
 
     @Override
@@ -126,10 +126,10 @@ public class EthServiceImpl implements Web3Service {
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
 
-        List<Log> logs = receipt.getLogs();
-        if(logs.size() == 0) {
-            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
-        }
+//        List<Log> logs = receipt.getLogs();
+//        if(logs.size() == 0) {
+//            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+//        }
     }
 
     @Override
@@ -147,10 +147,10 @@ public class EthServiceImpl implements Web3Service {
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
 
-        List<Log> logs = receipt.getLogs();
-        if(logs.size() == 0) {
-            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
-        }
+//        List<Log> logs = receipt.getLogs();
+//        if(logs.size() == 0) {
+//            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+//        }
     }
 
     @Override

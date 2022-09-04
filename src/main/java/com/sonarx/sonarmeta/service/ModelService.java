@@ -39,7 +39,7 @@ public interface ModelService extends IService<ModelDO> {
 
     void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation) throws BusinessException;
 
-    UserDO getModelTargetUser(Long modelId, Integer ownership) throws BusinessException;
+    UserDO getModelTargetUser(Long modelId, Integer ownership);
 
     UserModelOwnershipRelationDO getModelOwnRelation(Long id);
 }

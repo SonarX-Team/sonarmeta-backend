@@ -91,12 +91,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 modelService.updateModelOwner(form.getUserAddress(), beforeOwnRelation);
                 // NFT所有权转让
                 web3Service.transferERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), model.getGrantPrice());
                 log.info("用户{} 购买了 模型{} 所有权", form.getUserAddress(), form.getId());
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
             // 使用模型
             // 获取用户和该对象的所属关系
-            if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress()) || form.getUserAddress().equals(modelGrantor.getAddress())) {
+            if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress()) || (modelGrantor != null && form.getUserAddress().equals(modelGrantor.getAddress()))) {
                 // 创建者、拥有者、授权者不能获得授权
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
@@ -117,6 +118,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 modelService.addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_GRANTOR);
                 // NFT所有权转让
                 web3Service.grantERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), model.getGrantPrice());
                 log.info("用户{} 购买了 模型{} 使用权", form.getUserAddress(), form.getId());
             }
         }

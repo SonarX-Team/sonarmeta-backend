@@ -6,6 +6,7 @@ import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneModelRelationForm;
 import com.sonarx.sonarmeta.domain.model.SceneDO;
+import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.sonarx.sonarmeta.domain.model.UserSceneOwnershipRelationDO;
 import com.sonarx.sonarmeta.domain.view.SceneView;
 
@@ -25,4 +26,6 @@ public interface SceneService extends IService<SceneDO> {
     void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation) throws BusinessException;
 
     UserSceneOwnershipRelationDO getUserSceneRelation(Long id);
+
+    UserDO getSceneTargetUser(Long sceneId, Integer ownership);
 }
