@@ -91,6 +91,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 modelService.updateModelOwner(form.getUserAddress(), beforeOwnRelation);
                 // NFT所有权转让
                 web3Service.transferERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), model.getGrantPrice());
                 log.info("用户{} 购买了 模型{} 所有权", form.getUserAddress(), form.getId());
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
@@ -117,6 +118,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 modelService.addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_GRANTOR);
                 // NFT所有权转让
                 web3Service.grantERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), model.getGrantPrice());
                 log.info("用户{} 购买了 模型{} 使用权", form.getUserAddress(), form.getId());
             }
         }

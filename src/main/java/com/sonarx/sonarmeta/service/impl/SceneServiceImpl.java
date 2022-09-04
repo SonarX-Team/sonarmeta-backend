@@ -191,6 +191,19 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
             }
         }
     }
+
+    @Override
+    public UserDO getSceneTargetUser(Long sceneId, Integer ownership) {
+        UserDO userDO = null;
+        UserSceneOwnershipRelationDO relationDO = userSceneOwnershipRelationMapper.selectOne(
+                new QueryWrapper<UserSceneOwnershipRelationDO>()
+                        .eq("scene_id", sceneId)
+                        .eq("ownership_type", ownership));
+        if (relationDO != null) {
+            userDO = userService.getById(relationDO.getAddress());
+        }
+        return userDO;
+    }
 }
 
 
