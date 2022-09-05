@@ -5,6 +5,7 @@ import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.service.Web3Service;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletInputStream;
@@ -12,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -38,8 +40,7 @@ public class DefaultController {
 
     @RequestMapping(value = "/test", method = {RequestMethod.GET})
     public HttpResult test() throws EthTransactionException {
-        Long aLong = web3Service.mintERC721("0x1806041041052158694A97EFA1840F717A11f6ac");
-        return HttpResult.successResult(aLong);
+        return HttpResult.successResult(web3Service.mintERC998WithBatchTokens("0xBd666F8e0449C83E534DD34b132634dcdAe5617D", Arrays.asList(1L,2L,3L)));
     }
 
     // Test PathVariable

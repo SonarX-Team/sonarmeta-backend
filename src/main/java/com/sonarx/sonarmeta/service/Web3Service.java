@@ -1,6 +1,7 @@
 package com.sonarx.sonarmeta.service;
 
 import com.sonarx.sonarmeta.common.EthTransactionException;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -26,4 +27,5 @@ public interface Web3Service {
     Long mintERC998WithBatchTokens(String to, List<Long> childTokenIds) throws EthTransactionException;
 
 
+    TransactionReceipt getTransactionReceiptByHash(String s) throws EthTransactionException;
 }
