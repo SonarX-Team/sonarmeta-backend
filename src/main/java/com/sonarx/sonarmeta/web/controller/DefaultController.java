@@ -40,7 +40,7 @@ public class DefaultController {
 
     @RequestMapping(value = "/test", method = {RequestMethod.GET})
     public HttpResult test() throws EthTransactionException {
-        return HttpResult.successResult(web3Service.mintERC998WithBatchTokens("0xBd666F8e0449C83E534DD34b132634dcdAe5617D", Arrays.asList(1L,2L,3L)));
+        return HttpResult.successResult();
     }
 
     // Test PathVariable

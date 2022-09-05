@@ -89,9 +89,10 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    public void transferERC20UsingSonarMetaAllowance(String to, Double amount) throws EthTransactionException {
+    public void transferERC20UsingSonarMetaAllowance(String from, String to, Double amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(from));
         inputParameters.add(new Address(to));
         BigInteger Wei = new BigDecimal(amount).multiply(new BigDecimal("1E18")).toBigInteger();
         inputParameters.add(new Uint256(Wei));
