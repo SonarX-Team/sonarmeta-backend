@@ -89,9 +89,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
                 // 修改模型所有关系
                 modelService.updateModelOwner(form.getUserAddress(), beforeOwnRelation);
+                // 钱包代理转账：从该买家转向模型拥有者
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
                 // NFT所有权转让
                 web3Service.transferERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), model.getGrantPrice());
                 log.info("用户{} 购买了 模型{} 所有权", form.getUserAddress(), form.getId());
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
@@ -116,43 +117,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
                 // 添加模型使用权限
                 modelService.addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_GRANTOR);
+                // 钱包代理转账：从该买家转向模型拥有者
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
                 // NFT所有权转让
                 web3Service.grantERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), model.getGrantPrice());
                 log.info("用户{} 购买了 模型{} 使用权", form.getUserAddress(), form.getId());
             }
-        }
-//        else if (consumeType.equals(ConsumeTypeEnum.CONSUME_EXPERIENCE_MODEL.getCode())) {
-//            // 体验模型
-//            // 获取用户和该对象的所属关系
-//            UserModelOwnershipRelationDO relation = modelService.getOwnerShipRelationByUserAndModel(form.getUserId(), form.getId());
-//
-//            if (relation == null || relation.getOwnershipType() <= OwnershipTypeEnum.EXPERIENCE.getCode()) {
-//                // 所属关系不存在或者已经获得了相同或更高的权限
-//                throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
-//            } else {
-//                // 可以进行消费，修改金额，修改模型所属关系
-//                // 获取模型的信息
-//                ModelDO model = modelService.getModelById(form.getId());
-//                if (model == null) {
-//                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
-//                }
-//                // 获取模型拥有者信息
-//                UserModelOwnershipRelationDO beforeOwnRelation = modelService.getModelOwnRelation(form.getId());
-//                if (beforeOwnRelation == null) {
-//                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
-//                }
-//                // 转账
-//                transfer(form.getUserId(), beforeOwnRelation.getUserId(), model.getExperiencePrice());
-//                // 添加模型使用权限
-//                modelService.addUserModelOwnershipRelation(form.getUserId(), model.getId(), OwnershipTypeEnum.EXPERIENCE);
-//
-//                // NFT所有权转让
-//                // TODO
-//                log.info("用户{} 购买了 模型{} 使用权", form.getUserId(), form.getId());
-//            }
-//        }
-        else if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_SCENE.getCode())) {
+        } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_SCENE.getCode())) {
             // TODO
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_DIVE_SCENE.getCode())) {
             // TODO

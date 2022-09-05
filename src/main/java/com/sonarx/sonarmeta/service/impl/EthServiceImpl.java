@@ -83,16 +83,16 @@ public class EthServiceImpl implements Web3Service {
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
 
-//        List<Log> logs = receipt.getLogs();
-//        if(logs.size() == 0) {
-//            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
-//        }
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
     }
 
     @Override
-    public void transferERC20UsingSonarMetaAllowance(String to, Double amount) throws EthTransactionException {
+    public void transferERC20UsingSonarMetaAllowance(String from, String to, Double amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(from));
         inputParameters.add(new Address(to));
         BigInteger Wei = new BigDecimal(amount).multiply(new BigDecimal("1E18")).toBigInteger();
         inputParameters.add(new Uint256(Wei));
@@ -104,11 +104,9 @@ public class EthServiceImpl implements Web3Service {
                 outputParameters
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
-
-//        List<Log> logs = receipt.getLogs();
-//        if(logs.size() == 0) {
-//            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
-//        }
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
     }
 
     @Override
@@ -125,11 +123,9 @@ public class EthServiceImpl implements Web3Service {
                 outputParameters
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
-
-//        List<Log> logs = receipt.getLogs();
-//        if(logs.size() == 0) {
-//            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
-//        }
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
     }
 
     @Override
@@ -146,11 +142,9 @@ public class EthServiceImpl implements Web3Service {
                 outputParameters
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
-
-//        List<Log> logs = receipt.getLogs();
-//        if(logs.size() == 0) {
-//            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
-//        }
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
     }
 
     @Override
@@ -168,6 +162,9 @@ public class EthServiceImpl implements Web3Service {
                 outputParameters
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
 
         // Get return value from logs in receipt
         List<Log> logs = receipt.getLogs();
@@ -196,10 +193,8 @@ public class EthServiceImpl implements Web3Service {
                 outputParameters
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
-
-        List<Log> logs = receipt.getLogs();
-        if(logs.size() == 0) {
-            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
         }
     }
 
@@ -217,10 +212,8 @@ public class EthServiceImpl implements Web3Service {
                 outputParameters
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
-
-        List<Log> logs = receipt.getLogs();
-        if(logs.size() == 0) {
-            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
         }
     }
 
@@ -239,6 +232,9 @@ public class EthServiceImpl implements Web3Service {
                 outputParameters
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
 
         // Get return value from logs in receipt
         List<Log> logs = receipt.getLogs();
@@ -269,6 +265,9 @@ public class EthServiceImpl implements Web3Service {
                 outputParameters
         );
         log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
 
         // Get return value from logs in receipt
         List<Log> logs = receipt.getLogs();
@@ -278,7 +277,7 @@ public class EthServiceImpl implements Web3Service {
         List<String> topics = receipt.getLogs().get(1).getTopics();
         String requiredTopic = topics != null && topics.size() > 1 ? topics.get(2) : null;
         if (requiredTopic == null) {
-            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
+            throw new EthTransactionException(BusinessError.INCORRECT_CONTRACT.getDesc());
         }
         return Long.parseLong(requiredTopic.substring(2), 16);
     }
@@ -387,6 +386,17 @@ public class EthServiceImpl implements Web3Service {
                             TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
             return receiptProcessor.waitForTransactionReceipt(txHash);
         } catch (IOException | TransactionException | EthTransactionException e) {
+            throw new EthTransactionException(e.getMessage());
+        }
+    }
+
+    public TransactionReceipt getTransactionReceiptByHash(String txHash) throws EthTransactionException {
+        try {
+            TransactionReceiptProcessor receiptProcessor =
+                    new PollingTransactionReceiptProcessor(web3j, TransactionManager.DEFAULT_POLLING_FREQUENCY,
+                            TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH);
+            return receiptProcessor.waitForTransactionReceipt(txHash);
+        } catch (IOException | TransactionException e) {
             throw new EthTransactionException(e.getMessage());
         }
     }

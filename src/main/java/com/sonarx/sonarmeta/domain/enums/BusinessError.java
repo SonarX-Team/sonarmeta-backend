@@ -39,7 +39,7 @@ public enum BusinessError {
      */
     INCORRECT_CONTRACT("合约异常"),
 
-    ETH_TRANSACTION_ERROR("交易失败"),
+    ETH_TRANSACTION_ERROR("合约执行失败 - "),
 
     OUT_OF_BALANCE_ERROR("余额不足"),
 
