@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户和场景对应关系信息
@@ -14,6 +17,8 @@ import lombok.Data;
  */
 @TableName(value ="t_user_scene_ownership_relation")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserSceneOwnershipRelationDO implements Serializable {
     /**
      * 

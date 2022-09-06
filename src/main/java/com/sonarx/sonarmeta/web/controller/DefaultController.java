@@ -40,6 +40,10 @@ public class DefaultController {
 
     @RequestMapping(value = "/test", method = {RequestMethod.GET})
     public HttpResult test() throws EthTransactionException {
+        web3Service.transferERC20UsingSonarMetaAllowance(
+                "0x9715ee8a90e33d9b28a2935fc7270d73aaf7f83f",
+                "0x58f1098e8d981b8cb9c02e66b39775f38ddbfe22",
+                0.66);
         return HttpResult.successResult();
     }
 

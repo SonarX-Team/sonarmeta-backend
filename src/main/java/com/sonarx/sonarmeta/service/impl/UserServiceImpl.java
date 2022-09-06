@@ -61,7 +61,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
      * @param form
      */
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void consume(ConsumeActionForm form) throws BusinessException {
         Integer consumeType = form.getType();
         UserDO modelCreator = modelService.getModelTargetUser(form.getId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
