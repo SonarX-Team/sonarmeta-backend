@@ -2,6 +2,7 @@ package com.sonarx.sonarmeta.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.sonarx.sonarmeta.common.BusinessException;
+import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.CreateSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneForm;
 import com.sonarx.sonarmeta.domain.form.EditSceneModelRelationForm;
@@ -9,6 +10,8 @@ import com.sonarx.sonarmeta.domain.model.SceneDO;
 import com.sonarx.sonarmeta.domain.model.UserDO;
 import com.sonarx.sonarmeta.domain.model.UserSceneOwnershipRelationDO;
 import com.sonarx.sonarmeta.domain.view.SceneView;
+
+import java.util.List;
 
 /**
 * @author hinsliu
@@ -25,7 +28,13 @@ public interface SceneService extends IService<SceneDO> {
 
     void editSceneModelRelation(EditSceneModelRelationForm sceneModelRelation) throws BusinessException;
 
-    UserSceneOwnershipRelationDO getUserSceneRelation(Long id);
+    UserSceneOwnershipRelationDO getSceneOwnRelation(Long id);
 
-    UserDO getSceneTargetUser(Long sceneId, Integer ownership);
+    UserDO getSceneOwnerOrCreator(Long sceneId, Integer ownership);
+
+    List<UserDO> getSceneDivers(Long sceneId);
+
+    void updateSceneOwner(String userAddress, UserSceneOwnershipRelationDO beforeOwnRelation) throws BusinessException;
+
+    void addUserSceneOwnershipRelation(String userAddress, Long id, OwnershipTypeEnum sceneDiver) throws BusinessException;
 }

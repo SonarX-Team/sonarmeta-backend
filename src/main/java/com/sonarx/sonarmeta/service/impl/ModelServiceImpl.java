@@ -21,8 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author hinsliu
@@ -63,7 +66,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     public ModelDO createModelWithForm(CreateModelForm form) throws BusinessException {
         // 创建NFT
         UserDO user = userService.getById(form.getUserAddress());
-        if(user == null) {
+        if (user == null) {
             throw new BusinessException(BusinessError.USER_NOT_EXIST_ERROR);
         }
         Long nftTokenId = web3Service.mintERC721(user.getAddress());
@@ -87,7 +90,7 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     @Transactional
     public ModelDO editModelWithForm(EditModelForm form) throws BusinessException {
         QueryWrapper<UserModelOwnershipRelationDO> qw = new QueryWrapper<>();
-        qw.eq("address", form.getUserAddress()).eq("model_id", form.getId()).eq("ownership_type",OwnershipTypeEnum.MODEL_OWNER.getCode());
+        qw.eq("address", form.getUserAddress()).eq("model_id", form.getId()).eq("ownership_type", OwnershipTypeEnum.MODEL_OWNER.getCode());
         UserModelOwnershipRelationDO relation = userModelOwnershipRelationMapper.selectOne(qw);
         if (relation == null) {
             throw new BusinessException(BusinessError.EDIT_MODEL_ERROR);
@@ -103,15 +106,6 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
     }
 
     @Override
-    public ModelDO getModelById(Long id) throws BusinessException {
-        ModelDO modelDO = modelMapper.selectById(id);
-        if (modelDO == null) {
-            throw new BusinessException(BusinessError.MODEL_NOT_EXIST);
-        }
-        return modelDO;
-    }
-
-    @Override
     public ModelView getModelViewById(Long id) throws BusinessException {
         ModelView modelView = new ModelView();
         ModelDO modelDO = modelMapper.selectById(id);
@@ -120,17 +114,16 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         }
         BeanUtils.copyProperties(modelDO, modelView);
 
-        UserDO owner = getModelTargetUser(id, OwnershipTypeEnum.MODEL_OWNER.getCode());
+        UserDO owner = getModelOwnerOrCreator(id, OwnershipTypeEnum.MODEL_OWNER.getCode());
         modelView.setOwnerAvatar(owner.getAvatar());
         modelView.setOwnerUsername(owner.getUsername());
         modelView.setOwnerAddress(owner.getAddress());
 
-        UserDO creator = getModelTargetUser(id, OwnershipTypeEnum.MODEL_CREATOR.getCode());
+        UserDO creator = getModelOwnerOrCreator(id, OwnershipTypeEnum.MODEL_CREATOR.getCode());
         modelView.setCreatorAvatar(creator.getAvatar());
         modelView.setCreatorUsername(creator.getUsername());
         modelView.setCreatorAddress(creator.getAddress());
         return modelView;
-
     }
 
 
@@ -187,8 +180,8 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         QueryWrapper<ModelLightSettingsDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("model_id", modelLightSettingsDO.getModelId());
         if (modelLightSettingsMapper.selectOne(queryWrapper) == null) {
-           modelLightSettingsMapper.insert(modelLightSettingsDO);
-           return modelLightSettingsDO;
+            modelLightSettingsMapper.insert(modelLightSettingsDO);
+            return modelLightSettingsDO;
         }
         UpdateWrapper<ModelLightSettingsDO> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("model_id", modelLightSettingsDO.getModelId());
@@ -237,13 +230,13 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         log.info("编辑模型信息：模型{}", modelPostprocessingSettingsDO.getModelId());
         return modelPostprocessingSettingsDO;
     }
-    
+
 
     @Override
     public void addUserModelOwnershipRelation(String userAddress, Long modelId, OwnershipTypeEnum ownershipType) throws BusinessException {
         QueryWrapper<UserModelOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("address",userAddress)
-                .eq("model_id",modelId)
+        queryWrapper.eq("address", userAddress)
+                .eq("model_id", modelId)
                 .eq("ownership_type", ownershipType);
         if (userModelOwnershipRelationMapper.selectOne(queryWrapper) == null) {
             int affectCount = userModelOwnershipRelationMapper.insert(new UserModelOwnershipRelationDO(userAddress, modelId, ownershipType.getCode()));
@@ -265,8 +258,11 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         }
     }
 
-    @Override
-    public UserDO getModelTargetUser(Long modelId, Integer ownership) {
+    public UserDO getModelOwnerOrCreator(Long modelId, Integer ownership) {
+        if (ownership != OwnershipTypeEnum.MODEL_CREATOR.getCode() && ownership != OwnershipTypeEnum.MODEL_OWNER.getCode()) {
+            return null;
+        }
+
         UserDO userDO = null;
         UserModelOwnershipRelationDO relationDO = userModelOwnershipRelationMapper.selectOne(
                 new QueryWrapper<UserModelOwnershipRelationDO>()
@@ -276,6 +272,21 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
             userDO = userService.getById(relationDO.getAddress());
         }
         return userDO;
+    }
+
+    @Override
+    public List<UserDO> getModelGrantors(Long modelId) {
+        UserDO userDO = null;
+        List<UserModelOwnershipRelationDO> relationDOs = userModelOwnershipRelationMapper.selectList(
+                new QueryWrapper<UserModelOwnershipRelationDO>()
+                        .eq("model_id", modelId)
+                        .eq("ownership_type", OwnershipTypeEnum.MODEL_GRANTOR.getCode()));
+        if (relationDOs != null) {
+            return relationDOs.stream().map(
+                    relationDO -> userService.getById(relationDO.getAddress())
+            ).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
     }
 
     @Override

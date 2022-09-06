@@ -1,6 +1,7 @@
 package com.sonarx.sonarmeta.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.domain.common.PageParam;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,9 +74,9 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         } else {
             // 获取childTokenIds
             List<Long> childTokenIds = new LinkedList<>();
-            for(Long modelId : form.getModelIdList()) {
+            for (Long modelId : form.getModelIdList()) {
                 ModelDO model = modelMapper.selectById(modelId);
-                if(model == null) {
+                if (model == null) {
                     throw new BusinessException(BusinessError.MODEL_NOT_EXIST);
                 } else {
                     childTokenIds.add(model.getNftTokenId());
@@ -188,7 +190,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     }
 
     @Override
-    public UserSceneOwnershipRelationDO getUserSceneRelation(Long id) {
+    public UserSceneOwnershipRelationDO getSceneOwnRelation(Long id) {
         return userSceneOwnershipRelationMapper.selectOne(
                 new QueryWrapper<UserSceneOwnershipRelationDO>()
                         .eq("scene_id", id)
@@ -210,7 +212,11 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     }
 
     @Override
-    public UserDO getSceneTargetUser(Long sceneId, Integer ownership) {
+    public UserDO getSceneOwnerOrCreator(Long sceneId, Integer ownership) {
+        if (ownership != OwnershipTypeEnum.SCENE_OWNER.getCode() && ownership != OwnershipTypeEnum.SCENE_CREATOR.getCode()) {
+            return null;
+        }
+
         UserDO userDO = null;
         UserSceneOwnershipRelationDO relationDO = userSceneOwnershipRelationMapper.selectOne(
                 new QueryWrapper<UserSceneOwnershipRelationDO>()
@@ -220,6 +226,33 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
             userDO = userService.getById(relationDO.getAddress());
         }
         return userDO;
+    }
+
+    @Override
+    public List<UserDO> getSceneDivers(Long sceneId) {
+        UserDO userDO = null;
+        List<UserSceneOwnershipRelationDO> relationDOs = userSceneOwnershipRelationMapper.selectList(
+                new QueryWrapper<UserSceneOwnershipRelationDO>()
+                        .eq("scene_id", sceneId)
+                        .eq("ownership_type", OwnershipTypeEnum.SCENE_DIVER.getCode()));
+        if (relationDOs != null) {
+            return relationDOs.stream().map(
+                    relationDO -> userService.getById(relationDO.getAddress())
+            ).collect(Collectors.toList());
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void updateSceneOwner(String userAddress, UserSceneOwnershipRelationDO beforeRelation) throws BusinessException {
+        UpdateWrapper<UserSceneOwnershipRelationDO> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("scene_id", beforeRelation.getSceneId())
+                .eq("ownership_type", beforeRelation.getOwnershipType());
+        UserSceneOwnershipRelationDO userSceneOwnershipRelationDO = new UserSceneOwnershipRelationDO(userAddress, beforeRelation.getSceneId(), beforeRelation.getOwnershipType());
+        int affectCount = userSceneOwnershipRelationMapper.update(userSceneOwnershipRelationDO, updateWrapper);
+        if (affectCount <= 0) {
+            throw new BusinessException(ErrorCodeEnum.FAIL.getCode(), "场景拥有权转让失败");
+        }
     }
 }
 

@@ -8,11 +8,10 @@ import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
 import com.sonarx.sonarmeta.domain.form.UpdateUserForm;
-import com.sonarx.sonarmeta.domain.model.ModelDO;
-import com.sonarx.sonarmeta.domain.model.UserDO;
-import com.sonarx.sonarmeta.domain.model.UserModelOwnershipRelationDO;
+import com.sonarx.sonarmeta.domain.model.*;
 import com.sonarx.sonarmeta.mapper.UserMapper;
 import com.sonarx.sonarmeta.service.ModelService;
+import com.sonarx.sonarmeta.service.SceneService;
 import com.sonarx.sonarmeta.service.UserService;
 import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+
+import java.util.List;
 
 import static com.sonarx.sonarmeta.common.Constants.APP_NAME;
 import static com.sonarx.sonarmeta.common.Constants.DEFAULT_CONNECTOR;
@@ -38,6 +39,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Resource
     ModelService modelService;
+
+    @Resource
+    SceneService sceneService;
 
     @Resource
     Web3Service web3Service;
@@ -64,10 +68,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
     @Transactional(rollbackFor = Exception.class)
     public void consume(ConsumeActionForm form) throws BusinessException {
         Integer consumeType = form.getType();
-        UserDO modelCreator = modelService.getModelTargetUser(form.getId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
-        UserDO modelOwner = modelService.getModelTargetUser(form.getId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
-        UserDO modelGrantor = modelService.getModelTargetUser(form.getId(), OwnershipTypeEnum.MODEL_GRANTOR.getCode());
         if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_MODEL.getCode())) {
+            UserDO modelCreator = modelService.getModelOwnerOrCreator(form.getId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
+            UserDO modelOwner = modelService.getModelOwnerOrCreator(form.getId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
             // 购买模型
             // 获取用户和该对象的所属关系
             if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress())) {
@@ -76,7 +79,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             } else {
                 // 可以进行消费，修改金额，修改模型所属关系
                 // 获取模型的信息
-                ModelDO model = modelService.getModelById(form.getId());
+                ModelDO model = modelService.getById(form.getId());
                 if (model == null) {
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
@@ -85,26 +88,33 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 if (beforeOwnRelation == null) {
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
-                // 转账
-                transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
                 // 修改模型所有关系
                 modelService.updateModelOwner(form.getUserAddress(), beforeOwnRelation);
+                // 转账
+                transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
                 // 钱包代理转账：从该买家转向模型拥有者
                 web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
                 // NFT所有权转让
                 web3Service.transferERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
                 log.info("用户{} 购买了 模型{} 所有权", form.getUserAddress(), form.getId());
+                // TODO 另开线程/消息队列处理分红，调用erc20的transfer方法
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
+            UserDO modelCreator = modelService.getModelOwnerOrCreator(form.getId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
+            UserDO modelOwner = modelService.getModelOwnerOrCreator(form.getId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
+            List<UserDO> modelGrantors = modelService.getModelGrantors(form.getId());
             // 使用模型
             // 获取用户和该对象的所属关系
-            if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress()) || (modelGrantor != null && form.getUserAddress().equals(modelGrantor.getAddress()))) {
+            if (form.getUserAddress().equals(modelCreator.getAddress()) ||
+                    form.getUserAddress().equals(modelOwner.getAddress()) ||
+                    (modelGrantors != null && modelGrantors.stream().anyMatch(modelGrantor -> form.getUserAddress().equals(modelGrantor.getAddress())))
+            ) {
                 // 创建者、拥有者、授权者不能获得授权
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
                 // 可以进行消费，修改金额，修改模型所属关系
                 // 获取模型的信息
-                ModelDO model = modelService.getModelById(form.getId());
+                ModelDO model = modelService.getById(form.getId());
                 if (model == null) {
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
@@ -113,20 +123,81 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 if (beforeOwnRelation == null) {
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
-                // 转账
-                transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
                 // 添加模型使用权限
                 modelService.addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_GRANTOR);
+                // 转账
+                transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
                 // 钱包代理转账：从该买家转向模型拥有者
                 web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
                 // NFT所有权转让
                 web3Service.grantERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
                 log.info("用户{} 购买了 模型{} 使用权", form.getUserAddress(), form.getId());
+                // TODO 另开线程/消息队列处理分红，调用erc20的transfer方法
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_SCENE.getCode())) {
-            // TODO
+            UserDO sceneCreator = sceneService.getSceneOwnerOrCreator(form.getId(), OwnershipTypeEnum.SCENE_CREATOR.getCode());
+            UserDO sceneOwner = sceneService.getSceneOwnerOrCreator(form.getId(), OwnershipTypeEnum.SCENE_OWNER.getCode());
+            // 购买场景
+            // 获取用户和该对象的所属关系
+            if (form.getUserAddress().equals(sceneCreator.getAddress()) || form.getUserAddress().equals(sceneOwner.getAddress())) {
+                // 创建者、拥有者不能买
+                throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
+            } else {
+                // 可以进行消费，修改金额，修改场景所属关系
+                // 获取场景的信息
+                SceneDO scene = sceneService.getById(form.getId());
+                if (scene == null) {
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                }
+                // 获取场景拥有者信息
+                UserSceneOwnershipRelationDO beforeOwnRelation = sceneService.getSceneOwnRelation(form.getId());
+                if (beforeOwnRelation == null) {
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                }
+                // 修改场景所有关系
+                sceneService.updateSceneOwner(form.getUserAddress(), beforeOwnRelation);
+                // 转账
+                transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getTokenPrice());
+                // 钱包代理转账：从该买家转向场景拥有者
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getTokenPrice());
+                // NFT所有权转让
+                web3Service.transferERC998UsingSonarMetaApproval(scene.getNftTokenId(), form.getUserAddress());
+                log.info("用户{} 购买了 场景{} 所有权", form.getUserAddress(), form.getId());
+                // TODO 另开线程/消息队列处理分红，调用erc20的transfer方法
+            }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_DIVE_SCENE.getCode())) {
-            // TODO
+            UserDO sceneCreator = sceneService.getSceneOwnerOrCreator(form.getId(), OwnershipTypeEnum.SCENE_CREATOR.getCode());
+            UserDO sceneOwner = sceneService.getSceneOwnerOrCreator(form.getId(), OwnershipTypeEnum.SCENE_OWNER.getCode());
+            List<UserDO> sceneDivers = sceneService.getSceneDivers(form.getId());
+            // 体验场景
+            // 获取用户和该对象的所属关系
+            if (form.getUserAddress().equals(sceneCreator.getAddress()) ||
+                    form.getUserAddress().equals(sceneOwner.getAddress()) ||
+                    (sceneDivers != null && sceneDivers.stream().anyMatch(sceneDiver -> form.getUserAddress().equals(sceneDiver.getAddress())))
+            ) {
+                // 创建者、拥有者、体验者不能获得授权
+                throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
+            } else {
+                // 可以进行消费，修改金额，修改场景所属关系
+                // 获取场景的信息
+                SceneDO scene = sceneService.getById(form.getId());
+                if (scene == null) {
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                }
+                // 获取场景拥有者信息
+                UserSceneOwnershipRelationDO beforeOwnRelation = sceneService.getSceneOwnRelation(form.getId());
+                if (beforeOwnRelation == null) {
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                }
+                // 添加场景体验权限
+                sceneService.addUserSceneOwnershipRelation(form.getUserAddress(), scene.getId(), OwnershipTypeEnum.SCENE_DIVER);
+                // 转账
+                transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getDivePrice());
+                // 钱包代理转账：从该买家转向场景拥有者
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getDivePrice());
+                log.info("用户{} 购买了 场景{} 体验权", form.getUserAddress(), form.getId());
+                // TODO 另开线程/消息队列处理分红，调用erc20的transfer方法
+            }
         } else {
             throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
         }
