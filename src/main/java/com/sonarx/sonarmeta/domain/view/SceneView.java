@@ -15,6 +15,18 @@ public class SceneView extends SceneDO {
 
     private List<ModelDO> modelList;
 
+    private String CreatorAvatar;
+
+    private String CreatorUsername;
+
+    private String CreatorAddress;
+
+    private String OwnerAvatar;
+
+    private String OwnerUsername;
+
+    private String OwnerAddress;
+
     public SceneView(SceneDO sceneDO) {
         super(sceneDO);
     }

@@ -8,6 +8,7 @@ import com.sonarx.sonarmeta.domain.model.*;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.sonarx.sonarmeta.domain.view.ModelView;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,8 +21,6 @@ public interface ModelService extends IService<ModelDO> {
     ModelDO createModelWithForm(CreateModelForm form) throws BusinessException;
 
     ModelDO editModelWithForm(EditModelForm form) throws BusinessException;
-
-    ModelDO getModelById(Long id) throws BusinessException;
 
     ModelView getModelViewById(Long id) throws BusinessException;
 
@@ -39,7 +38,9 @@ public interface ModelService extends IService<ModelDO> {
 
     void updateModelOwner(String userAddress, UserModelOwnershipRelationDO beforeRelation) throws BusinessException;
 
-    UserDO getModelTargetUser(Long modelId, Integer ownership);
+    UserDO getModelOwnerOrCreator(Long modelId, Integer ownership);
+
+    List<UserDO> getModelGrantors(Long modelId);
 
     UserModelOwnershipRelationDO getModelOwnRelation(Long id);
 }

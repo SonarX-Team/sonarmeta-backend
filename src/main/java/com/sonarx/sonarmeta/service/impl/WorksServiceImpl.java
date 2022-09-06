@@ -15,7 +15,6 @@ import com.sonarx.sonarmeta.service.ModelService;
 import com.sonarx.sonarmeta.service.SceneService;
 import com.sonarx.sonarmeta.service.WorksService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -76,7 +75,7 @@ public class WorksServiceImpl implements WorksService {
         qw2.eq("status", SceneStatusEnum.SCENE_STATUS_PASSED.getStatusCode());
         Page<SceneDO> scenes = sceneMapper.selectPage(pageSelector2, qw2);
         scenes.getRecords().forEach(sceneDO -> {
-            UserSceneOwnershipRelationDO sceneOwnershipRelationDO = sceneService.getUserSceneRelation(sceneDO.getId());
+            UserSceneOwnershipRelationDO sceneOwnershipRelationDO = sceneService.getSceneOwnRelation(sceneDO.getId());
             UserDO userDO = userMapper.selectById(sceneOwnershipRelationDO.getAddress());
             result.add(getWorksFromScene(sceneDO, userDO));
         });
@@ -121,7 +120,7 @@ public class WorksServiceImpl implements WorksService {
                 });
         Page<SceneDO> scenes = sceneMapper.selectPage(pageSelector2, qw2);
         scenes.getRecords().forEach(sceneDO -> {
-            UserSceneOwnershipRelationDO sceneOwnershipRelationDO = sceneService.getUserSceneRelation(sceneDO.getId());
+            UserSceneOwnershipRelationDO sceneOwnershipRelationDO = sceneService.getSceneOwnRelation(sceneDO.getId());
             UserDO userDO = userMapper.selectById(sceneOwnershipRelationDO.getAddress());
             result.add(getWorksFromScene(sceneDO, userDO));
         });
@@ -131,7 +130,6 @@ public class WorksServiceImpl implements WorksService {
 
     @Override
     public Map<Integer, List<WorksView>> getWorksByUserAddress(String address1, String address2) throws BusinessException {
-
         Map<Integer, List<WorksView>> res = new HashMap<>();
         List<WorksView> createModelList = new LinkedList<>();
         List<WorksView> ownModelList = new LinkedList<>();
@@ -158,7 +156,7 @@ public class WorksServiceImpl implements WorksService {
                 ModelDO modelDO = modelMapper.selectById(userModelOwnershipRelationDO.getModelId());
                 if (modelDO == null) {break;}
                 boolean isPublished =  modelDO.getStatus().equals(ModelStatusEnum.MODEL_STATUS_PASSED.getStatusCode());
-                UserDO modelOwner = modelService.getModelTargetUser(modelDO.getId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
+                UserDO modelOwner = modelService.getModelOwnerOrCreator(modelDO.getId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
                 if (userModelOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.MODEL_CREATOR.getCode())) {
                     if (isCurrentUser || isPublished) {
                         createModelList.add(getWorksFromModel(modelDO, modelOwner));
@@ -185,7 +183,7 @@ public class WorksServiceImpl implements WorksService {
         if (userSceneOwnershipRelationDOS != null) {
             for (UserSceneOwnershipRelationDO userSceneOwnershipRelationDO : userSceneOwnershipRelationDOS) {
                 SceneDO sceneDO = sceneMapper.selectById(userSceneOwnershipRelationDO.getSceneId());
-                UserDO sceneOwner = sceneService.getSceneTargetUser(userSceneOwnershipRelationDO.getSceneId(), OwnershipTypeEnum.SCENE_OWNER.getCode());
+                UserDO sceneOwner = sceneService.getSceneOwnerOrCreator(userSceneOwnershipRelationDO.getSceneId(), OwnershipTypeEnum.SCENE_OWNER.getCode());
                 if (sceneDO == null) {break;}
                 boolean isPublished =  sceneDO.getStatus().equals(ModelStatusEnum.MODEL_STATUS_PASSED.getStatusCode());
                 if (userSceneOwnershipRelationDO.getOwnershipType().equals(OwnershipTypeEnum.SCENE_CREATOR.getCode())) {
