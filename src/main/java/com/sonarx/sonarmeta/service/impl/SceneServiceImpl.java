@@ -151,7 +151,15 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
             }
         }
         sceneView.setModelList(modelList);
-        return null;
+        UserDO sceneCreator = getSceneOwnerOrCreator(sceneId, OwnershipTypeEnum.SCENE_CREATOR.getCode());
+        sceneView.setCreatorAddress(sceneCreator.getAddress());
+        sceneView.setCreatorUsername(sceneCreator.getUsername());
+        sceneView.setCreatorAvatar(sceneCreator.getAvatar());
+        UserDO sceneOwner = getSceneOwnerOrCreator(sceneId, OwnershipTypeEnum.SCENE_CREATOR.getCode());
+        sceneView.setOwnerAddress(sceneOwner.getAddress());
+        sceneView.setOwnerUsername(sceneOwner.getUsername());
+        sceneView.setOwnerAvatar(sceneOwner.getAvatar());
+        return sceneView;
     }
 
     @Override
@@ -198,6 +206,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         );
     }
 
+    @Override
     public void addUserSceneOwnershipRelation(String userAddress, Long sceneId, OwnershipTypeEnum ownershipType) throws BusinessException {
         QueryWrapper<UserSceneOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("address", userAddress)
@@ -213,7 +222,7 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
 
     @Override
     public UserDO getSceneOwnerOrCreator(Long sceneId, Integer ownership) {
-        if (ownership != OwnershipTypeEnum.SCENE_OWNER.getCode() && ownership != OwnershipTypeEnum.SCENE_CREATOR.getCode()) {
+        if (!ownership.equals(OwnershipTypeEnum.SCENE_OWNER.getCode()) && !ownership.equals(OwnershipTypeEnum.SCENE_CREATOR.getCode())) {
             return null;
         }
 
