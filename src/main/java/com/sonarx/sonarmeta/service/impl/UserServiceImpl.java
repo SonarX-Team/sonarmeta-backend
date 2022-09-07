@@ -73,7 +73,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             UserDO modelOwner = modelService.getModelOwnerOrCreator(form.getId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
             // 购买模型
             // 获取用户和该对象的所属关系
-            if (form.getUserAddress().equals(modelCreator.getAddress()) || form.getUserAddress().equals(modelOwner.getAddress())) {
+            if ((modelCreator != null && form.getUserAddress().equals(modelCreator.getAddress())) ||
+                    (modelOwner != null && form.getUserAddress().equals(modelOwner.getAddress()))
+            ) {
                 // 创建者、拥有者不能买
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
@@ -105,8 +107,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             List<UserDO> modelGrantors = modelService.getModelGrantors(form.getId());
             // 使用模型
             // 获取用户和该对象的所属关系
-            if (form.getUserAddress().equals(modelCreator.getAddress()) ||
-                    form.getUserAddress().equals(modelOwner.getAddress()) ||
+            if ((modelCreator != null && form.getUserAddress().equals(modelCreator.getAddress())) ||
+                    (modelOwner != null && form.getUserAddress().equals(modelOwner.getAddress())) ||
                     (modelGrantors != null && modelGrantors.stream().anyMatch(modelGrantor -> form.getUserAddress().equals(modelGrantor.getAddress())))
             ) {
                 // 创建者、拥有者、授权者不能获得授权
@@ -139,7 +141,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             UserDO sceneOwner = sceneService.getSceneOwnerOrCreator(form.getId(), OwnershipTypeEnum.SCENE_OWNER.getCode());
             // 购买场景
             // 获取用户和该对象的所属关系
-            if (form.getUserAddress().equals(sceneCreator.getAddress()) || form.getUserAddress().equals(sceneOwner.getAddress())) {
+            if ((sceneCreator != null && form.getUserAddress().equals(sceneCreator.getAddress())) ||
+                    (sceneOwner != null && form.getUserAddress().equals(sceneOwner.getAddress()))
+            ) {
                 // 创建者、拥有者不能买
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
@@ -171,8 +175,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
             List<UserDO> sceneDivers = sceneService.getSceneDivers(form.getId());
             // 体验场景
             // 获取用户和该对象的所属关系
-            if (form.getUserAddress().equals(sceneCreator.getAddress()) ||
-                    form.getUserAddress().equals(sceneOwner.getAddress()) ||
+            if ((sceneCreator != null && form.getUserAddress().equals(sceneCreator.getAddress())) ||
+                    (sceneOwner != null && form.getUserAddress().equals(sceneOwner.getAddress())) ||
                     (sceneDivers != null && sceneDivers.stream().anyMatch(sceneDiver -> form.getUserAddress().equals(sceneDiver.getAddress())))
             ) {
                 // 创建者、拥有者、体验者不能获得授权
