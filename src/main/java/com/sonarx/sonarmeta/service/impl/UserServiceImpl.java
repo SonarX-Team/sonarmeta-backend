@@ -18,13 +18,10 @@ import com.sonarx.sonarmeta.service.SceneService;
 import com.sonarx.sonarmeta.service.UserService;
 import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-
-import java.util.LinkedList;
 import java.util.List;
 
 import static com.sonarx.sonarmeta.common.Constants.APP_NAME;
