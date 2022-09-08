@@ -258,8 +258,9 @@ public class ModelServiceImpl extends ServiceImpl<ModelMapper, ModelDO>
         }
     }
 
+    @Override
     public UserDO getModelOwnerOrCreator(Long modelId, Integer ownership) {
-        if (ownership != OwnershipTypeEnum.MODEL_CREATOR.getCode() && ownership != OwnershipTypeEnum.MODEL_OWNER.getCode()) {
+        if (!ownership.equals(OwnershipTypeEnum.MODEL_CREATOR.getCode()) && !ownership.equals(OwnershipTypeEnum.MODEL_OWNER.getCode())) {
             return null;
         }
 

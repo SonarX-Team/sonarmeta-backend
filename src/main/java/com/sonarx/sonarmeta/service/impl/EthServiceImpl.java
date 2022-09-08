@@ -5,6 +5,8 @@ import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
@@ -89,6 +91,7 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
+    @Async("asyncThreadPoolTaskExecutor")
     public void transferERC20UsingSonarMetaAllowance(String from, String to, Double amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
@@ -390,6 +393,7 @@ public class EthServiceImpl implements Web3Service {
         }
     }
 
+    @Override
     public TransactionReceipt getTransactionReceiptByHash(String txHash) throws EthTransactionException {
         try {
             TransactionReceiptProcessor receiptProcessor =
