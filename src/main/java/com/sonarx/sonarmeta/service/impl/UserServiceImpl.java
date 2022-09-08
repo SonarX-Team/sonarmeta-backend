@@ -1,7 +1,9 @@
 package com.sonarx.sonarmeta.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sonarx.sonarmeta.common.BusinessException;
+import com.sonarx.sonarmeta.common.constant.Ratio;
 import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.domain.enums.ConsumeTypeEnum;
 import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
@@ -9,17 +11,20 @@ import com.sonarx.sonarmeta.domain.enums.OwnershipTypeEnum;
 import com.sonarx.sonarmeta.domain.form.ConsumeActionForm;
 import com.sonarx.sonarmeta.domain.form.UpdateUserForm;
 import com.sonarx.sonarmeta.domain.model.*;
+import com.sonarx.sonarmeta.mapper.SceneModelRelationMapper;
 import com.sonarx.sonarmeta.mapper.UserMapper;
 import com.sonarx.sonarmeta.service.ModelService;
 import com.sonarx.sonarmeta.service.SceneService;
 import com.sonarx.sonarmeta.service.UserService;
 import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import static com.sonarx.sonarmeta.common.Constants.APP_NAME;
@@ -36,6 +41,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
     @Resource
     UserMapper userMapper;
+
+    @Resource
+    SceneModelRelationMapper sceneModelRelationMapper;
 
     @Resource
     ModelService modelService;
@@ -94,12 +102,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 modelService.updateModelOwner(form.getUserAddress(), beforeOwnRelation);
                 // 转账
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
-                // 钱包代理转账：从该买家转向模型拥有者
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
                 // NFT所有权转让
                 web3Service.transferERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
                 log.info("用户{} 购买了 模型{} 所有权", form.getUserAddress(), form.getId());
-                // TODO 另开线程/消息队列处理分红，调用erc20的transfer方法
+                // 分红
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice() * Ratio.MODEL_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelCreator.getAddress(), model.getTokenPrice() * Ratio.MODEL_CREATOR_RATIO);
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
             UserDO modelCreator = modelService.getModelOwnerOrCreator(form.getId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
@@ -134,7 +142,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 // NFT所有权转让
                 web3Service.grantERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
                 log.info("用户{} 购买了 模型{} 使用权", form.getUserAddress(), form.getId());
-                // TODO 另开线程/消息队列处理分红，调用erc20的transfer方法
+                // 分红
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice() * Ratio.MODEL_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelCreator.getAddress(), model.getGrantPrice() * Ratio.MODEL_CREATOR_RATIO);
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_SCENE.getCode())) {
             UserDO sceneCreator = sceneService.getSceneOwnerOrCreator(form.getId(), OwnershipTypeEnum.SCENE_CREATOR.getCode());
@@ -162,12 +172,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 sceneService.updateSceneOwner(form.getUserAddress(), beforeOwnRelation);
                 // 转账
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getTokenPrice());
-                // 钱包代理转账：从该买家转向场景拥有者
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getTokenPrice());
                 // NFT所有权转让
                 web3Service.transferERC998UsingSonarMetaApproval(scene.getNftTokenId(), form.getUserAddress());
                 log.info("用户{} 购买了 场景{} 所有权", form.getUserAddress(), form.getId());
-                // TODO 另开线程/消息队列处理分红，调用erc20的transfer方法
+
+                // 分红
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneCreator.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_CREATOR_RATIO);
+
+                QueryWrapper<SceneModelRelationDO> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("scene_id", form.getId());
+                List<SceneModelRelationDO> sceneModelRelationDOS = sceneModelRelationMapper.selectList(queryWrapper);
+                if (sceneModelRelationDOS != null) {
+                    double perModelBonus = scene.getTokenPrice() * (1 - Ratio.SCENE_MODEL_RATIO) / sceneModelRelationDOS.size();
+                    for (SceneModelRelationDO sceneModelRelationDO : sceneModelRelationDOS) {
+                        UserDO modelCreator = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
+                        UserDO modelOwner = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
+                        web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelCreator.getAddress(), perModelBonus * Ratio.MODEL_CREATOR_RATIO);
+                        web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelOwner.getAddress(), perModelBonus * Ratio.MODEL_OWNER_RATIO);
+                    }
+                }
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_DIVE_SCENE.getCode())) {
             UserDO sceneCreator = sceneService.getSceneOwnerOrCreator(form.getId(), OwnershipTypeEnum.SCENE_CREATOR.getCode());
@@ -193,14 +217,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 if (beforeOwnRelation == null) {
                     throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
                 }
+
                 // 添加场景体验权限
                 sceneService.addUserSceneOwnershipRelation(form.getUserAddress(), scene.getId(), OwnershipTypeEnum.SCENE_DIVER);
+
                 // 转账
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getDivePrice());
-                // 钱包代理转账：从该买家转向场景拥有者
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getDivePrice());
                 log.info("用户{} 购买了 场景{} 体验权", form.getUserAddress(), form.getId());
-                // TODO 另开线程/消息队列处理分红，调用erc20的transfer方法
+
+                // 分红
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getDivePrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneCreator.getAddress(), scene.getDivePrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_CREATOR_RATIO);
+
+                QueryWrapper<SceneModelRelationDO> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("scene_id", form.getId());
+                List<SceneModelRelationDO> sceneModelRelationDOS = sceneModelRelationMapper.selectList(queryWrapper);
+                if (sceneModelRelationDOS != null) {
+                    double perModelBonus = scene.getDivePrice() * (1 - Ratio.SCENE_MODEL_RATIO) / sceneModelRelationDOS.size();
+                    for (SceneModelRelationDO sceneModelRelationDO : sceneModelRelationDOS) {
+                        UserDO modelCreator = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
+                        UserDO modelOwner = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
+                        web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelCreator.getAddress(), perModelBonus * Ratio.MODEL_CREATOR_RATIO);
+                        web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelOwner.getAddress(), perModelBonus * Ratio.MODEL_OWNER_RATIO);
+                    }
+                }
             }
         } else {
             throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
