@@ -70,6 +70,7 @@ public class EthServiceImpl implements Web3Service {
     private String controller2PrivateKey;
 
     @Override
+    @Async("asyncThreadPoolTaskExecutor")
     public void transferERC20(String to, Double amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
@@ -111,7 +112,6 @@ public class EthServiceImpl implements Web3Service {
     }
 
     @Override
-    @Async("asyncThreadPoolTaskExecutor")
     public void transferERC20UsingSonarMetaAllowance(String from, String to, Double amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
