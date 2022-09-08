@@ -69,6 +69,27 @@ public class EthServiceImpl implements Web3Service {
     private String controller2PrivateKey;
 
     @Override
+    public void transferERC20(String to, Double amount) throws EthTransactionException {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(to));
+        BigInteger Wei = new BigDecimal(amount).multiply(new BigDecimal("1E18")).toBigInteger();
+        inputParameters.add(new Uint256(Wei));
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                ERC20Contract,
+                "transfer",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
+    }
+
+    @Override
     public void fundTreasury(Double amount) throws EthTransactionException {
         List<Type> inputParameters = new LinkedList<>();
         List<TypeReference<?>> outputParameters = new LinkedList<>();
