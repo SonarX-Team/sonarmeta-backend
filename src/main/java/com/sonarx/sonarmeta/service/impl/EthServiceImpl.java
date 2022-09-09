@@ -5,6 +5,7 @@ import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.service.Web3Service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.web3j.abi.FunctionEncoder;
 import org.web3j.abi.FunctionReturnDecoder;
@@ -67,6 +68,28 @@ public class EthServiceImpl implements Web3Service {
 
     @Value("${web3j.accounts-pk.controller2}")
     private String controller2PrivateKey;
+
+    @Override
+    @Async("asyncThreadPoolTaskExecutor")
+    public void transferERC20(String to, Double amount) throws EthTransactionException {
+        List<Type> inputParameters = new LinkedList<>();
+        List<TypeReference<?>> outputParameters = new LinkedList<>();
+        inputParameters.add(new Address(to));
+        BigInteger Wei = new BigDecimal(amount).multiply(new BigDecimal("1E18")).toBigInteger();
+        inputParameters.add(new Uint256(Wei));
+        TransactionReceipt receipt = invokeContractWithParameters(
+                getAccountFromPrivateKey(controller1PrivateKey),
+                ERC20Contract,
+                "transfer",
+                inputParameters,
+                outputParameters
+        );
+        log.info("调用合约方法，得到transactionHash：{}", receipt.getTransactionHash());
+
+        if(!receipt.isStatusOK()) {
+            throw new EthTransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc() + receipt.getRevertReason());
+        }
+    }
 
     @Override
     public void fundTreasury(Double amount) throws EthTransactionException {
@@ -390,6 +413,7 @@ public class EthServiceImpl implements Web3Service {
         }
     }
 
+    @Override
     public TransactionReceipt getTransactionReceiptByHash(String txHash) throws EthTransactionException {
         try {
             TransactionReceiptProcessor receiptProcessor =

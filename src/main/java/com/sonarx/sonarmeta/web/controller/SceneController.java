@@ -32,20 +32,20 @@ public class SceneController {
 
     @ApiOperation(value = "创建场景作品")
     @RequestMapping(value = "/create", method = {RequestMethod.POST})
-    public HttpResult createScene(@RequestBody @Validated CreateSceneForm createSceneForm) {
+    public HttpResult<SceneDO> createScene(@RequestBody @Validated CreateSceneForm createSceneForm) {
         SceneDO sceneDO;
         try {
             sceneDO = sceneService.createSceneWithForm(createSceneForm);
         } catch (BusinessException e) {
             return HttpResult.errorResult(e.getMessage());
         }
-        return  HttpResult.successResult(sceneDO);
+        return HttpResult.successResult(sceneDO);
     }
 
 
     @ApiOperation(value = "编辑场景作品")
     @RequestMapping(value = "/edit", method = {RequestMethod.POST})
-    public HttpResult editScene(@RequestBody @Validated EditSceneForm editSceneForm) {
+    public HttpResult<SceneDO> editScene(@RequestBody @Validated EditSceneForm editSceneForm) {
         SceneDO sceneDO;
         try {
             sceneDO = sceneService.editSceneWithForm(editSceneForm);
