@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.text.DecimalFormat;
 import java.util.List;
 
 import static com.sonarx.sonarmeta.common.Constants.APP_NAME;
@@ -84,6 +85,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 // 创建者、拥有者不能买
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
+                if (modelCreator == null || modelOwner == null) {
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                }
                 // 可以进行消费，修改金额，修改模型所属关系
                 // 获取模型的信息
                 ModelDO model = modelService.getById(form.getId());
@@ -99,13 +103,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 modelService.updateModelOwner(form.getUserAddress(), beforeOwnRelation);
                 // 转账
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getTokenPrice());
                 // NFT所有权转让
                 web3Service.transferERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
                 log.info("用户{} 购买了 模型{} 所有权", form.getUserAddress(), form.getId());
-                // 分红
-                web3Service.transferERC20(beforeOwnRelation.getAddress(), model.getTokenPrice() * Ratio.MODEL_OWNER_RATIO);
-                web3Service.transferERC20(modelCreator.getAddress(), model.getTokenPrice() * Ratio.MODEL_CREATOR_RATIO);
+                // 分红 钱包代理转账：从该买家转向分红对象
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelOwner.getAddress(), model.getTokenPrice() * Ratio.MODEL_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelCreator.getAddress(), model.getTokenPrice() * Ratio.MODEL_CREATOR_RATIO);
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_GRANT_MODEL.getCode())) {
             UserDO modelCreator = modelService.getModelOwnerOrCreator(form.getId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
@@ -120,6 +123,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 // 创建者、拥有者、授权者不能获得授权
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
+                if (modelCreator == null || modelOwner == null) {
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                }
                 // 可以进行消费，修改金额，修改模型所属关系
                 // 获取模型的信息
                 ModelDO model = modelService.getById(form.getId());
@@ -135,15 +141,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 modelService.addUserModelOwnershipRelation(form.getUserAddress(), model.getId(), OwnershipTypeEnum.MODEL_GRANTOR);
                 // 转账
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
-                // 钱包代理转账：从该买家转向模型拥有者
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), model.getGrantPrice());
                 // NFT所有权转让
                 web3Service.grantERC721UsingSonarMetaApproval(model.getNftTokenId(), form.getUserAddress());
                 log.info("用户{} 购买了 模型{} 使用权", form.getUserAddress(), form.getId());
-                // 分红
-                web3Service.transferERC20(beforeOwnRelation.getAddress(), model.getGrantPrice() * Ratio.MODEL_OWNER_RATIO);
-                web3Service.transferERC20(modelCreator.getAddress(), model.getGrantPrice() * Ratio.MODEL_CREATOR_RATIO);
+                // 分红 钱包代理转账：从该买家转向分红对象
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelOwner.getAddress(), model.getGrantPrice() * Ratio.MODEL_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), modelCreator.getAddress(), model.getGrantPrice() * Ratio.MODEL_CREATOR_RATIO);
             }
         } else if (consumeType.equals(ConsumeTypeEnum.CONSUME_PURCHASE_SCENE.getCode())) {
             UserDO sceneCreator = sceneService.getSceneOwnerOrCreator(form.getId(), OwnershipTypeEnum.SCENE_CREATOR.getCode());
@@ -156,6 +159,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 // 创建者、拥有者不能买
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
+                if (sceneCreator == null || sceneOwner == null) {
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                }
                 // 可以进行消费，修改金额，修改场景所属关系
                 // 获取场景的信息
                 SceneDO scene = sceneService.getById(form.getId());
@@ -171,25 +177,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 sceneService.updateSceneOwner(form.getUserAddress(), beforeOwnRelation);
                 // 转账
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getTokenPrice());
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getTokenPrice());
                 // NFT所有权转让
                 web3Service.transferERC998UsingSonarMetaApproval(scene.getNftTokenId(), form.getUserAddress());
                 log.info("用户{} 购买了 场景{} 所有权", form.getUserAddress(), form.getId());
 
-                // 分红
-                web3Service.transferERC20(beforeOwnRelation.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_OWNER_RATIO);
-                web3Service.transferERC20(sceneCreator.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_CREATOR_RATIO);
-
+                // 分红 钱包代理转账：从该买家转向分红对象
+                // 场景拥有者和创建者分红
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneOwner.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneCreator.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_CREATOR_RATIO);
+                // 对于每个组成场景的模型，对模型的拥有者和和创建者分红
                 QueryWrapper<SceneModelRelationDO> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq("scene_id", form.getId());
                 List<SceneModelRelationDO> sceneModelRelationDOS = sceneModelRelationMapper.selectList(queryWrapper);
                 if (sceneModelRelationDOS != null) {
-                    double perModelBonus = scene.getTokenPrice() * (1 - Ratio.SCENE_MODEL_RATIO) / sceneModelRelationDOS.size();
+                    // 每个模型应得分红，保留三位小数，向下取整，避免总额溢出
+                    double perModelBonus = scene.getTokenPrice() * Double.parseDouble(new DecimalFormat("###.000").format((1 - Ratio.SCENE_MODEL_RATIO) / sceneModelRelationDOS.size()));
                     for (SceneModelRelationDO sceneModelRelationDO : sceneModelRelationDOS) {
-                        UserDO modelCreator = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
-                        UserDO modelOwner = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
-                        web3Service.transferERC20(modelCreator.getAddress(), perModelBonus * Ratio.MODEL_CREATOR_RATIO);
-                        web3Service.transferERC20(modelOwner.getAddress(), perModelBonus * Ratio.MODEL_OWNER_RATIO);
+                        UserDO someModelCreator = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
+                        UserDO someModelOwner = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
+                        if (someModelOwner == null || someModelCreator == null) {
+                            throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                        }
+                        web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), someModelCreator.getAddress(), perModelBonus * Ratio.MODEL_CREATOR_RATIO);
+                        web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), someModelOwner.getAddress(), perModelBonus * Ratio.MODEL_OWNER_RATIO);
                     }
                 }
             }
@@ -206,6 +216,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
                 // 创建者、拥有者、体验者不能获得授权
                 throw new BusinessException(BusinessError.TRANSACTION_TYPE_ERROR);
             } else {
+                if (sceneCreator == null || sceneOwner == null) {
+                    throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                }
                 // 可以进行消费，修改金额，修改场景所属关系
                 // 获取场景的信息
                 SceneDO scene = sceneService.getById(form.getId());
@@ -220,26 +233,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
                 // 添加场景体验权限
                 sceneService.addUserSceneOwnershipRelation(form.getUserAddress(), scene.getId(), OwnershipTypeEnum.SCENE_DIVER);
-
                 // 转账
                 transfer(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getDivePrice());
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), beforeOwnRelation.getAddress(), scene.getDivePrice());
                 log.info("用户{} 购买了 场景{} 体验权", form.getUserAddress(), form.getId());
 
-                // 分红
-                web3Service.transferERC20(beforeOwnRelation.getAddress(), scene.getDivePrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_OWNER_RATIO);
-                web3Service.transferERC20(sceneCreator.getAddress(), scene.getDivePrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_CREATOR_RATIO);
-
+                // 分红 钱包代理转账：从该买家转向分红对象
+                // 场景拥有者和创建者分红
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneOwner.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneCreator.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_CREATOR_RATIO);
+                // 对于每个组成场景的模型，对模型的拥有者和和创建者分红
                 QueryWrapper<SceneModelRelationDO> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq("scene_id", form.getId());
                 List<SceneModelRelationDO> sceneModelRelationDOS = sceneModelRelationMapper.selectList(queryWrapper);
                 if (sceneModelRelationDOS != null) {
-                    double perModelBonus = scene.getDivePrice() * (1 - Ratio.SCENE_MODEL_RATIO) / sceneModelRelationDOS.size();
+                    // 每个模型应得分红，保留三位小数，向下取整，避免总额溢出
+                    double perModelBonus = scene.getTokenPrice() * Double.parseDouble(new DecimalFormat("###.000").format((1 - Ratio.SCENE_MODEL_RATIO) / sceneModelRelationDOS.size()));
                     for (SceneModelRelationDO sceneModelRelationDO : sceneModelRelationDOS) {
-                        UserDO modelCreator = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
-                        UserDO modelOwner = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
-                        web3Service.transferERC20(modelCreator.getAddress(), perModelBonus * Ratio.MODEL_CREATOR_RATIO);
-                        web3Service.transferERC20(modelOwner.getAddress(), perModelBonus * Ratio.MODEL_OWNER_RATIO);
+                        UserDO someModelCreator = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
+                        UserDO someModelOwner = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_OWNER.getCode());
+                        if (someModelOwner == null || someModelCreator == null) {
+                            throw new BusinessException(BusinessError.TRANSACTION_OBJECT_NOT_EXIST);
+                        }
+                        web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), someModelCreator.getAddress(), perModelBonus * Ratio.MODEL_CREATOR_RATIO);
+                        web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), someModelOwner.getAddress(), perModelBonus * Ratio.MODEL_OWNER_RATIO);
                     }
                 }
             }

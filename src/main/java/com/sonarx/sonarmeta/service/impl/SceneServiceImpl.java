@@ -14,6 +14,7 @@ import com.sonarx.sonarmeta.domain.form.EditSceneModelRelationForm;
 import com.sonarx.sonarmeta.domain.model.*;
 import com.sonarx.sonarmeta.domain.view.SceneView;
 import com.sonarx.sonarmeta.mapper.*;
+import com.sonarx.sonarmeta.service.ModelService;
 import com.sonarx.sonarmeta.service.SceneService;
 import com.sonarx.sonarmeta.service.UserService;
 import com.sonarx.sonarmeta.service.Web3Service;
@@ -60,6 +61,9 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
     @Resource
     UserService userService;
 
+    @Resource
+    ModelService modelService;
+
     @Override
     @Transactional
     public SceneDO createSceneWithForm(CreateSceneForm form) throws BusinessException {
@@ -99,11 +103,9 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         addUserSceneOwnershipRelation(form.getUserAddress(), sceneDO.getId(), OwnershipTypeEnum.SCENE_OWNER);
 
         for (Long modelId : form.getModelIdList()) {
-            QueryWrapper<UserModelOwnershipRelationDO> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("address", form.getUserAddress())
-                    .eq("model_id", modelId);
-            UserModelOwnershipRelationDO userModelOwnershipRelationDO = userModelOwnershipRelationMapper.selectOne(queryWrapper);
-            if (userModelOwnershipRelationDO == null) {
+            UserDO modelCreator = modelService.getModelOwnerOrCreator(modelId, OwnershipTypeEnum.MODEL_CREATOR.getCode());
+            UserDO modelOwner = modelService.getModelOwnerOrCreator(modelId, OwnershipTypeEnum.MODEL_OWNER.getCode());
+            if (!form.getUserAddress().equals(modelCreator.getAddress()) && !form.getUserAddress().equals(modelOwner.getAddress())) {
                 throw new BusinessException(BusinessError.USER_MODEL_PERMISSION_DENIED);
             }
             sceneModelRelationMapper.insert(new SceneModelRelationDO(sceneDO.getId(), modelId));
