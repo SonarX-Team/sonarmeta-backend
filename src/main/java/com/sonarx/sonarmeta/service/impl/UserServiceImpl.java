@@ -239,15 +239,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDO> implements 
 
                 // 分红 钱包代理转账：从该买家转向分红对象
                 // 场景拥有者和创建者分红
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneOwner.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_OWNER_RATIO);
-                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneCreator.getAddress(), scene.getTokenPrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_CREATOR_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneOwner.getAddress(), scene.getDivePrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_OWNER_RATIO);
+                web3Service.transferERC20UsingSonarMetaAllowance(form.getUserAddress(), sceneCreator.getAddress(), scene.getDivePrice() * Ratio.SCENE_MODEL_RATIO * Ratio.SCENE_CREATOR_RATIO);
                 // 对于每个组成场景的模型，对模型的拥有者和和创建者分红
                 QueryWrapper<SceneModelRelationDO> queryWrapper = new QueryWrapper<>();
                 queryWrapper.eq("scene_id", form.getId());
                 List<SceneModelRelationDO> sceneModelRelationDOS = sceneModelRelationMapper.selectList(queryWrapper);
                 if (sceneModelRelationDOS != null) {
                     // 每个模型应得分红，保留三位小数，向下取整，避免总额溢出
-                    double perModelBonus = scene.getTokenPrice() * Double.parseDouble(new DecimalFormat("###.000").format((1 - Ratio.SCENE_MODEL_RATIO) / sceneModelRelationDOS.size()));
+                    double perModelBonus = scene.getDivePrice() * Double.parseDouble(new DecimalFormat("###.000").format((1 - Ratio.SCENE_MODEL_RATIO) / sceneModelRelationDOS.size()));
                     for (SceneModelRelationDO sceneModelRelationDO : sceneModelRelationDOS) {
                         UserDO someModelCreator = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_CREATOR.getCode());
                         UserDO someModelOwner = modelService.getModelOwnerOrCreator(sceneModelRelationDO.getModelId(), OwnershipTypeEnum.MODEL_OWNER.getCode());

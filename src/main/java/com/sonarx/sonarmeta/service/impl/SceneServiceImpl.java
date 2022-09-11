@@ -105,10 +105,15 @@ public class SceneServiceImpl extends ServiceImpl<SceneMapper, SceneDO>
         for (Long modelId : form.getModelIdList()) {
             UserDO modelCreator = modelService.getModelOwnerOrCreator(modelId, OwnershipTypeEnum.MODEL_CREATOR.getCode());
             UserDO modelOwner = modelService.getModelOwnerOrCreator(modelId, OwnershipTypeEnum.MODEL_OWNER.getCode());
-            if (!form.getUserAddress().equals(modelCreator.getAddress()) && !form.getUserAddress().equals(modelOwner.getAddress())) {
+            List<UserDO> modelGrantors = modelService.getModelGrantors(modelId);
+            if ((modelCreator != null && form.getUserAddress().equals(modelCreator.getAddress())) ||
+                    (modelOwner != null && form.getUserAddress().equals(modelOwner.getAddress())) ||
+                    (modelGrantors != null && modelGrantors.stream().anyMatch(modelGrantor -> form.getUserAddress().equals(modelGrantor.getAddress())))
+            ) {
+                sceneModelRelationMapper.insert(new SceneModelRelationDO(sceneDO.getId(), modelId));
+            } else {
                 throw new BusinessException(BusinessError.USER_MODEL_PERMISSION_DENIED);
             }
-            sceneModelRelationMapper.insert(new SceneModelRelationDO(sceneDO.getId(), modelId));
         }
 
         log.info("新建场景信息：用户{}，场景{}，NFT{}", form.getUserAddress(), sceneDO.getId(), sceneDO.getNftTokenId());
