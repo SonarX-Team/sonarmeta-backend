@@ -2,7 +2,7 @@ package com.sonarx.sonarmeta.web.controller;
 
 import com.sonarx.sonarmeta.common.BusinessException;
 import com.sonarx.sonarmeta.common.Constants;
-import com.sonarx.sonarmeta.common.EthTransactionException;
+import com.sonarx.sonarmeta.common.Web3TransactionException;
 import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import lombok.extern.slf4j.Slf4j;
@@ -78,7 +78,7 @@ public class HttpExceptionController {
      * @param e 业务异常类
      * @return HttpResult
      */
-    @ExceptionHandler({BusinessException.class, EthTransactionException.class})
+    @ExceptionHandler({BusinessException.class, Web3TransactionException.class})
     @ResponseStatus(HttpStatus.OK)
     public HttpResult<Object> handleBusinessException(BusinessException e) {
         log.error(e.getMessage(), e);

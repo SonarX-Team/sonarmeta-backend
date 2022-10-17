@@ -1,19 +1,16 @@
 package com.sonarx.sonarmeta.web.controller;
 
-import com.sonarx.sonarmeta.common.EthTransactionException;
+import com.sonarx.sonarmeta.common.Web3TransactionException;
 import com.sonarx.sonarmeta.domain.common.HttpResult;
 import com.sonarx.sonarmeta.service.Web3Service;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.*;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -39,7 +36,7 @@ public class DefaultController {
     }
 
     @RequestMapping(value = "/test", method = {RequestMethod.GET})
-    public HttpResult test() throws EthTransactionException {
+    public HttpResult test() throws Web3TransactionException {
         web3Service.transferERC20UsingSonarMetaAllowance(
                 "0x9715ee8a90e33d9b28a2935fc7270d73aaf7f83f",
                 "0x58f1098e8d981b8cb9c02e66b39775f38ddbfe22",

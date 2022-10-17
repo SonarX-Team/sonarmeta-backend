@@ -1,13 +1,12 @@
 package com.sonarx.sonarmeta.common;
 
-import com.sonarx.sonarmeta.domain.enums.BusinessError;
 import com.sonarx.sonarmeta.domain.enums.ErrorCodeEnum;
 
 /**
- * @description: 以太坊交易异常
+ * @description: Web3交易异常
  * @author: liuxuanming
  */
-public class EthTransactionException extends BusinessException {
+public class Web3TransactionException extends BusinessException {
 
     private int code;
 
@@ -34,11 +33,11 @@ public class EthTransactionException extends BusinessException {
     //业务异常信息
     private String message;
 
-    public EthTransactionException() {
+    public Web3TransactionException() {
         super();
     }
 
-    public EthTransactionException(String message) {
+    public Web3TransactionException(String message) {
         super(message);
         this.code = ErrorCodeEnum.FAIL.getCode();
         this.message = "交易异常： " + message;
