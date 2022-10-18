@@ -71,8 +71,6 @@ public class MychainConfig {
         List<InetSocketAddress> socketAddressArrayList = new ArrayList<>();
         socketAddressArrayList.add(InetSocketAddress.createUnresolved(rpcHost, rpcPort));
 
-        byte[] ca = IOUtil.inputStreamToByte(Objects.requireNonNull(SonarmetaApplication.class.getResourceAsStream(MYCHAIN_RESOURCE_PREFIX + SDK_TRUST_STORE_FILE)));
-
         MychainClient sdk = new MychainClient();
         boolean res = sdk.init(
                 ClientEnv.build(

@@ -37,11 +37,8 @@ public class DefaultController {
 
     @RequestMapping(value = "/test", method = {RequestMethod.GET})
     public HttpResult test() throws Web3TransactionException {
-        web3Service.transferERC20UsingSonarMetaAllowance(
-                "0x9715ee8a90e33d9b28a2935fc7270d73aaf7f83f",
-                "0x58f1098e8d981b8cb9c02e66b39775f38ddbfe22",
-                0.66);
-        return HttpResult.successResult();
+        return HttpResult.successResult( web3Service.mintERC998(
+                "e8ffa3c1e30a830aa3c75b8fa4db532558e196a5b12c70e4535403e4552d5f32"));
     }
 
     // Test PathVariable

@@ -71,7 +71,7 @@ public class MyChainServiceImpl implements Web3Service {
 
     @Override
     public void transferERC20(String to, Double amount) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("fundTreasury(uint256)");
+        EVMParameter parameters = new EVMParameter("transfer(identity, uint256)");
         parameters.addIdentity(new Identity(to));
         parameters.addUint(new BigDecimal(amount).multiply(new BigDecimal("1E18")).toBigInteger());
 
@@ -92,7 +92,7 @@ public class MyChainServiceImpl implements Web3Service {
 
     @Override
     public void transferERC20UsingSonarMetaAllowance(String from, String to, Double amount) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("transferERC20UsingSonarMetaAllowance(identity,identity,uint256)");
+        EVMParameter parameters = new EVMParameter("transferMRC20UsingSonarMetaAllowance(identity,identity,uint256)");
         parameters.addIdentity(new Identity(from));
         parameters.addIdentity(new Identity(to));
         parameters.addUint(new BigDecimal(amount).multiply(new BigDecimal("1E18")).toBigInteger());
@@ -114,7 +114,7 @@ public class MyChainServiceImpl implements Web3Service {
 
     @Override
     public void grantERC721UsingSonarMetaApproval(Long tokenId, String to) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("grantERC721UsingSonarMetaApproval(uint256,identity)");
+        EVMParameter parameters = new EVMParameter("grantMRC721UsingSonarMetaApproval(uint256,identity)");
         parameters.addUint(BigInteger.valueOf(tokenId));
         parameters.addIdentity(new Identity(to));
 
@@ -122,7 +122,7 @@ public class MyChainServiceImpl implements Web3Service {
                 .callContract(
                         new CallContractRequest(
                                 Utils.getIdentityByName(account),
-                                new Identity(ERC721Contract),
+                                new Identity(mainContract),
                                 parameters,
                                 BigInteger.ZERO,
                                 VMTypeEnum.EVM)
@@ -135,7 +135,7 @@ public class MyChainServiceImpl implements Web3Service {
 
     @Override
     public void transferERC721UsingSonarMetaApproval(Long tokenId, String to) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("transferERC721UsingSonarMetaApproval(uint256,identity)");
+        EVMParameter parameters = new EVMParameter("transferMRC721UsingSonarMetaApproval(uint256,identity)");
         parameters.addUint(BigInteger.valueOf(tokenId));
         parameters.addIdentity(new Identity(to));
 
@@ -143,7 +143,7 @@ public class MyChainServiceImpl implements Web3Service {
                 .callContract(
                         new CallContractRequest(
                                 Utils.getIdentityByName(account),
-                                new Identity(ERC721Contract),
+                                new Identity(mainContract),
                                 parameters,
                                 BigInteger.ZERO,
                                 VMTypeEnum.EVM)
@@ -156,14 +156,14 @@ public class MyChainServiceImpl implements Web3Service {
 
     @Override
     public Long mintERC721(String to) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("mintERC721(identity)");
+        EVMParameter parameters = new EVMParameter("mintMRC721(identity)");
         parameters.addIdentity(new Identity(to));
 
         TransactionReceiptResponse receipt = mychainClient.getContractService()
                 .callContract(
                         new CallContractRequest(
                                 Utils.getIdentityByName(account),
-                                new Identity(ERC721Contract),
+                                new Identity(mainContract),
                                 parameters,
                                 BigInteger.ZERO,
                                 VMTypeEnum.EVM)
@@ -179,16 +179,16 @@ public class MyChainServiceImpl implements Web3Service {
             throw new Web3TransactionException(BusinessError.INCORRECT_CONTRACT.getDesc());
         }
         List<String> topics = receipt.getTransactionReceipt().getLogs().get(1).getTopics();
-        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(2) : null;
+        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(3) : null;
         if (requiredTopic == null) {
             throw new Web3TransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
         }
-        return Long.parseLong(requiredTopic.substring(2), 16);
+        return Long.parseLong(requiredTopic, 16);
     }
 
     @Override
     public void grantERC998UsingSonarMetaApproval(Long tokenId, String to) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("grantERC998UsingSonarMetaApproval(uint256,identity)");
+        EVMParameter parameters = new EVMParameter("grantMRC998UsingSonarMetaApproval(uint256,identity)");
         parameters.addUint(BigInteger.valueOf(tokenId));
         parameters.addIdentity(new Identity(to));
 
@@ -196,7 +196,7 @@ public class MyChainServiceImpl implements Web3Service {
                 .callContract(
                         new CallContractRequest(
                                 Utils.getIdentityByName(account),
-                                new Identity(ERC998Contract),
+                                new Identity(mainContract),
                                 parameters,
                                 BigInteger.ZERO,
                                 VMTypeEnum.EVM)
@@ -209,7 +209,7 @@ public class MyChainServiceImpl implements Web3Service {
 
     @Override
     public void transferERC998UsingSonarMetaApproval(Long tokenId, String to) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("transferERC998UsingSonarMetaApproval(uint256,identity)");
+        EVMParameter parameters = new EVMParameter("transferMRC998UsingSonarMetaApproval(uint256,identity)");
         parameters.addUint(BigInteger.valueOf(tokenId));
         parameters.addIdentity(new Identity(to));
 
@@ -217,7 +217,7 @@ public class MyChainServiceImpl implements Web3Service {
                 .callContract(
                         new CallContractRequest(
                                 Utils.getIdentityByName(account),
-                                new Identity(ERC998Contract),
+                                new Identity(mainContract),
                                 parameters,
                                 BigInteger.ZERO,
                                 VMTypeEnum.EVM)
@@ -230,14 +230,14 @@ public class MyChainServiceImpl implements Web3Service {
 
     @Override
     public Long mintERC998(String to) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("mintERC998(identity)");
+        EVMParameter parameters = new EVMParameter("mintMRC998(identity)");
         parameters.addIdentity(new Identity(to));
 
         TransactionReceiptResponse receipt = mychainClient.getContractService()
                 .callContract(
                         new CallContractRequest(
                                 Utils.getIdentityByName(account),
-                                new Identity(ERC998Contract),
+                                new Identity(mainContract),
                                 parameters,
                                 BigInteger.ZERO,
                                 VMTypeEnum.EVM)
@@ -253,16 +253,16 @@ public class MyChainServiceImpl implements Web3Service {
             throw new Web3TransactionException(BusinessError.INCORRECT_CONTRACT.getDesc());
         }
         List<String> topics = receipt.getTransactionReceipt().getLogs().get(1).getTopics();
-        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(2) : null;
+        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(3) : null;
         if (requiredTopic == null) {
             throw new Web3TransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
         }
-        return Long.parseLong(requiredTopic.substring(2), 16);
+        return Long.parseLong(requiredTopic, 16);
     }
 
     @Override
     public Long mintERC998WithBatchTokens(String to, List<Long> childTokenIds) throws Web3TransactionException {
-        EVMParameter parameters = new EVMParameter("mintERC998WithBatchTokens(identity, uint256[])");
+        EVMParameter parameters = new EVMParameter("mintMRC998WithBatchTokens(identity, uint256[])");
         parameters.addIdentity(new Identity(to));
         parameters.addUintArray(childTokenIds.stream().map(BigInteger::valueOf).collect(Collectors.toList()));
 
@@ -270,7 +270,7 @@ public class MyChainServiceImpl implements Web3Service {
                 .callContract(
                         new CallContractRequest(
                                 Utils.getIdentityByName(account),
-                                new Identity(ERC998Contract),
+                                new Identity(mainContract),
                                 parameters,
                                 BigInteger.ZERO,
                                 VMTypeEnum.EVM)
@@ -286,10 +286,10 @@ public class MyChainServiceImpl implements Web3Service {
             throw new Web3TransactionException(BusinessError.INCORRECT_CONTRACT.getDesc());
         }
         List<String> topics = receipt.getTransactionReceipt().getLogs().get(1).getTopics();
-        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(2) : null;
+        String requiredTopic = topics != null && topics.size() > 1 ? topics.get(3) : null;
         if (requiredTopic == null) {
             throw new Web3TransactionException(BusinessError.ETH_TRANSACTION_ERROR.getDesc());
         }
-        return Long.parseLong(requiredTopic.substring(2), 16);
+        return Long.parseLong(requiredTopic, 16);
     }
 }
