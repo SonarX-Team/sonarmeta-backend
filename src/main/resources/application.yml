@@ -5,8 +5,8 @@ spring:
   profiles:
     active: chainbasetbsc
   datasource:
-    # url: jdbc:mysql://124.221.134.180:3306/sonarmeta?characterEncoding=utf8
-    url: jdbc:mysql://118.195.247.60:3306/sonarmeta?characterEncoding=utf8
+    url: jdbc:mysql://124.221.134.180:3306/my_sonarmeta?characterEncoding=utf8
+#    url: jdbc:mysql://118.195.247.60:3306/sonarmeta?useUnicode=true&characterEncoding=utf8&useSSL=false
     username: ${mysql.username:root}
     password: ${mysql.password:root}
     driver-class-name: com.mysql.cj.jdbc.Driver
